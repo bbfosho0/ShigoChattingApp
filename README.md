@@ -1,0 +1,2 @@
+# ShigoChattingApp
+A messaging application
