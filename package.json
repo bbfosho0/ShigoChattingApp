@@ -1,0 +1,34 @@
+{
+  "name": "shigo-chat",
+  "version": "1.0.0",
+  "description": "Simple chat application with CRUD and authentication",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbfosho0/ShigoChattingApp.git"
+  },
+  "keywords": [
+    "chat",
+    "express",
+    "jwt",
+    "mongo"
+  ],
+  "author": "Yoshi Gomez Gutierrez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bbfosho0/ShigoChattingApp/issues"
+  },
+  "homepage": "https://github.com/bbfosho0/ShigoChattingApp#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.0",
+    "react-router-dom": "^7.6.0"
+  }
+}
