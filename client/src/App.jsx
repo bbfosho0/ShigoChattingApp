@@ -11,26 +11,37 @@
  *
  * @component
  */
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useContext } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Chatroom from "./pages/Chatroom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+
+function AppRoutes() {
+  const { user } = useContext(AuthContext);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/chat" element={user ? <Chatroom /> : <Navigate to="/login" />} />
+    </Routes>
+  );
+}
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/chat" element={<Chatroom />} />
-        </Routes>
+        <div className="min-h-screen bg-gray-100 text-gray-900">
+          <AppRoutes />
+        </div>
       </Router>
     </AuthProvider>
   );
 }
 
 export default App;
+
 

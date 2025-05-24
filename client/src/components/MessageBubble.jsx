@@ -1,55 +1,54 @@
-/**
- * MessageBubble component displays a single chat message with options to edit or delete if the user is the owner.
- *
- * @component
- * @param {Object} props
- * @param {Object} props.message - The message object containing content, sender, and metadata.
- * @param {string} props.userId - The current user's ID to determine ownership.
- * @param {function} props.onDelete - Callback function to handle message deletion. Receives message ID as argument.
- * @param {function} props.onEdit - Callback function to handle message editing. Receives message ID and new text as arguments.
- *
- * @example
- * <MessageBubble
- *   message={message}
- *   userId={currentUserId}
- *   onDelete={handleDelete}
- *   onEdit={handleEdit}
- * />
- */
-import { useState } from "react";
+import React, { useState } from "react";
 
 const MessageBubble = ({ message, userId, onDelete, onEdit }) => {
-  const isOwner = message.sender._id === userId;
+  const isOwn = message.sender === userId || message.sender?._id === userId;
   const [editing, setEditing] = useState(false);
-  const [newText, setNewText] = useState(message.content);
+  const [editedText, setEditedText] = useState(message.content);
 
-  const handleEdit = () => {
-    onEdit(message._id, newText);
-    setEditing(false);
+  const time = new Date(message.createdAt).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  const handleSave = () => {
+    if (editedText.trim()) {
+      onEdit(message._id, editedText);
+      setEditing(false);
+    }
   };
 
   return (
-    <div>
-      <p><strong>{message.sender.username}</strong></p>
-      {editing ? (
-        <>
-          <input
-            value={newText}
-            onChange={(e) => setNewText(e.target.value)}
-          />
-          <button onClick={handleEdit}>Save</button>
-          <button onClick={() => setEditing(false)}>Cancel</button>
-        </>
-      ) : (
-        <p>{message.content}</p>
-      )}
-      <small>{new Date(message.createdAt).toLocaleString()}</small>
-      {isOwner && !editing && (
-        <>
-          <button onClick={() => setEditing(true)}>Edit</button>
-          <button onClick={() => onDelete(message._id)}>Delete</button>
-        </>
-      )}
+    <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+      <div
+        className={`p-3 rounded-xl max-w-xs ${
+          isOwn ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
+        }`}
+      >
+        {editing ? (
+          <>
+            <input
+              className="w-full text-black px-2 py-1 rounded"
+              value={editedText}
+              onChange={(e) => setEditedText(e.target.value)}
+            />
+            <div className="mt-1 space-x-1 text-xs">
+              <button className="underline" onClick={handleSave}>Save</button>
+              <button className="underline text-gray-300" onClick={() => setEditing(false)}>Cancel</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-sm">{message.content}</div>
+            <div className="text-xs opacity-60 mt-1">{time}</div>
+            {isOwn && (
+              <div className="mt-1 space-x-1 text-xs">
+                <button className="underline" onClick={() => setEditing(true)}>Edit</button>
+                <button className="underline text-red-300" onClick={() => onDelete(message._id)}>Delete</button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
