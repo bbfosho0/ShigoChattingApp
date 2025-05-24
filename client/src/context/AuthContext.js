@@ -4,22 +4,24 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // 👈
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Invalid user data in localStorage");
+        localStorage.removeItem("user");
+      }
     }
-
-    setLoading(false); // ✅ finish loading
+    setLoading(false); // ✅ always end loading
   }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      {!loading && children} {/* ✅ only show routes when ready */}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

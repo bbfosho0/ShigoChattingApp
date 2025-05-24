@@ -4,10 +4,14 @@ import { AuthContext } from "../context/AuthContext";
 import MessageInput from "../components/MessageInput";
 import MessageBubble from "../components/MessageBubble";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:5000");
 
 const Chatroom = () => {
   const { user, setUser } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const bottomRef = useRef(null);
   const navigate = useNavigate();
 
@@ -26,6 +30,8 @@ const Chatroom = () => {
       setMessages(res.data);
     } catch (err) {
       console.error("Failed to load messages");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,7 +43,7 @@ const Chatroom = () => {
         { content },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-      setMessages([...messages, res.data]);
+      socket.emit("sendMessage", res.data);
     } catch (err) {
       console.error("Send failed");
     }
@@ -48,7 +54,7 @@ const Chatroom = () => {
       await axios.delete(`http://localhost:5000/api/messages/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setMessages(messages.filter((msg) => msg._id !== id));
+      setMessages((prev) => prev.filter((msg) => msg._id !== id));
     } catch (err) {
       console.error("Delete failed");
     }
@@ -61,24 +67,46 @@ const Chatroom = () => {
         { content },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-      setMessages(messages.map((m) => (m._id === id ? res.data : m)));
+      setMessages((prev) =>
+        prev.map((m) => (m._id === id ? res.data : m))
+      );
     } catch (err) {
       console.error("Edit failed");
     }
   };
 
   useEffect(() => {
-    fetchMessages();
-  }, []);
+    if (!user && !loading) {
+      navigate("/login");
+    } else if (user) {
+      fetchMessages();
+
+      socket.on("receiveMessage", (message) => {
+        setMessages((prev) => [...prev, message]);
+      });
+
+      return () => {
+        socket.off("receiveMessage");
+      };
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-xl font-bold">
+        Loading chat...
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen max-w-2xl mx-auto bg-white shadow">
       <div className="flex justify-between items-center p-4 border-b text-xl font-bold">
-        <span>Welcome, {user.username}</span>
+        <span>Welcome, {user?.username}</span>
         <button
           onClick={logout}
           className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
@@ -91,7 +119,7 @@ const Chatroom = () => {
           <MessageBubble
             key={message._id}
             message={message}
-            userId={user._id}
+            userId={user?._id}
             onDelete={handleDelete}
             onEdit={handleEdit}
           />
