@@ -30,6 +30,11 @@ module.exports = {
       },
     },
   },
+  corePlugins: {
+    // Explicitly ensure these are not disabled
+    transform: true,
+    translate: true,
+  },
   plugins: [
     require('@tailwindcss/forms'),
     require('tailwindcss-animate'),

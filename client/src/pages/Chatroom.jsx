@@ -113,20 +113,24 @@ const Chatroom = () => {
   }
 
   return (
-    <div className="relative flex flex-col h-screen overflow-hidden bg-gradient-to-br from-gray-100 to-gray-300 dark:from-black dark:to-gray-900 transition-colors duration-500">
+    <div className="relative h-screen w-screen flex items-center justify-center">
       {/* Floating Blobs */}
       <div className="absolute w-[30rem] h-[30rem] bg-purple-400/30 blur-3xl rounded-full top-[-10rem] left-[-10rem] animate-pulse z-0"></div>
       <div className="absolute w-[30rem] h-[30rem] bg-blue-400/30 blur-3xl rounded-full bottom-[-10rem] right-[-10rem] animate-pulse z-0"></div>
 
       {/* Chat Container */}
       <motion.div
-        initial={{ opacity: 0}}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10 m-auto flex flex-col w-full max-w-2xl h-[90vh] backdrop-blur-2xl bg-white/30 dark:bg-white/10 rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
-      >
+    layout
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.5 }}
+    className="z-10 flex flex-col w-[90vw] md:max-w-[80vw] h-[70%] py-4 px-4 
+               backdrop-blur-2xl bg-white/30 dark:bg-white/10 
+               rounded-2xl shadow-2xl border border-white/20"
+  >
+
         {/* Header */}
-       <div className="sticky top-16 z-20 self-center flex justify-between items-center px-6 py-4 border-b border-white/20 rounded-t-xl backdrop-blur-md bg-white/30 dark:bg-white/10 shadow-md text-lg font-bold text-gray-800 dark:text-white max-w-4xl w-full">
+       <div className="self-center flex justify-between items-center px-6 py-4 border-b border-white/20 rounded-t-xl backdrop-blur-md bg-white/30 dark:bg-white/10 shadow-md text-lg font-bold text-gray-800 dark:text-white w-full">
 
           <span>Welcome, {user?.username}</span>
           <button

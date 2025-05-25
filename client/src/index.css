@@ -20,6 +20,12 @@ button {
   animation: float 6s ease-in-out infinite;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
 @layer components {
   .glass-card {
     @apply bg-glass dark:bg-darkglass backdrop-blur-md shadow-glass border border-white/20 dark:border-white/10;
