@@ -78,7 +78,10 @@ const Chatroom = () => {
   useEffect(() => {
     if (!user && !loading) {
       navigate("/login");
-    } else if (user) {
+      return;
+    }
+
+    if (user) {
       fetchMessages();
 
       socket.on("receiveMessage", (message) => {
@@ -104,8 +107,8 @@ const Chatroom = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-2xl mx-auto bg-white shadow">
-      <div className="flex justify-between items-center p-4 border-b text-xl font-bold">
+    <div className="flex flex-col h-screen max-w-2xl mx-auto bg-gray-50 shadow-lg">
+      <div className="flex justify-between items-center p-4 border-b text-xl font-bold bg-white">
         <span>Welcome, {user?.username}</span>
         <button
           onClick={logout}
@@ -114,7 +117,8 @@ const Chatroom = () => {
           Logout
         </button>
       </div>
-      <div className="flex-grow overflow-y-auto p-4 space-y-2">
+
+      <div className="flex-grow overflow-y-auto p-4 space-y-2 bg-white">
         {messages.map((message) => (
           <MessageBubble
             key={message._id}
@@ -126,7 +130,8 @@ const Chatroom = () => {
         ))}
         <div ref={bottomRef} />
       </div>
-      <div className="border-t p-2">
+
+      <div className="border-t p-2 bg-white">
         <MessageInput onSend={handleSend} />
       </div>
     </div>
