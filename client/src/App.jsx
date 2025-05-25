@@ -1,21 +1,30 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useContext } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+import SplashScreen from "./pages/SplashScreen";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Chatroom from "./pages/Chatroom";
-import { AuthProvider } from "./context/AuthContext";
+
+function AppRoutes() {
+  const { user } = useContext(AuthContext);
+
+  return (
+    <Routes>
+      <Route path="/" element={<SplashScreen />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/chat" element={user ? <Chatroom /> : <Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-100 text-gray-900">
-          <Routes>
-            <Route path="/" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/chat" element={<Chatroom />} />
-          </Routes>
-        </div>
+        <AppRoutes />
       </Router>
     </AuthProvider>
   );

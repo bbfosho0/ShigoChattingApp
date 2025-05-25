@@ -5,6 +5,8 @@ import MessageInput from "../components/MessageInput";
 import MessageBubble from "../components/MessageBubble";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import { motion } from "framer-motion";
+import { LogOut } from "lucide-react";
 
 const socket = io("http://localhost:5000");
 
@@ -41,7 +43,9 @@ const Chatroom = () => {
       const res = await axios.post(
         "http://localhost:5000/api/messages",
         { content },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
       );
       socket.emit("sendMessage", res.data);
     } catch (err) {
@@ -65,7 +69,9 @@ const Chatroom = () => {
       const res = await axios.patch(
         `http://localhost:5000/api/messages/${id}`,
         { content },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
       );
       setMessages((prev) =>
         prev.map((m) => (m._id === id ? res.data : m))
@@ -107,33 +113,50 @@ const Chatroom = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-2xl mx-auto bg-gray-50 shadow-lg">
-      <div className="flex justify-between items-center p-4 border-b text-xl font-bold bg-white">
-        <span>Welcome, {user?.username}</span>
-        <button
-          onClick={logout}
-          className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
-      </div>
+    <div className="relative flex flex-col h-screen overflow-hidden bg-gradient-to-br from-gray-100 to-gray-300 dark:from-black dark:to-gray-900 transition-colors duration-500">
+      {/* Floating Blobs */}
+      <div className="absolute w-[30rem] h-[30rem] bg-purple-400/30 blur-3xl rounded-full top-[-10rem] left-[-10rem] animate-pulse z-0"></div>
+      <div className="absolute w-[30rem] h-[30rem] bg-blue-400/30 blur-3xl rounded-full bottom-[-10rem] right-[-10rem] animate-pulse z-0"></div>
 
-      <div className="flex-grow overflow-y-auto p-4 space-y-2 bg-white">
-        {messages.map((message) => (
-          <MessageBubble
-            key={message._id}
-            message={message}
-            userId={user?._id}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-          />
-        ))}
-        <div ref={bottomRef} />
-      </div>
+      {/* Chat Container */}
+      <motion.div
+        initial={{ opacity: 0}}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 m-auto flex flex-col w-full max-w-2xl h-[90vh] backdrop-blur-2xl bg-white/30 dark:bg-white/10 rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
+      >
+        {/* Header */}
+       <div className="sticky top-16 z-20 self-center flex justify-between items-center px-6 py-4 border-b border-white/20 rounded-t-xl backdrop-blur-md bg-white/30 dark:bg-white/10 shadow-md text-lg font-bold text-gray-800 dark:text-white max-w-4xl w-full">
 
-      <div className="border-t p-2 bg-white">
-        <MessageInput onSend={handleSend} />
-      </div>
+          <span>Welcome, {user?.username}</span>
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 text-sm text-white bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition"
+          >
+            <LogOut size={16} /> Logout
+          </button>
+        </div>
+
+
+        {/* Messages */}
+        <div className="flex-grow overflow-y-auto px-6 py-4 space-y-2 text-sm scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+          {messages.map((message) => (
+            <MessageBubble
+              key={message._id}
+              message={message}
+              userId={user?._id}
+              onDelete={handleDelete}
+              onEdit={handleEdit}
+            />
+          ))}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input Box */}
+        <div className="border-t border-white/20 px-4 py-3 bg-white/10 backdrop-blur-xl">
+          <MessageInput onSend={handleSend} />
+        </div>
+      </motion.div>
     </div>
   );
 };
