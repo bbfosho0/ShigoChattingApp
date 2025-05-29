@@ -101,7 +101,7 @@ const Chatroom = () => {
         setMessages([]);
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/messages", {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/messages`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (mounted.current) setMessages(res.data);
@@ -146,7 +146,7 @@ const Chatroom = () => {
     console.log("Establishing socket connection for user:", user?.username);
 
     // Create socket with websocket transport for reliability
-    const socket = io("http://localhost:5000", {
+    const socket = io(process.env.REACT_APP_API_URL, {
       auth: { token },
       transports: ["websocket"],
       reconnectionAttempts: 5,
@@ -250,7 +250,7 @@ const Chatroom = () => {
         return;
       }
       const res = await axios.post(
-        "http://localhost:5000/api/messages",
+        `${process.env.REACT_APP_API_URL}/api/messages`,
         { content },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -293,7 +293,7 @@ const Chatroom = () => {
         console.warn("No token found during handleDelete");
         return;
       }
-      await axios.delete(`http://localhost:5000/api/messages/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/messages/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages((prev) => prev.filter((m) => m._id !== id));
@@ -327,7 +327,7 @@ const Chatroom = () => {
         return;
       }
       const res = await axios.patch(
-        `http://localhost:5000/api/messages/${id}`,
+        `${process.env.REACT_APP_API_URL}/api/messages/${id}`,
         { content },
         { headers: { Authorization: `Bearer ${token}` } }
       );

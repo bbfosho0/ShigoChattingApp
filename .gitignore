@@ -7,3 +7,7 @@ AGENTS.md
 /node_modules
 /server/node_modules
 /client/node_modules
+client/.env.deployment
+client/.env.production
+server/.env
+.codexignore
