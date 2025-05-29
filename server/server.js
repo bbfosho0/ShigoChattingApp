@@ -178,15 +178,6 @@ socket.on("deleteMessage", async (payload) => {
   });
 });
 
-const path = require("path");
-
-// Serve static files from client/build
-app.use(express.static(path.join(__dirname, "client", "build")));
-
-// Fallback to index.html for unknown routes (SPA fix)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-});
 
 
 // Start server
