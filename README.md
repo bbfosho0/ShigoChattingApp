@@ -1,4 +1,5 @@
 ## Project Overview
+https://shigochat.onrender.com/login
 
 ShigoChat is more than a chat app — it’s a **sanctuary** that gently invites users into a calm, flowing, and heartfelt environment to share thoughts, feelings, and ephemeral moments. Every interaction, color gradient, and animation has been deliberately curated to evoke warmth, invitation, and sanctuary.
 
