@@ -118,7 +118,8 @@ const Login = () => {
         </motion.h1>
 
         <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
-          Type, drift, connect. A sanctuary of whispers, laughter, and logic.
+          Type, drift, connect. A sanctuary of whispers, laughter, and logic. <br />
+  Note: Logging in may take up to a minute due to free-tier MongoDB Atlas connection. Thanks for your patience!
         </p>
 
         <div>
