@@ -1,17 +1,3 @@
----
-post_title: "ShigoChat Architecture Blueprint"
-author1: "ShigoChat Team"
-post_slug: "shigochat-architecture"
-microsoft_alias: "shigochat"
-featured_image: "https://example.com/images/shigochat-cover.png"
-categories: ["architecture"]
-tags: ["react", "express", "socket-io", "tailwind"]
-ai_note: "Generated with AI assistance"
-summary: "Cohesive overview of the ShigoChat sanctuary-inspired chat platform and how to build, run, and extend it."
-post_date: "2025-12-01"
----
-
-<!-- markdownlint-disable-next-line MD041 -->
 ## ShigoChat: Sanctuary-Inspired Chat Experience
 
 ShigoChat is a full-stack conversation sanctuary. The React client delivers a glassmorphic interface, theme-aware transitions, and ambient audio, while the Express + Socket.IO backend keeps messages, presence, and safeguards flowing in real time. Every interaction honors the sanctuary charter: interfaces should breathe, transitions should feel like memory, and security must remain sacred.
