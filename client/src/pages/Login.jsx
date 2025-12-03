@@ -39,7 +39,10 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, form);
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/login`,
+        form
+      );
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setUser(res.data.user);
@@ -118,8 +121,8 @@ const Login = () => {
         </motion.h1>
 
         <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
-          Type, drift, connect. A sanctuary of whispers, laughter, and logic. <br />
-  Note: Logging in may take up to a minute due to free-tier MongoDB Atlas connection. Thanks for your patience!
+          Type, drift, connect. A sanctuary of whispers, laughter, and logic.{" "}
+          <br />
         </p>
 
         <div>
@@ -147,7 +150,9 @@ const Login = () => {
             value={form.password}
             onChange={handleChange}
             placeholder="Password"
-            className={`form-field pr-10 ${error.password ? "border-red-500" : ""}`}
+            className={`form-field pr-10 ${
+              error.password ? "border-red-500" : ""
+            }`}
             aria-invalid={error.password ? "true" : "false"}
             aria-describedby="password-error"
           />
@@ -169,7 +174,9 @@ const Login = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`primary-btn ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+          className={`primary-btn ${
+            loading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
