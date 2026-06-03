@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect } from "react";
     export const ThemeContext = createContext({
       darkMode: false,
       toggleDarkMode: () => {},
+      setTheme: () => {},
     });
 
     export const ThemeProvider = ({ children }) => {
@@ -26,9 +27,10 @@ import React, { createContext, useState, useEffect } from "react";
       }, [darkMode]);
 
       const toggleDarkMode = () => setDarkMode((prev) => !prev);
+      const setTheme = (theme) => setDarkMode(theme === "dark");
 
       return (
-        <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+        <ThemeContext.Provider value={{ darkMode, toggleDarkMode, setTheme }}>
           {children}
         </ThemeContext.Provider>
       );

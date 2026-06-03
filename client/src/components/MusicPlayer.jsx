@@ -1,15 +1,13 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Moon,
-  Sun,
-  Play,
+  ChevronDown,
+  ChevronUp,
   Pause,
+  Play,
   SkipBack,
   SkipForward,
   Volume2,
   VolumeX,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
 
 import agosto from "../music/Agosto.mp3";
@@ -26,44 +24,19 @@ const SONGS = [
   { title: "Soulful", src: soulful },
 ];
 
-/**
- * MusicPlayer component - ambient music player with enhanced controls and collapse toggle.
- *
- * Features:
- * - Play/pause, previous/next track controls.
- * - Volume and mute toggle with slider.
- * - Progress bar with seek capability.
- * - Collapsible UI triggered by toggle button at top-right corner.
- * - When collapsed: only minimal header with song title and toggle button shown.
- * - Maintains playback and state across collapse/expand.
- *
- * @param {object} props
- * @param {boolean} props.autoPlay - start playing automatically on mount (default: false)
- */
-const MusicPlayer = ({ autoPlay = false }) => {
-  // State variables to track current song index, playing status, volume, mute, progress, and collapsed UI state
+const MusicPlayer = ({ autoPlay = false, volumeInitial = 0.2, compact = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
-  const [volume, setVolume] = useState(0.2);
+  const [volume, setVolume] = useState(volumeInitial);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [collapsed, setCollapsed] = useState(false);
-
-  // Ref to the underlying <audio> element for playback manipulation
+  const [collapsed, setCollapsed] = useState(compact);
   const audioRef = useRef(null);
 
-  /**
-   * Callback for handling the ended event on the audio element.
-   * Advances to the next song automatically (loops in playlist).
-   */
   const onEnded = useCallback(() => {
     setCurrentIndex((i) => (i + 1) % SONGS.length);
   }, []);
 
-  /**
-   * Side effect to update audio element whenever song, play state,
-   * volume, or muted state changes.
-   */
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -72,152 +45,127 @@ const MusicPlayer = ({ autoPlay = false }) => {
     audio.muted = muted;
 
     if (isPlaying) {
-      audio
-        .play()
-        .catch((e) => {
-          console.error("Audio play error:", e);
-        });
+      audio.play().catch((e) => {
+        console.error("Audio play error:", e);
+        setIsPlaying(false);
+      });
     } else {
       audio.pause();
     }
   }, [currentIndex, isPlaying, volume, muted]);
 
-  // Event handlers to update playback status and toggle mute/play
-
   const togglePlay = () => setIsPlaying((p) => !p);
   const toggleMute = () => setMuted((m) => !m);
-
-  // Navigate to next or previous song indices with wrap-around
-
   const nextSong = () => setCurrentIndex((i) => (i + 1) % SONGS.length);
   const prevSong = () => setCurrentIndex((i) => (i - 1 + SONGS.length) % SONGS.length);
 
-  /**
-   * Update progress state based on audio currentTime / duration.
-   * This updates slider UI.
-   */
   const onTimeUpdate = () => {
-    if (audioRef.current && audioRef.current.duration) {
+    if (audioRef.current?.duration) {
       setProgress(audioRef.current.currentTime / audioRef.current.duration);
     }
   };
 
-  /**
-   * Seek within audio track based on slider input.
-   * @param {Event} e
-   */
   const onSeek = (e) => {
-    if (audioRef.current && audioRef.current.duration) {
-      const newTime = e.target.value * audioRef.current.duration;
-      if (Number.isFinite(newTime) && newTime >= 0 && newTime <= audioRef.current.duration) {
+    if (audioRef.current?.duration) {
+      const newTime = Number(e.target.value) * audioRef.current.duration;
+      if (Number.isFinite(newTime)) {
         audioRef.current.currentTime = newTime;
         setProgress(newTime / audioRef.current.duration);
       }
     }
   };
 
-  /**
-   * Handle volume slider change while unmuting audio.
-   * @param {Event} e
-   */
   const onVolumeChange = (e) => {
     setVolume(parseFloat(e.target.value));
     setMuted(false);
   };
 
-  /**
-   * Toggle collapsed UI state.
-   * Collapsed: minimizes the UI to show only header with toggle button.
-   */
-  const toggleCollapse = () => setCollapsed((c) => !c);
+  const track = SONGS[currentIndex];
 
   return (
     <section
-      className={`glassmorphic flex flex-col p-4 rounded-xl border border-white/20 shadow-lg bg-white/30 dark:bg-black/30 backdrop-blur-lg max-w-md mx-auto select-none transition-all duration-300 ease-in-out ${
-        collapsed ? "w-72 h-14" : "w-full max-w-md h-auto"
-      }`}
+      className={`select-none rounded-xl p-3 ${compact || collapsed ? "" : "p-5"}`}
+      style={{
+        background: "var(--sc-bubble-other)",
+        border: "1px solid var(--sc-border)",
+        boxShadow: "0 8px 32px var(--sc-shadow)",
+      }}
       aria-label="Ambient music player"
     >
-      {/* Audio element for playback */}
       <audio
         ref={audioRef}
-        src={SONGS[currentIndex].src}
+        src={track.src}
         onEnded={onEnded}
         onTimeUpdate={onTimeUpdate}
         autoPlay={autoPlay}
       />
 
-      {/* Header with title and collapse toggle button */}
-      <div className="flex items-center justify-between">
-        <h4
-          className="font-inter font-normal text-base text-white select-none truncate"
-          title={SONGS[currentIndex].title}
-          aria-live="polite"
-        >
-          {SONGS[currentIndex].title}
-        </h4>
-        <button
-          onClick={toggleCollapse}
-          aria-label={collapsed ? "Expand music player" : "Collapse music player"}
-          className="ml-2 p-1 rounded-full bg-white/20 hover:bg-white/30 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          type="button"
-        >
-          {collapsed ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
-        </button>
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[0.8rem] font-medium sc-text-primary" title={track.title} aria-live="polite">
+            {track.title}
+          </p>
+          <p className="text-[0.7rem] sc-text-secondary">Ambient</p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={prevSong} className="sc-icon-button h-7 w-7 rounded-lg" type="button" aria-label="Previous song">
+            <SkipBack size={13} />
+          </button>
+          <button
+            onClick={togglePlay}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-white"
+            style={{
+              background: "linear-gradient(135deg, var(--sc-accent), #c4b8e8)",
+              border: 0,
+              cursor: "pointer",
+            }}
+            type="button"
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? <Pause size={13} /> : <Play size={13} style={{ marginLeft: 1 }} />}
+          </button>
+          <button onClick={nextSong} className="sc-icon-button h-7 w-7 rounded-lg" type="button" aria-label="Next song">
+            <SkipForward size={13} />
+          </button>
+          {!compact && (
+            <button
+              onClick={() => setCollapsed((c) => !c)}
+              className="sc-icon-button ml-1 h-7 w-7 rounded-lg"
+              type="button"
+              aria-label={collapsed ? "Expand music player" : "Collapse music player"}
+            >
+              {collapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Render full controls only when not collapsed */}
-      {!collapsed && (
-        <>
-          {/* Playback controls: previous, play/pause, next */}
-          <div className="flex items-center space-x-6 justify-center mt-3">
-            <button
-              onClick={prevSong}
-              aria-label="Previous Song"
-              className="hover:text-indigo-300 transition"
-              type="button"
-            >
-              <SkipBack size={24} />
-            </button>
-            <button
-              onClick={togglePlay}
-              aria-label={isPlaying ? "Pause" : "Play"}
-              className="text-xl hover:text-indigo-300 transition"
-              type="button"
-            >
-              {isPlaying ? <Pause size={28} /> : <Play size={28} />}
-            </button>
-            <button
-              onClick={nextSong}
-              aria-label="Next Song"
-              className="hover:text-indigo-300 transition"
-              type="button"
-            >
-              <SkipForward size={24} />
-            </button>
-          </div>
+      <div className="relative mt-2 h-[3px] overflow-hidden rounded-full" style={{ background: "var(--sc-accent-glow)" }}>
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.001}
+          value={progress}
+          onChange={onSeek}
+          aria-label="Song progress"
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+        <div
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{
+            width: `${progress * 100}%`,
+            background: "rgba(164,146,212,0.65)",
+            transition: "width 0.15s linear",
+          }}
+        />
+      </div>
 
-          {/* Progress bar slider */}
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.001}
-            value={progress}
-            onChange={onSeek}
-            aria-label="Song Progress"
-            className="w-full h-1 rounded-lg bg-indigo-600 cursor-pointer mt-4"
-          />
-
-          {/* Volume controls */}
-          <div className="flex items-center space-x-4 w-full mt-3">
-            <button
-              onClick={toggleMute}
-              aria-label={muted ? "Unmute" : "Mute"}
-              className="hover:text-indigo-300 transition"
-              type="button"
-            >
-              {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+      {!compact && !collapsed && (
+        <div className="mt-4">
+          <div className="flex items-center gap-3">
+            <button onClick={toggleMute} className="sc-icon-button h-8 w-8 rounded-lg" type="button" aria-label={muted ? "Unmute" : "Mute"}>
+              {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
             </button>
             <input
               type="range"
@@ -227,10 +175,32 @@ const MusicPlayer = ({ autoPlay = false }) => {
               value={muted ? 0 : volume}
               onChange={onVolumeChange}
               aria-label="Volume"
-              className="flex-grow h-1 rounded-lg bg-indigo-600 cursor-pointer"
+              className="h-1 flex-1 cursor-pointer accent-[#a492d4]"
             />
           </div>
-        </>
+
+          <div className="mt-4 space-y-1">
+            {SONGS.map((song, index) => (
+              <button
+                key={song.title}
+                onClick={() => {
+                  setCurrentIndex(index);
+                  setProgress(0);
+                }}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left transition"
+                style={{
+                  background: index === currentIndex ? "var(--sc-accent-soft)" : "transparent",
+                  border: 0,
+                  color: index === currentIndex ? "var(--sc-accent)" : "var(--sc-text-secondary)",
+                  cursor: "pointer",
+                }}
+                type="button"
+              >
+                <span className="truncate text-[0.8rem]">{song.title}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </section>
   );
