@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -9,78 +9,32 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+import { useMusic } from "../context/MusicContext";
 
-import agosto from "../music/Agosto.mp3";
-import bennyBronco from "../music/Benny Bronco - o k t o b u.mp3";
-import dorc from "../music/Dor-c - Sunshine Rider.mp3";
-import johnnyGorillas from "../music/Johnny Gorillas - Blue Morning.mp3";
-import soulful from "../music/Soulful.mp3";
-
-const SONGS = [
-  { title: "Agosto", src: agosto },
-  { title: "Benny Bronco - o k t o b u", src: bennyBronco },
-  { title: "Dor-c - Sunshine Rider", src: dorc },
-  { title: "Johnny Gorillas - Blue Morning", src: johnnyGorillas },
-  { title: "Soulful", src: soulful },
-];
-
-const MusicPlayer = ({ autoPlay = false, volumeInitial = 0.2, compact = false }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(autoPlay);
-  const [volume, setVolume] = useState(volumeInitial);
-  const [muted, setMuted] = useState(false);
-  const [progress, setProgress] = useState(0);
+const MusicPlayer = ({ autoPlay = false, compact = false }) => {
   const [collapsed, setCollapsed] = useState(compact);
-  const audioRef = useRef(null);
-
-  const onEnded = useCallback(() => {
-    setCurrentIndex((i) => (i + 1) % SONGS.length);
-  }, []);
+  const {
+    songs,
+    currentSong,
+    currentIndex,
+    isPlaying,
+    muted,
+    volume,
+    progress,
+    togglePlay,
+    toggleMute,
+    setVolume,
+    nextSong,
+    prevSong,
+    selectSong,
+    seek,
+  } = useMusic();
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.volume = volume;
-    audio.muted = muted;
-
-    if (isPlaying) {
-      audio.play().catch((e) => {
-        console.error("Audio play error:", e);
-        setIsPlaying(false);
-      });
-    } else {
-      audio.pause();
-    }
-  }, [currentIndex, isPlaying, volume, muted]);
-
-  const togglePlay = () => setIsPlaying((p) => !p);
-  const toggleMute = () => setMuted((m) => !m);
-  const nextSong = () => setCurrentIndex((i) => (i + 1) % SONGS.length);
-  const prevSong = () => setCurrentIndex((i) => (i - 1 + SONGS.length) % SONGS.length);
-
-  const onTimeUpdate = () => {
-    if (audioRef.current?.duration) {
-      setProgress(audioRef.current.currentTime / audioRef.current.duration);
-    }
-  };
-
-  const onSeek = (e) => {
-    if (audioRef.current?.duration) {
-      const newTime = Number(e.target.value) * audioRef.current.duration;
-      if (Number.isFinite(newTime)) {
-        audioRef.current.currentTime = newTime;
-        setProgress(newTime / audioRef.current.duration);
-      }
-    }
-  };
-
-  const onVolumeChange = (e) => {
-    setVolume(parseFloat(e.target.value));
-    setMuted(false);
-  };
-
-  const track = SONGS[currentIndex];
+    if (autoPlay && !isPlaying) togglePlay();
+    // autoPlay is only an initial request from legacy callers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section
@@ -92,18 +46,10 @@ const MusicPlayer = ({ autoPlay = false, volumeInitial = 0.2, compact = false })
       }}
       aria-label="Ambient music player"
     >
-      <audio
-        ref={audioRef}
-        src={track.src}
-        onEnded={onEnded}
-        onTimeUpdate={onTimeUpdate}
-        autoPlay={autoPlay}
-      />
-
       <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[0.8rem] font-medium sc-text-primary" title={track.title} aria-live="polite">
-            {track.title}
+          <p className="truncate text-[0.8rem] font-medium sc-text-primary" title={currentSong.title} aria-live="polite">
+            {currentSong.title}
           </p>
           <p className="text-[0.7rem] sc-text-secondary">Ambient</p>
         </div>
@@ -129,7 +75,7 @@ const MusicPlayer = ({ autoPlay = false, volumeInitial = 0.2, compact = false })
           </button>
           {!compact && (
             <button
-              onClick={() => setCollapsed((c) => !c)}
+              onClick={() => setCollapsed((value) => !value)}
               className="sc-icon-button ml-1 h-7 w-7 rounded-lg"
               type="button"
               aria-label={collapsed ? "Expand music player" : "Collapse music player"}
@@ -147,7 +93,7 @@ const MusicPlayer = ({ autoPlay = false, volumeInitial = 0.2, compact = false })
           max={1}
           step={0.001}
           value={progress}
-          onChange={onSeek}
+          onChange={(event) => seek(event.target.value)}
           aria-label="Song progress"
           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
         />
@@ -173,20 +119,17 @@ const MusicPlayer = ({ autoPlay = false, volumeInitial = 0.2, compact = false })
               max={1}
               step={0.01}
               value={muted ? 0 : volume}
-              onChange={onVolumeChange}
+              onChange={(event) => setVolume(parseFloat(event.target.value))}
               aria-label="Volume"
               className="h-1 flex-1 cursor-pointer accent-[#a492d4]"
             />
           </div>
 
           <div className="mt-4 space-y-1">
-            {SONGS.map((song, index) => (
+            {songs.map((song, index) => (
               <button
                 key={song.title}
-                onClick={() => {
-                  setCurrentIndex(index);
-                  setProgress(0);
-                }}
+                onClick={() => selectSong(index)}
                 className="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left transition"
                 style={{
                   background: index === currentIndex ? "var(--sc-accent-soft)" : "transparent",

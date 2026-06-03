@@ -1,13 +1,64 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
+import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Moon, Sun, X } from "lucide-react";
+import { KeyRound, LogOut, Moon, Sun, X } from "lucide-react";
+import toast from "react-hot-toast";
 import { ThemeContext } from "../context/ThemeContext";
 import MusicPlayer from "./MusicPlayer";
 
 const Preferences = ({ open, onClose, user, onLogout }) => {
   const { darkMode, setTheme } = useContext(ThemeContext);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
   const initials = user?.username?.slice(0, 2).toUpperCase() || "U";
   const activeTheme = darkMode ? "dark" : "light";
+
+  const updatePasswordField = (field, value) => {
+    setPasswordForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+    if (!passwordForm.currentPassword || !passwordForm.newPassword) {
+      toast.error("Current and new password are required");
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const token = localStorage.getItem("token");
+      await axios.patch(
+        `${process.env.REACT_APP_API_URL}/api/auth/change-password`,
+        {
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Password changed");
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.errors?.[0]?.msg ||
+        "Password change failed";
+      toast.error(message);
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -84,6 +135,53 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
                     </button>
                   ))}
                 </div>
+              </section>
+
+              <section>
+                <p className="mb-2 text-[0.72rem] font-semibold uppercase tracking-[0.06em] sc-text-secondary">
+                  Account
+                </p>
+                <form
+                  onSubmit={handleChangePassword}
+                  className="space-y-3 rounded-xl p-4"
+                  style={{ background: "var(--sc-accent-glow)", border: "1px solid var(--sc-border)" }}
+                >
+                  <div className="flex items-center gap-2 text-[0.86rem] font-semibold sc-text-primary">
+                    <KeyRound size={15} style={{ color: "var(--sc-accent)" }} />
+                    Change password
+                  </div>
+                  <input
+                    type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={(event) => updatePasswordField("currentPassword", event.target.value)}
+                    placeholder="Current password"
+                    className="sc-field px-3 py-2 text-[0.84rem]"
+                    autoComplete="current-password"
+                  />
+                  <input
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(event) => updatePasswordField("newPassword", event.target.value)}
+                    placeholder="New password"
+                    className="sc-field px-3 py-2 text-[0.84rem]"
+                    autoComplete="new-password"
+                  />
+                  <input
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(event) => updatePasswordField("confirmPassword", event.target.value)}
+                    placeholder="Confirm new password"
+                    className="sc-field px-3 py-2 text-[0.84rem]"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="submit"
+                    disabled={passwordLoading}
+                    className="sc-primary-button w-full px-3 py-2 text-[0.84rem] font-medium"
+                  >
+                    {passwordLoading ? "Saving..." : "Save password"}
+                  </button>
+                </form>
               </section>
 
               <section>

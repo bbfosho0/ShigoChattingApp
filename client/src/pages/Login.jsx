@@ -15,6 +15,9 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetForm, setResetForm] = useState({ email: "", password: "", confirmPassword: "" });
+  const [resetLoading, setResetLoading] = useState(false);
   const { setUser } = useContext(AuthContext);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
@@ -47,6 +50,42 @@ const Login = () => {
       toast.error("Invalid credentials");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResetSubmit = async (e) => {
+    e.preventDefault();
+    if (!resetForm.email.trim() || !resetForm.password.trim()) {
+      toast.error("Email and new password are required");
+      return;
+    }
+    if (resetForm.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    if (resetForm.password !== resetForm.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      setResetLoading(true);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/forgot-password`, {
+        email: resetForm.email,
+        password: resetForm.password,
+      });
+      toast.success("Password reset. Sign in with the new password.");
+      setForm({ email: resetForm.email, password: "" });
+      setResetForm({ email: "", password: "", confirmPassword: "" });
+      setResetOpen(false);
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.errors?.[0]?.msg ||
+        "Password reset failed";
+      toast.error(message);
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -178,7 +217,72 @@ const Login = () => {
                 </button>
               </div>
               {error.password && <p className="mt-1 text-xs text-[#e05b7a]">{error.password}</p>}
+              <button
+                type="button"
+                onClick={() => {
+                  setResetOpen((value) => !value);
+                  setResetForm((value) => ({ ...value, email: form.email }));
+                }}
+                className="mt-2 text-[0.78rem] font-semibold underline underline-offset-2"
+                style={{
+                  background: "none",
+                  border: 0,
+                  color: "var(--sc-accent)",
+                  cursor: "pointer",
+                  padding: 0,
+                  textDecorationColor: "var(--sc-accent-soft)",
+                }}
+              >
+                Forgot password?
+              </button>
             </div>
+
+            {resetOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl p-3"
+                style={{ background: "var(--sc-accent-glow)", border: "1px solid var(--sc-border)" }}
+              >
+                <p className="mb-3 text-[0.78rem] leading-relaxed sc-text-secondary">
+                  Reset your password for this ShigoChat account.
+                </p>
+                <div className="space-y-2">
+                  <input
+                    type="email"
+                    value={resetForm.email}
+                    onChange={(event) => setResetForm({ ...resetForm, email: event.target.value })}
+                    placeholder="Account email"
+                    className="sc-field px-3 py-2 text-[0.84rem]"
+                    autoComplete="email"
+                  />
+                  <input
+                    type="password"
+                    value={resetForm.password}
+                    onChange={(event) => setResetForm({ ...resetForm, password: event.target.value })}
+                    placeholder="New password"
+                    className="sc-field px-3 py-2 text-[0.84rem]"
+                    autoComplete="new-password"
+                  />
+                  <input
+                    type="password"
+                    value={resetForm.confirmPassword}
+                    onChange={(event) => setResetForm({ ...resetForm, confirmPassword: event.target.value })}
+                    placeholder="Confirm new password"
+                    className="sc-field px-3 py-2 text-[0.84rem]"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleResetSubmit}
+                    disabled={resetLoading}
+                    className="sc-primary-button w-full px-3 py-2 text-[0.84rem] font-medium"
+                  >
+                    {resetLoading ? "Resetting..." : "Reset password"}
+                  </button>
+                </div>
+              </motion.div>
+            )}
 
             <button
               type="submit"
