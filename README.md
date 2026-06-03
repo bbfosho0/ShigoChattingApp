@@ -1,152 +1,286 @@
-## ShigoChat: Sanctuary-Inspired Chat Experience
+# ShigoChat
 
-ShigoChat is a full-stack conversation sanctuary. The React client delivers a glassmorphic interface, theme-aware transitions, and ambient audio, while the Express + Socket.IO backend keeps messages, presence, and safeguards flowing in real time. Every interaction honors the sanctuary charter: interfaces should breathe, transitions should feel like memory, and security must remain sacred.
+ShigoChat is a full-stack real-time chat application built around one shared conversation space called **Quiet Room**. It combines a polished React interface with JWT authentication, MongoDB persistence, Socket.IO updates, message CRUD, light/dark themes, account password management, and synced ambient audio controls.
 
-## Quick Facts
+The project is designed as a production-style portfolio piece: the frontend focuses on responsive product polish and interaction design, while the backend demonstrates practical API design, authentication, database modeling, and realtime event handling.
 
-| Layer | Technology | Notes |
-| --- | --- | --- |
-| Experience | React 19, React Router 7, Tailwind CSS 3, Framer Motion 12, Lucide Icons, Axios 1.9, Socket.IO Client 4.8, react-hot-toast | CRA runtime with Theme + Auth contexts |
-| Services | Node.js 18+, Express 5.1, Socket.IO 4.8, Mongoose 8.15, bcryptjs 3, jsonwebtoken 9, express-validator 7, cors 2.8 | Stateless JWT auth; MongoDB Atlas data store |
-| Tooling | npm, dotenv, nodemon, PostCSS, Tailwind plugins | Local dev + build support |
+## Highlights
 
-## Sanctuary Principles
+- **Full-stack chat workflow**: register, log in, fetch message history, send messages, edit/delete owned messages, and receive live updates.
+- **Realtime architecture**: Socket.IO shares the Express HTTP server and authenticates socket handshakes with JWTs.
+- **MongoDB Atlas persistence**: users and messages are stored with Mongoose models and populated sender metadata.
+- **Secure account flows**: bcrypt password hashing, JWT sessions, protected message routes, authenticated password changes, and password reset support.
+- **Responsive product UI**: desktop sidebar layout, mobile navigation drawer, calm visual system, polished auth screens, and accessible controls.
+- **Synced ambient player**: one shared music state powers both the compact sidebar player and the full settings player.
+- **Theme system**: persisted light/dark mode with CSS design tokens and theme-aware components.
 
-- Interfaces must breathe: generous whitespace, gentle glass layers, calm typography.
-- Interaction flows mimic memory: Framer Motion eases every view change and toast.
-- Emotion leads architecture: ThemeContext, MusicPlayer, and sensory cues stay first-class.
-- Security is sacred: validation everywhere, JWT-authenticated sockets, curated CORS.
+## Tech Stack
 
-## Repository Map
+| Area | Tools |
+| --- | --- |
+| Frontend | React 19, Create React App, React Router 7, Tailwind CSS 3, Framer Motion, Lucide React |
+| Client State | React Context for auth, theme, and shared music playback |
+| API Client | Axios, Socket.IO Client |
+| Backend | Node.js, Express 5, Socket.IO, Mongoose |
+| Auth & Validation | JWT, bcryptjs, express-validator |
+| Database | MongoDB Atlas |
+| Tooling | npm, dotenv, nodemon, PostCSS |
+
+## Core Features
+
+### Authentication
+
+- Email/password registration and login
+- JWT stored client-side for authenticated API calls
+- Passwords hashed with bcrypt before persistence
+- Protected `/chat` route in the React app
+- Authenticated Socket.IO handshake
+- Forgot-password reset flow
+- Change-password form in Preferences
+
+### Messaging
+
+- One global chat feed presented as **Quiet Room**
+- Fetch existing messages from MongoDB
+- Send new messages through the REST API
+- Broadcast new messages through Socket.IO
+- Edit and delete only the signed-in user's own messages
+- Realtime edit/delete sync across connected clients
+- Date separators and sender metadata in the UI
+
+### Frontend Experience
+
+- Figma-inspired sanctuary visual design
+- Responsive desktop and mobile layouts
+- Sidebar with room identity, ambient player, theme controls, user summary, and logout
+- Preferences drawer for account, theme, and music controls
+- Synced music player state across multiple player surfaces
+- Light and dark themes with persisted user preference
+- Accessible form labels, button labels, and keyboard-friendly composer behavior
+
+## Architecture
 
 ```text
-.
-├─ client/
-│  ├─ public/
-│  └─ src/
-│     ├─ components/        # MessageBubble, MessageInput, MusicPlayer
-│     ├─ context/           # AuthContext, ThemeContext
-│     ├─ pages/             # SplashScreen, Register, Login, Chatroom
-│     └─ App.jsx, index.js, index.css
-├─ server/
-│  ├─ routes/               # auth.js, messages.js
-│  ├─ models/               # User.js, Message.js
-│  ├─ middleware/           # auth.js, validators.js
-│  └─ server.js
-├─ README.md
-└─ package.json
+React client
+  |
+  | REST: auth, messages, password flows
+  | Socket.IO: realtime message events
+  v
+Express + Socket.IO server
+  |
+  | Mongoose models
+  v
+MongoDB Atlas
 ```
 
-## Setup Guide
+### Frontend Structure
+
+```text
+client/src/
+├─ components/
+│  ├─ MessageBubble.jsx
+│  ├─ MessageInput.jsx
+│  ├─ MusicPlayer.jsx
+│  └─ Preferences.jsx
+├─ context/
+│  ├─ AuthContext.js
+│  ├─ MusicContext.js
+│  └─ ThemeContext.js
+├─ pages/
+│  ├─ Chatroom.jsx
+│  ├─ Login.jsx
+│  ├─ Register.jsx
+│  └─ SplashScreen.jsx
+├─ App.jsx
+├─ index.css
+└─ index.js
+```
+
+### Backend Structure
+
+```text
+server/
+├─ middleware/
+│  ├─ auth.js
+│  └─ validators.js
+├─ models/
+│  ├─ Message.js
+│  └─ User.js
+├─ routes/
+│  ├─ auth.js
+│  └─ messages.js
+└─ server.js
+```
+
+## API Overview
+
+### Auth
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | Create a new user |
+| `POST` | `/api/auth/login` | Log in and receive JWT |
+| `POST` | `/api/auth/forgot-password` | Reset a password for an account email |
+| `PATCH` | `/api/auth/change-password` | Change password for authenticated user |
+
+### Messages
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/messages` | Fetch chat history |
+| `POST` | `/api/messages` | Create a message |
+| `PATCH` | `/api/messages/:id` | Edit an owned message |
+| `DELETE` | `/api/messages/:id` | Delete an owned message |
+
+### Socket Events
+
+| Event | Direction | Purpose |
+| --- | --- | --- |
+| `sendMessage` | client -> server | Notify server that a new message should be broadcast |
+| `receiveMessage` | server -> clients | Broadcast a populated new message |
+| `editMessage` | both | Sync message edits |
+| `deleteMessage` | both | Sync message deletions |
+
+## Local Setup
 
 ### Prerequisites
 
-- Node.js 18+ with npm
-- MongoDB Atlas (or local MongoDB) connection string
-- Optional: Render/Railway (backend) and Netlify/Vercel (frontend)
+- Node.js 18+
+- npm
+- MongoDB Atlas connection string, or a local MongoDB URI
 
-### Install Dependencies
+### Install
 
 ```bash
 git clone https://github.com/bbfosho0/ShigoChattingApp.git
 cd ShigoChattingApp
 
-cd server && npm install
-cd ../client && npm install
+cd server
+npm install
+
+cd ../client
+npm install
 ```
 
 ### Environment Variables
 
-`server/.env`
+Create `server/.env`:
 
 ```env
 PORT=5000
-MONGO_URI=your-mongodb-connection-string
-JWT_SECRET=your-very-secret-key
-CLIENT_URL=https://your-frontend.example.com
+MONGO_URI=mongodb+srv://your-user:your-password@your-cluster.mongodb.net/your-db
+JWT_SECRET=replace-with-a-long-random-secret
+CLIENT_URL=http://localhost:3000
 ```
 
-`client/.env`
+Create `client/.env`:
 
 ```env
 REACT_APP_API_URL=http://localhost:5000
 ```
 
-### Local Development
+### Run Locally
+
+Terminal 1:
 
 ```bash
-# Terminal 1 – API + Socket.IO
 cd server
-npm run dev
+npm start
+```
 
-# Terminal 2 – React client
+Expected backend output:
+
+```text
+Server running on port 5000
+MongoDB connected
+```
+
+Terminal 2:
+
+```bash
 cd client
 npm start
 ```
 
-Visit <http://localhost:3000>. Free-tier MongoDB clusters may take up to a minute to wake.
+Open:
 
-## Key Features
-
-- **Sanctuary UI**: Glass panels, floating blobs, system-aware light/dark palettes, and gentle motion.
-- **Identity & Auth**: bcrypt-backed registration/login with JWTs persisted through `AuthContext`.
-- **Realtime Messaging**: Create, edit, delete, and synchronize messages through Socket.IO with optimistic UI.
-- **Ambient Emotion Layer**: `MusicPlayer` surfaces curated playlists, remembers state, and responds to theme changes.
-- **Accessibility**: Focus-visible states, ARIA hints, keyboard-friendly forms, and reduced motion fallbacks.
-- **Security Guardrails**: `express-validator`, ownership checks, rate limiting, and curated CORS origins.
-
-## Architectural Overview
-
-1. **Experience Layer** (`client/src/pages`) renders Splash, Register, Login, and Chatroom with Tailwind + Framer Motion.
-2. **State Layer** couples `AuthContext`, `ThemeContext`, and the ambient `MusicPlayer` to keep identity, theme, and audio in sync.
-3. **API Layer** exposes `/api/auth` and `/api/messages`, validating every payload before persistence.
-4. **Realtime Layer** shares the HTTP server via Socket.IO, authenticating each connection and broadcasting lifecycle events.
-5. **Data Layer** stores `User` and `Message` models in MongoDB with timestamps and population helpers.
-
-This flow keeps React unaware of MongoDB specifics, keeps Express ignorant of motion assets, and funnels every realtime change through authenticated sockets.
-
-## Implementation Notes
-
-- **Routing**: `App.jsx` uses React Router 7 with guarded `/chat` access; `<Navigate>` enforces login.
-- **Sockets**: `Chatroom.jsx` holds a singleton socket via `useRef`, registers listeners, and disconnects on cleanup.
-- **Validation**: `validators.js` contains shared `express-validator` rules consumed by auth/message routers.
-- **Security**: `verifyToken` middleware protects every message route and the socket handshake; rate limiting is applied to auth routes.
-- **Styling**: Tailwind config extends blur, radii, and gradients to maintain the glass aesthetic; focus states remain high contrast.
-
-## Workflow & Standards
-
-- Start with the sanctuary charter, then open a feature branch per change.
-- Extend existing contexts/hooks before adding new global state containers.
-- Keep commits small and prefer PRs that touch either `client/` or `server/` unless a contract change requires both.
-- Re-use the established socket helper; avoid multiple simultaneous connections per user.
-- Never commit `node_modules`, `.env`, or build artifacts—`.gitignore` already guards them.
-
-## Testing Strategy
-
-- **Frontend**: CRA Testing Library scaffolding (`App.test.js`, `setupTests.js`) is ready for context, hook, and component tests.
-- **Backend**: Add Supertest suites for `/api/auth` and `/api/messages`, plus Jest unit tests for middleware and validators.
-- **Manual**: Before merging, exercise login, theme toggle, message CRUD, ambient audio, and socket reconnection behavior.
+```text
+http://localhost:3000
+```
 
 ## Deployment Notes
 
-- Build the client via `npm run build` and host on Netlify/Vercel or any static host.
-- Deploy the server on Render/Railway (Node 18 runtime) with environment variables configured in the dashboard.
-- Ensure the deployed backend exposes WebSocket support and that `CLIENT_URL` matches the hosted frontend origin.
-- If both tiers share a hostname, serve the CRA build through Express’ static middleware for simplicity.
+This app is split into two deployable parts:
 
-## Extension Ideas
+- **Backend service**: deploy `server/` to Render, Railway, Heroku, or another Node host.
+- **Frontend static site**: deploy `client/` to Netlify, Vercel, Render Static Sites, or similar.
 
-- Typing indicators and presence pulses that share the existing Socket.IO channel.
-- Threaded conversations or reactions layered on top of the `Message` schema.
-- Ambient soundscape variations keyed to time of day or theme mode.
-- GitHub Actions workflow for lint + test + deploy, keeping sanctuary standards enforced automatically.
+Backend environment variables:
 
-## Support & Contributions
+```env
+MONGO_URI=mongodb+srv://...
+JWT_SECRET=...
+CLIENT_URL=https://your-frontend-domain
+```
 
-1. Open an issue describing the enhancement or fix with sanctuary context (how it impacts emotion, flow, or safety).
-2. Fork or branch from `main`, keeping the change scoped to `client/` or `server/` when possible.
-3. Add or update tests and documentation, then open a PR that references the issue.
-4. Expect reviews focused on sanctuary fidelity, validation coverage, and socket hygiene.
+Frontend environment variable:
 
-ShigoChat thrives when every change deepens the sanctuary. Build gently, validate rigorously, and keep the experience breathing.
+```env
+REACT_APP_API_URL=https://your-backend-domain
+```
 
+The MongoDB connection string belongs only on the backend host. It should never be committed to GitHub or exposed in frontend code.
+
+## Engineering Notes
+
+- The frontend never talks directly to MongoDB. It only talks to the Express API.
+- Message ownership is enforced server-side before edits/deletes.
+- Socket connections are authenticated with the same JWT used by REST requests.
+- The chat view stores the socket instance in a ref to avoid duplicate connections.
+- The music player uses a shared React context so multiple UI controls stay synchronized.
+- The visual design uses CSS custom properties for consistent light/dark theming.
+
+## Security Considerations
+
+Implemented:
+
+- bcrypt password hashing
+- JWT auth
+- authenticated message routes
+- authenticated socket handshake
+- basic request validation
+- CORS allowlist using `CLIENT_URL`
+
+Recommended before production hardening:
+
+- Replace the simple forgot-password flow with email-based reset tokens.
+- Add rate limiting to auth endpoints.
+- Add automated API tests for auth and message ownership.
+- Rotate secrets periodically and use host-managed environment variables.
+- Remove deprecated Mongoose connection options.
+
+## Validation Checklist
+
+Before shipping changes, verify:
+
+- `npm run build` in `client/`
+- Backend starts and logs `MongoDB connected`
+- Register/login work against the deployed backend
+- Message send/edit/delete work for the signed-in user
+- Realtime message updates appear across two browser sessions
+- Light/dark mode persists
+- Preferences password change works
+- Sidebar and Preferences music players stay synchronized
+
+## Why This Project Matters
+
+ShigoChat demonstrates the kind of work expected in real product engineering:
+
+- building and integrating a full-stack feature set
+- preserving working application behavior during a visual redesign
+- connecting frontend state, backend APIs, realtime events, and persistent data
+- handling authentication and ownership checks
+- shipping responsive UI that is more than a static mockup
+- documenting setup, deployment, and operational boundaries clearly
+
+It is intentionally small in product scope, but complete enough to show end-to-end engineering judgment.
