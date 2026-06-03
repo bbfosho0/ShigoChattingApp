@@ -4,6 +4,53 @@ ShigoChat is a full-stack real-time chat application built around one shared con
 
 The project is designed as a production-style portfolio piece: the frontend focuses on responsive product polish and interaction design, while the backend demonstrates practical API design, authentication, database modeling, and realtime event handling.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%">
+      <strong>Quiet Room</strong><br />
+      <sub>Realtime chat feed with message history, composer, shared room identity, synced ambient controls, and authenticated user actions.</sub>
+    </td>
+    <td width="50%">
+      <strong>Preferences</strong><br />
+      <sub>Account, appearance, password management, and expanded music controls in a focused settings drawer.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/chat-room.png" alt="ShigoChat Quiet Room chat interface" /></td>
+    <td><img src="docs/screenshots/preferences.png" alt="ShigoChat preferences drawer with account and music controls" /></td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong>Login</strong><br />
+      <sub>Polished authentication entry point with theme-aware sanctuary visuals.</sub>
+    </td>
+    <td width="50%">
+      <strong>Forgot Password</strong><br />
+      <sub>In-app password reset flow connected to the Express auth API.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/login.png" alt="ShigoChat login page" /></td>
+    <td><img src="docs/screenshots/forgot-password.png" alt="ShigoChat forgot password panel" /></td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong>Register</strong><br />
+      <sub>Matching account creation screen with validation-backed API integration.</sub>
+    </td>
+    <td width="50%">
+      <strong>Splash</strong><br />
+      <sub>Brand-forward loading state that routes users into the auth or chat experience.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/register.png" alt="ShigoChat register page" /></td>
+    <td><img src="docs/screenshots/splash.png" alt="ShigoChat splash screen" /></td>
+  </tr>
+</table>
+
 ## Highlights
 
 - **Full-stack chat workflow**: register, log in, fetch message history, send messages, edit/delete owned messages, and receive live updates.
