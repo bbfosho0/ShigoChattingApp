@@ -6,48 +6,104 @@ The project is designed as a production-style portfolio piece: the frontend focu
 
 ## Screenshots
 
+The UI is fully themed. The screenshots below show the same core flows in both light and dark modes.
+
+### Main Application
+
 <table>
   <tr>
     <td width="50%">
-      <strong>Quiet Room</strong><br />
+      <strong>Quiet Room - Light</strong><br />
       <sub>Realtime chat feed with message history, composer, shared room identity, synced ambient controls, and authenticated user actions.</sub>
     </td>
     <td width="50%">
-      <strong>Preferences</strong><br />
-      <sub>Account, appearance, password management, and expanded music controls in a focused settings drawer.</sub>
+      <strong>Quiet Room - Dark</strong><br />
+      <sub>The same production chat workflow rendered in the darker moonlit theme.</sub>
     </td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/chat-room.png" alt="ShigoChat Quiet Room chat interface" /></td>
-    <td><img src="docs/screenshots/preferences.png" alt="ShigoChat preferences drawer with account and music controls" /></td>
+    <td><img src="docs/screenshots/chat-room-light.png" alt="ShigoChat Quiet Room chat interface in light mode" /></td>
+    <td><img src="docs/screenshots/chat-room-dark.png" alt="ShigoChat Quiet Room chat interface in dark mode" /></td>
   </tr>
   <tr>
     <td width="50%">
-      <strong>Login</strong><br />
+      <strong>Preferences - Light</strong><br />
+      <sub>Account, appearance, password management, and expanded music controls in a focused settings drawer.</sub>
+    </td>
+    <td width="50%">
+      <strong>Preferences - Dark</strong><br />
+      <sub>Synced audio controls and account settings remain consistent across themes.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/preferences-light.png" alt="ShigoChat preferences drawer in light mode" /></td>
+    <td><img src="docs/screenshots/preferences-dark.png" alt="ShigoChat preferences drawer in dark mode" /></td>
+  </tr>
+</table>
+
+### Authentication
+
+<table>
+  <tr>
+    <td width="50%">
+      <strong>Login - Light</strong><br />
       <sub>Polished authentication entry point with theme-aware sanctuary visuals.</sub>
     </td>
     <td width="50%">
-      <strong>Forgot Password</strong><br />
-      <sub>In-app password reset flow connected to the Express auth API.</sub>
+      <strong>Login - Dark</strong><br />
+      <sub>The same auth flow in the dark visual system.</sub>
     </td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/login.png" alt="ShigoChat login page" /></td>
-    <td><img src="docs/screenshots/forgot-password.png" alt="ShigoChat forgot password panel" /></td>
+    <td><img src="docs/screenshots/login-light.png" alt="ShigoChat login page in light mode" /></td>
+    <td><img src="docs/screenshots/login-dark.png" alt="ShigoChat login page in dark mode" /></td>
   </tr>
   <tr>
     <td width="50%">
-      <strong>Register</strong><br />
+      <strong>Forgot Password - Light</strong><br />
+      <sub>In-app password reset flow connected to the Express auth API.</sub>
+    </td>
+    <td width="50%">
+      <strong>Forgot Password - Dark</strong><br />
+      <sub>Password recovery presented inside the same focused auth card.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/forgot-password-light.png" alt="ShigoChat forgot password panel in light mode" /></td>
+    <td><img src="docs/screenshots/forgot-password-dark.png" alt="ShigoChat forgot password panel in dark mode" /></td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong>Register - Light</strong><br />
       <sub>Matching account creation screen with validation-backed API integration.</sub>
     </td>
     <td width="50%">
-      <strong>Splash</strong><br />
-      <sub>Brand-forward loading state that routes users into the auth or chat experience.</sub>
+      <strong>Register - Dark</strong><br />
+      <sub>Consistent account creation experience across the full theme system.</sub>
     </td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/register.png" alt="ShigoChat register page" /></td>
-    <td><img src="docs/screenshots/splash.png" alt="ShigoChat splash screen" /></td>
+    <td><img src="docs/screenshots/register-light.png" alt="ShigoChat register page in light mode" /></td>
+    <td><img src="docs/screenshots/register-dark.png" alt="ShigoChat register page in dark mode" /></td>
+  </tr>
+</table>
+
+### Brand Entry
+
+<table>
+  <tr>
+    <td width="50%">
+      <strong>Splash - Light</strong><br />
+      <sub>Brand-forward loading state that routes users into the auth or chat experience.</sub>
+    </td>
+    <td width="50%">
+      <strong>Splash - Dark</strong><br />
+      <sub>The moonlit entry screen used for dark-mode sessions.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/splash-light.png" alt="ShigoChat splash screen in light mode" /></td>
+    <td><img src="docs/screenshots/splash-dark.png" alt="ShigoChat splash screen in dark mode" /></td>
   </tr>
 </table>
 
