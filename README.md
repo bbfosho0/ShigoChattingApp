@@ -4,6 +4,8 @@ ShigoChat is a full-stack real-time chat application built around one shared con
 
 The project is designed as a production-style portfolio piece: the frontend focuses on responsive product polish and interaction design, while the backend demonstrates practical API design, authentication, database modeling, and realtime event handling.
 
+Live site:  https://shigochat.onrender.com/
+
 ## Screenshots
 
 The UI is fully themed. The screenshots below show the same core flows in both light and dark modes.
