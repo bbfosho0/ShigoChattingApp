@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import './index.css';
 import { Toaster } from 'react-hot-toast';
-import { ThemeProvider } from "./context/ThemeContext.js";
-import { MusicProvider } from "./context/MusicContext.js";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
+import { MusicProvider } from "./context/MusicContext.jsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

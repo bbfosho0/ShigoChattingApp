@@ -18,7 +18,6 @@ server/.env.*
 .gptallow
 gpt.js
 instructions.md
-AGENTS.md
 .codexignore
 
 # Dependencies

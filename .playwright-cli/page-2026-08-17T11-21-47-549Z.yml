@@ -1,0 +1,4 @@
+- main "Splash screen" [ref=e3]:
+  - generic [ref=e11]:
+    - heading "ShigoChat" [level=1] [ref=e12]
+    - paragraph [ref=e13]: A quieter place to connect.

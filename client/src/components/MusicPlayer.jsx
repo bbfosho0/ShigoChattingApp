@@ -37,12 +37,12 @@ const MusicPlayer = ({ autoPlay = false, compact = false }) => {
   }, []);
 
   return (
-    <section
-      className={`select-none rounded-xl p-3 ${compact || collapsed ? "" : "p-5"}`}
+    <div
+      className={`sc-music-player select-none rounded-xl p-3 ${compact || collapsed ? "" : "p-5"}`}
       style={{
         background: "var(--sc-bubble-other)",
         border: "1px solid var(--sc-border)",
-        boxShadow: "0 8px 32px var(--sc-shadow)",
+        boxShadow: "0 6px 18px var(--sc-shadow)",
       }}
       aria-label="Ambient music player"
     >
@@ -54,14 +54,14 @@ const MusicPlayer = ({ autoPlay = false, compact = false }) => {
           <p className="text-[0.7rem] sc-text-secondary">Ambient</p>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={prevSong} className="sc-icon-button h-7 w-7 rounded-lg" type="button" aria-label="Previous song">
+          <button onClick={prevSong} className="sc-icon-button sc-touch-target h-10 w-10 rounded-lg" type="button" aria-label="Previous song">
             <SkipBack size={13} />
           </button>
           <button
             onClick={togglePlay}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-white"
+            className="sc-touch-target flex h-10 w-10 items-center justify-center rounded-full text-white"
             style={{
-              background: "linear-gradient(135deg, var(--sc-accent), #c4b8e8)",
+              background: "var(--sc-accent)",
               border: 0,
               cursor: "pointer",
             }}
@@ -70,13 +70,13 @@ const MusicPlayer = ({ autoPlay = false, compact = false }) => {
           >
             {isPlaying ? <Pause size={13} /> : <Play size={13} style={{ marginLeft: 1 }} />}
           </button>
-          <button onClick={nextSong} className="sc-icon-button h-7 w-7 rounded-lg" type="button" aria-label="Next song">
+          <button onClick={nextSong} className="sc-icon-button sc-touch-target h-10 w-10 rounded-lg" type="button" aria-label="Next song">
             <SkipForward size={13} />
           </button>
           {!compact && (
             <button
               onClick={() => setCollapsed((value) => !value)}
-              className="sc-icon-button ml-1 h-7 w-7 rounded-lg"
+              className="sc-icon-button sc-touch-target ml-1 h-10 w-10 rounded-lg"
               type="button"
               aria-label={collapsed ? "Expand music player" : "Collapse music player"}
             >
@@ -101,7 +101,7 @@ const MusicPlayer = ({ autoPlay = false, compact = false }) => {
           className="absolute inset-y-0 left-0 rounded-full"
           style={{
             width: `${progress * 100}%`,
-            background: "rgba(164,146,212,0.65)",
+            background: "var(--sc-accent)",
             transition: "width 0.15s linear",
           }}
         />
@@ -110,7 +110,7 @@ const MusicPlayer = ({ autoPlay = false, compact = false }) => {
       {!compact && !collapsed && (
         <div className="mt-4">
           <div className="flex items-center gap-3">
-            <button onClick={toggleMute} className="sc-icon-button h-8 w-8 rounded-lg" type="button" aria-label={muted ? "Unmute" : "Mute"}>
+            <button onClick={toggleMute} className="sc-icon-button sc-touch-target h-10 w-10 rounded-lg" type="button" aria-label={muted ? "Unmute" : "Mute"}>
               {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
             </button>
             <input
@@ -130,7 +130,7 @@ const MusicPlayer = ({ autoPlay = false, compact = false }) => {
               <button
                 key={song.title}
                 onClick={() => selectSong(index)}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left transition"
+                className="flex min-h-11 w-full items-center justify-between rounded-lg px-3 py-1.5 text-left transition"
                 style={{
                   background: index === currentIndex ? "var(--sc-accent-soft)" : "transparent",
                   border: 0,
@@ -145,7 +145,7 @@ const MusicPlayer = ({ autoPlay = false, compact = false }) => {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 };
 

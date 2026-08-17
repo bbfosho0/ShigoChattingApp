@@ -10,6 +10,7 @@ import { io } from "socket.io-client";
 import { motion } from "framer-motion";
 import { Hash, LogOut, Menu, Moon, Settings, Sun } from "lucide-react";
 import Preferences from "../components/Preferences";
+import RoomState from "../components/RoomState";
 
 /**
  * Chatroom component - main chat interface with robust socket lifecycle handling.
@@ -27,8 +28,24 @@ const Chatroom = () => {
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
+  const [sendError, setSendError] = useState("");
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const preferencesTriggerRef = useRef(null);
+
+  useEffect(() => {
+    document.title = "Quiet Room — ShigoChat";
+  }, []);
+
+  useEffect(() => {
+    if (!sidebarOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setSidebarOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [sidebarOpen]);
   const navigate = useNavigate();
 
   // Socket reference to keep single stable socket instance
@@ -43,6 +60,7 @@ const Chatroom = () => {
    * Wrapped in function so it can be called after socket initialization or on user change.
    */
   const fetchMessages = async () => {
+    setFetchError("");
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -56,6 +74,7 @@ const Chatroom = () => {
       if (mounted.current) setMessages(res.data);
     } catch (err) {
       console.error("Fetch messages error:", err);
+      if (mounted.current) setFetchError("Unable to connect to Quiet Room.");
     } finally {
       if (mounted.current) setLoading(false);
     }
@@ -196,6 +215,7 @@ const Chatroom = () => {
    */
   const handleSend = async (content) => {
     if (!content.trim()) return;
+    setSendError("");
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -229,6 +249,7 @@ const Chatroom = () => {
       }
     } catch (err) {
       console.error("Handle send message error:", err);
+      setSendError("Message not sent. Check your connection and try again.");
     }
   };
 
@@ -303,12 +324,11 @@ const Chatroom = () => {
   };
 
   const initials = user?.username?.slice(0, 2).toUpperCase() || "U";
-  const sidebarBg = darkMode
-    ? "linear-gradient(180deg, #0f1629 0%, #0c1220 100%)"
-    : "linear-gradient(180deg, #fdfbff 0%, #f8f4fe 100%)";
+  const sidebarBg = "var(--sc-panel)";
+  const presence = ["M", "A", initials];
 
   const renderSidebar = () => (
-    <div className="flex h-full w-64 flex-col">
+    <div className="flex h-full w-64 flex-col sc-room-rail">
       <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: "1px solid var(--sc-border)" }}>
         <svg width="30" height="30" viewBox="0 0 64 64" fill="none" aria-hidden="true">
           <path d="M32 8 C18 8, 8 19, 8 32 C8 45, 18 56, 32 56 C24 50, 20 42, 20 32 C20 22, 24 14, 32 8Z" fill={darkMode ? "#c4b8e8" : "#9b78d4"} />
@@ -318,22 +338,20 @@ const Chatroom = () => {
           <span className="sc-serif block text-[1.05rem] font-medium leading-tight sc-text-primary">
             ShigoChat
           </span>
-          <span className="text-[0.65rem] tracking-[0.02em] sc-text-muted">
+          <span className="text-[0.65rem] tracking-[0.02em] sc-text-secondary">
             A quieter place to connect.
           </span>
         </div>
       </div>
 
       <div className="px-3 pb-2 pt-5">
-        <p className="mb-2 pl-2 text-[0.65rem] font-semibold uppercase tracking-[0.1em] sc-text-muted">
+        <p className="mb-2 pl-2 sc-room-kicker">
           Space
         </p>
         <div
           className="flex cursor-default items-center gap-3 rounded-xl px-3.5 py-3"
           style={{
-            background: darkMode
-              ? "linear-gradient(135deg, rgba(107,79,168,0.2), rgba(164,146,212,0.08))"
-              : "linear-gradient(135deg, rgba(124,92,191,0.12), rgba(184,158,232,0.06))",
+            background: "var(--sc-accent-soft)",
             border: "1px solid var(--sc-border)",
           }}
         >
@@ -344,12 +362,12 @@ const Chatroom = () => {
             <p className="text-[0.85rem] font-semibold sc-text-primary">Quiet Room</p>
             <p className="truncate text-[0.68rem] sc-text-secondary">One shared conversation space</p>
           </div>
-          <div className="h-1.5 w-1.5 rounded-full bg-[#5cc88a] shadow-[0_0_6px_rgba(92,200,138,0.6)]" />
+          <span className="sc-status-dot" aria-label="Room active" />
         </div>
       </div>
 
       <div className="mt-4 px-3">
-        <p className="mb-2 pl-1 text-[0.65rem] font-semibold uppercase tracking-[0.1em] sc-text-muted">
+        <p className="mb-2 pl-1 sc-room-kicker">
           Ambient
         </p>
         <MusicPlayer compact />
@@ -359,40 +377,45 @@ const Chatroom = () => {
 
       <div className="px-3 pb-4 pt-4" style={{ borderTop: "1px solid var(--sc-border)" }}>
         <div className="mb-3 flex items-center gap-3 rounded-xl px-3 py-2.5 sc-panel">
-          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#6b4fa8] to-[#9b78d4]">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--sc-accent)" }}>
             <span className="text-[0.68rem] font-bold text-white">{initials}</span>
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[0.84rem] font-semibold sc-text-primary">{user?.username}</p>
-            <p className="truncate text-[0.68rem] sc-text-muted">{user?.email}</p>
+            <p className="truncate text-[0.68rem] sc-text-secondary">{user?.email}</p>
           </div>
         </div>
 
         <div className="flex gap-2">
           <button
             onClick={toggleDarkMode}
-            className="sc-icon-button flex-1 rounded-lg py-2 text-[0.75rem] font-medium"
+            className="sc-icon-button sc-touch-target flex-1 rounded-lg py-2 text-[0.75rem] font-medium"
             type="button"
             title={darkMode ? "Light mode" : "Dark mode"}
+            aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}
           >
             {darkMode ? <Sun size={13} /> : <Moon size={13} />}
             <span className="ml-1.5">{darkMode ? "Light" : "Dark"}</span>
           </button>
           <button
             onClick={() => setPrefsOpen(true)}
-            className="sc-icon-button rounded-lg px-3 py-2"
+            className="sc-icon-button sc-touch-target rounded-lg px-3 py-2"
             type="button"
             title="Preferences"
+            aria-label="Open preferences"
+            aria-expanded={prefsOpen}
+            aria-controls="preferences-dialog"
+            ref={preferencesTriggerRef}
           >
             <Settings size={14} />
           </button>
           <button
             onClick={logout}
-            className="flex items-center justify-center rounded-lg px-3 py-2"
+            className="sc-touch-target flex items-center justify-center rounded-lg px-3 py-2"
             style={{
-              background: "rgba(224,91,122,0.06)",
-              border: "1px solid rgba(224,91,122,0.15)",
-              color: "#e05b7a",
+              background: "transparent",
+              border: "1px solid var(--sc-danger)",
+              color: "var(--sc-danger)",
               cursor: "pointer",
             }}
             type="button"
@@ -405,25 +428,12 @@ const Chatroom = () => {
     </div>
   );
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center sc-app-bg">
-        <div className="flex flex-col items-center gap-4">
-          <svg width="44" height="44" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-            <path d="M32 8 C18 8, 8 19, 8 32 C8 45, 18 56, 32 56 C24 50, 20 42, 20 32 C20 22, 24 14, 32 8Z" fill={darkMode ? "#c4b8e8" : "#9b78d4"} />
-          </svg>
-          <p className="text-sm tracking-[0.04em] sc-text-secondary">Opening Quiet Room...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 flex sc-app-bg"
+      className="sc-room-shell fixed inset-0 flex sc-app-bg"
     >
       <aside
         className="hidden h-full flex-shrink-0 md:flex"
@@ -439,15 +449,16 @@ const Chatroom = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-30 md:hidden"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)" }}
+            style={{ background: "rgba(14,17,23,0.58)" }}
             onClick={() => setSidebarOpen(false)}
           />
           <motion.aside
             initial={{ x: -256 }}
             animate={{ x: 0 }}
             exit={{ x: -256 }}
-            transition={{ type: "spring", damping: 28, stiffness: 280 }}
+            transition={{ duration: 0.28, ease: "easeOut" }}
             className="fixed bottom-0 left-0 top-0 z-40 md:hidden"
+            id="mobile-navigation"
             style={{ background: sidebarBg, borderRight: "1px solid var(--sc-border)" }}
           >
             {renderSidebar()}
@@ -455,29 +466,23 @@ const Chatroom = () => {
         </>
       )}
 
-      <main className="relative flex min-w-0 flex-1 flex-col">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: darkMode
-              ? "radial-gradient(ellipse 60% 50% at 70% 30%, rgba(90,60,160,0.06) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 20% 80%, rgba(50,30,120,0.04) 0%, transparent 70%)"
-              : "radial-gradient(ellipse 60% 50% at 70% 20%, rgba(200,170,240,0.12) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 10% 80%, rgba(220,190,255,0.08) 0%, transparent 70%)",
-          }}
-        />
+      <main className="sc-room-main relative flex min-w-0 flex-1 flex-col">
+        <div className="sc-room-atmosphere" aria-hidden="true" />
 
         <header
-          className="relative z-10 flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
+          className="sc-room-header relative z-10 flex flex-shrink-0 items-center gap-3 px-5 py-4"
           style={{
-            background: darkMode ? "rgba(9,13,26,0.85)" : "rgba(252,250,255,0.9)",
+            background: "var(--sc-surface)",
             borderBottom: "1px solid var(--sc-border)",
-            backdropFilter: "blur(16px)",
           }}
         >
           <button
-            className="sc-icon-button h-8 w-8 rounded-lg md:hidden"
+            className="sc-icon-button sc-touch-target h-8 w-8 rounded-lg md:hidden"
             onClick={() => setSidebarOpen(true)}
             type="button"
             aria-label="Open navigation"
+            aria-expanded={sidebarOpen}
+            aria-controls="mobile-navigation"
           >
             <Menu size={18} />
           </button>
@@ -487,84 +492,90 @@ const Chatroom = () => {
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-[0.9rem] font-semibold leading-tight sc-text-primary">Quiet Room</p>
-            <p className="truncate text-[0.71rem] sc-text-secondary">A calm shared space for conversation.</p>
+            <div className="flex items-center gap-2">
+              <p className="sc-room-wordmark truncate">Quiet Room</p>
+              <span className="sc-room-kicker hidden sm:inline">Private</span>
+            </div>
+            <div className="mt-1 flex items-center gap-3">
+              <span className="sc-status-line"><span className="sc-status-dot" />3 people here</span>
+              <div className="sc-presence-stack" aria-label="People in Quiet Room">
+                {presence.map((letter, index) => <span className="sc-presence-avatar" key={`${letter}-${index}`}>{letter}</span>)}
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-1">
-            <button onClick={toggleDarkMode} className="sc-icon-button h-8 w-8 rounded-lg" type="button" aria-label="Toggle theme">
+            <button onClick={toggleDarkMode} className="sc-icon-button sc-touch-target h-8 w-8 rounded-lg" type="button" aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}>
               {darkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-            <button onClick={() => setPrefsOpen(true)} className="sc-icon-button h-8 w-8 rounded-lg" type="button" aria-label="Open preferences">
+            <button onClick={() => setPrefsOpen(true)} className="sc-icon-button sc-touch-target h-8 w-8 rounded-lg" type="button" aria-label="Open preferences" aria-expanded={prefsOpen} aria-controls="preferences-dialog" ref={preferencesTriggerRef}>
               <Settings size={16} />
             </button>
           </div>
         </header>
 
-        <section className="sc-scrollbar relative flex-1 overflow-y-auto px-4 py-6 md:px-6" style={{ overflowAnchor: "none" }}>
-          {messages.length === 0 && (
-            <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-              <svg width="48" height="48" viewBox="0 0 64 64" fill="none" style={{ opacity: 0.25 }} aria-hidden="true">
-                <path d="M32 8 C18 8, 8 19, 8 32 C8 45, 18 56, 32 56 C24 50, 20 42, 20 32 C20 22, 24 14, 32 8Z" fill={darkMode ? "#c4b8e8" : "#9b78d4"} />
-              </svg>
-              <p className="text-[0.88rem] leading-relaxed sc-text-muted">
-                The room is quiet.
-                <br />
-                Be the first to share something.
-              </p>
-            </div>
-          )}
-
-          <div className="mx-auto flex max-w-3xl flex-col gap-5">
-            {messages.map((message, index) => {
+        <section className="sc-scrollbar relative flex-1 overflow-y-auto px-4 md:px-6" style={{ overflowAnchor: "none" }} aria-label="Quiet Room conversation">
+          {loading ? (
+            <RoomState kind="loading" />
+          ) : fetchError ? (
+            <RoomState kind="error" onRetry={fetchMessages} />
+          ) : messages.length === 0 ? (
+            <RoomState kind="empty" />
+          ) : (
+            <div className="sc-room-message-list flex flex-col gap-5">
+              {messages.map((message, index) => {
               const previous = messages[index - 1];
               const showDayLabel =
                 !previous ||
                 new Date(message.createdAt).toDateString() !== new Date(previous.createdAt).toDateString();
 
-              return (
-                <React.Fragment key={message._id}>
+                return (
+                  <React.Fragment key={message._id}>
                   {showDayLabel && (
-                    <div className="my-2 flex items-center gap-3">
-                      <div className="h-px flex-1" style={{ background: "var(--sc-border)" }} />
-                      <span className="text-[0.68rem] font-medium tracking-[0.04em] sc-text-muted">
+                    <div className="sc-date-rule my-2">
+                      <span>
                         {new Date(message.createdAt).toLocaleDateString([], {
                           weekday: "long",
                           month: "long",
                           day: "numeric",
                         })}
                       </span>
-                      <div className="h-px flex-1" style={{ background: "var(--sc-border)" }} />
                     </div>
                   )}
-                  <MessageBubble
+                    <MessageBubble
                     message={message}
                     userId={user?._id}
                     onDelete={handleDelete}
                     onEdit={handleEdit}
-                  />
-                </React.Fragment>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </div>
+                    />
+                  </React.Fragment>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
         </section>
 
         <footer
-          className="relative flex-shrink-0 px-4 pb-5 pt-3 md:px-6"
+          className="sc-room-composer relative flex-shrink-0 px-4 pb-5 pt-3 md:px-6"
           style={{
-            background: darkMode ? "rgba(9,13,26,0.92)" : "rgba(252,250,255,0.92)",
+            background: "var(--sc-surface)",
             borderTop: "1px solid var(--sc-border)",
-            backdropFilter: "blur(12px)",
           }}
         >
           <div className="mx-auto max-w-3xl">
-            <MessageInput onSend={handleSend} />
+            <MessageInput onSend={handleSend} disabled={loading} error={sendError} />
           </div>
         </footer>
       </main>
 
-      <Preferences open={prefsOpen} onClose={() => setPrefsOpen(false)} user={user} onLogout={logout} />
+      <Preferences
+        open={prefsOpen}
+        onClose={() => setPrefsOpen(false)}
+        returnFocusRef={preferencesTriggerRef}
+        user={user}
+        onLogout={logout}
+      />
     </motion.div>
   );
 };

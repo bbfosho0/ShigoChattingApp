@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { KeyRound, LogOut, Moon, Sun, X } from "lucide-react";
@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { ThemeContext } from "../context/ThemeContext";
 import MusicPlayer from "./MusicPlayer";
 
-const Preferences = ({ open, onClose, user, onLogout }) => {
+const Preferences = ({ open, onClose, returnFocusRef, user, onLogout }) => {
   const { darkMode, setTheme } = useContext(ThemeContext);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -14,8 +14,37 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
     confirmPassword: "",
   });
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const closeButtonRef = useRef(null);
+  const dialogRef = useRef(null);
   const initials = user?.username?.slice(0, 2).toUpperCase() || "U";
   const activeTheme = darkMode ? "dark" : "light";
+  const handleClose = useCallback(() => {
+    onClose();
+    window.setTimeout(() => returnFocusRef?.current?.focus(), 0);
+  }, [onClose, returnFocusRef]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    closeButtonRef.current?.focus();
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") handleClose();
+      if (event.key === "Tab" && dialogRef.current) {
+        const focusable = [...dialogRef.current.querySelectorAll("button, input, textarea, select, a[href], [tabindex]:not([tabindex='-1'])")].filter((element) => !element.disabled);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, handleClose]);
 
   const updatePasswordField = (field, value) => {
     setPasswordForm((current) => ({ ...current, [field]: value }));
@@ -64,17 +93,19 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
     <AnimatePresence>
       {open && (
         <>
-          <motion.div
+          <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40"
-            style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
-            onClick={onClose}
+            className="fixed inset-0 z-40 cursor-default border-0 p-0"
+            style={{ background: "rgba(14,17,23,0.52)" }}
+            onClick={handleClose}
+            type="button"
+            aria-label="Close preferences"
           />
 
-          <motion.aside
+          <motion.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -87,14 +118,24 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
                 ? "-24px 0 64px rgba(0,0,0,0.6)"
                 : "-24px 0 64px rgba(100,70,180,0.1)",
             }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="preferences-title"
+            aria-describedby="preferences-description"
+            id="preferences-dialog"
+            ref={dialogRef}
           >
             <div className="flex items-center justify-between p-5" style={{ borderBottom: "1px solid var(--sc-border)" }}>
-              <h2 className="sc-serif text-[1.2rem] font-medium sc-text-primary">Preferences</h2>
+              <div>
+                <h2 id="preferences-title" className="sc-serif text-[1.2rem] font-medium sc-text-primary">Preferences</h2>
+                <p id="preferences-description" className="mt-1 text-[0.74rem] sc-text-secondary">Tune the room without leaving the conversation.</p>
+              </div>
               <button
-                onClick={onClose}
-                className="sc-icon-button h-8 w-8 rounded-lg"
+                onClick={handleClose}
+                className="sc-icon-button sc-touch-target h-8 w-8 rounded-lg"
                 type="button"
                 aria-label="Close preferences"
+                ref={closeButtonRef}
               >
                 <X size={18} />
               </button>
@@ -102,7 +143,7 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
 
             <div className="sc-scrollbar flex-1 space-y-6 overflow-y-auto p-5">
               <section className="flex items-center gap-4 rounded-xl p-4 sc-panel">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#6b4fa8] to-[#9b78d4]">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--sc-accent)" }}>
                   <span className="text-base font-semibold text-white">{initials}</span>
                 </div>
                 <div className="min-w-0">
@@ -146,11 +187,23 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
                   className="space-y-3 rounded-xl p-4"
                   style={{ background: "var(--sc-accent-glow)", border: "1px solid var(--sc-border)" }}
                 >
+                  <input
+                    type="text"
+                    name="username"
+                    autoComplete="username"
+                    value={user?.email || ""}
+                    readOnly
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="sc-visually-hidden"
+                  />
                   <div className="flex items-center gap-2 text-[0.86rem] font-semibold sc-text-primary">
                     <KeyRound size={15} style={{ color: "var(--sc-accent)" }} />
                     Change password
                   </div>
+                  <label className="sc-visually-hidden" htmlFor="current-password">Current password</label>
                   <input
+                    id="current-password"
                     type="password"
                     value={passwordForm.currentPassword}
                     onChange={(event) => updatePasswordField("currentPassword", event.target.value)}
@@ -158,7 +211,9 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
                     className="sc-field px-3 py-2 text-[0.84rem]"
                     autoComplete="current-password"
                   />
+                  <label className="sc-visually-hidden" htmlFor="new-password">New password</label>
                   <input
+                    id="new-password"
                     type="password"
                     value={passwordForm.newPassword}
                     onChange={(event) => updatePasswordField("newPassword", event.target.value)}
@@ -166,7 +221,9 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
                     className="sc-field px-3 py-2 text-[0.84rem]"
                     autoComplete="new-password"
                   />
+                  <label className="sc-visually-hidden" htmlFor="confirm-password">Confirm new password</label>
                   <input
+                    id="confirm-password"
                     type="password"
                     value={passwordForm.confirmPassword}
                     onChange={(event) => updatePasswordField("confirmPassword", event.target.value)}
@@ -195,11 +252,11 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
             <div className="p-5" style={{ borderTop: "1px solid var(--sc-border)" }}>
               <button
                 onClick={onLogout}
-                className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-[0.88rem] font-medium transition"
+                className="sc-touch-target flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-[0.88rem] font-medium transition"
                 style={{
-                  background: darkMode ? "rgba(224,91,122,0.08)" : "rgba(224,91,122,0.06)",
-                  border: "1px solid rgba(224,91,122,0.2)",
-                  color: "#e05b7a",
+                background: "transparent",
+                border: "1px solid var(--sc-danger)",
+                color: "var(--sc-danger)",
                   cursor: "pointer",
                 }}
                 type="button"
@@ -208,7 +265,7 @@ const Preferences = ({ open, onClose, user, onLogout }) => {
                 Log out
               </button>
             </div>
-          </motion.aside>
+          </motion.div>
         </>
       )}
     </AnimatePresence>

@@ -186,16 +186,24 @@ client/src/
 │  ├─ MessageBubble.jsx
 │  ├─ MessageInput.jsx
 │  ├─ MusicPlayer.jsx
+│  ├─ Primitives.jsx
+│  ├─ RoomState.jsx
 │  └─ Preferences.jsx
 ├─ context/
-│  ├─ AuthContext.js
-│  ├─ MusicContext.js
-│  └─ ThemeContext.js
+│  ├─ AuthContext.jsx
+│  ├─ MusicContext.jsx
+│  └─ ThemeContext.jsx
 ├─ pages/
 │  ├─ Chatroom.jsx
 │  ├─ Login.jsx
 │  ├─ Register.jsx
 │  └─ SplashScreen.jsx
+├─ stories/
+│  ├─ 21stAdaptations.stories.jsx
+│  ├─ ChatPrimitives.stories.jsx
+│  └─ RoomStates.stories.jsx
+├─ components/*.test.jsx
+├─ setupTests.js
 ├─ App.jsx
 ├─ index.css
 └─ index.js
@@ -389,3 +397,24 @@ ShigoChat demonstrates the kind of work expected in real product engineering:
 - documenting setup, deployment, and operational boundaries clearly
 
 It is intentionally small in product scope, but complete enough to show end-to-end engineering judgment.
+
+## Design and component research
+
+The visual source of truth is the tokenized Quiet Room design documented in .21st/DESIGN.md. Storybook is the rendered implementation reference for deterministic UI states.
+
+21st.dev is used as a research and pattern-discovery layer. Retrieved components are staged under client/src/components/21st-candidates/, reviewed for accessibility, responsiveness, dependencies, and product fit, and then rebuilt locally when useful. ShigoChat does not install a runtime 21st registry dependency or publish its theme. The retrieval ledger and adoption decisions live in .21st/INTEGRATION.md.
+
+## Storybook and verification
+
+Run these commands from client/:
+
+    npm start
+    npm test -- --watchAll=false --runInBand
+    npm run build
+    npm run storybook
+    npm run test-storybook -- --watch=false
+    npm run build-storybook
+
+Stories use local fixtures and do not require MongoDB, Socket.IO, credentials, or network access. UI changes should be checked in both themes, at mobile and desktop widths, with keyboard-only interaction, reduced motion, drawer focus behavior, message actions, composer loading/error states, and no horizontal overflow where applicable.
+
+Unit tests and Storybook checks are local. Live authentication, realtime behavior, MongoDB persistence, deployment checks, and Chromatic review require their corresponding backend, credentials, or external service and must be reported as unrun when those dependencies are unavailable.

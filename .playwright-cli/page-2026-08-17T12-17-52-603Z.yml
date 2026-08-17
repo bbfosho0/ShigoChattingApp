@@ -1,0 +1,241 @@
+- generic [ref=e37]:
+  - complementary [ref=e38]:
+    - generic [ref=e39]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: ShigoChat
+        - text: A quieter place to connect.
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Space
+        - generic [ref=e48]:
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: Quiet Room
+            - paragraph [ref=e55]: One shared conversation space
+          - generic "Room active" [ref=e56]
+      - generic [ref=e57]:
+        - paragraph [ref=e58]: Ambient
+        - region "Ambient music player" [ref=e59]:
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: Agosto
+              - paragraph [ref=e63]: Ambient
+            - generic [ref=e64]:
+              - button "Previous song" [ref=e65] [cursor=pointer]
+              - button "Play" [ref=e68] [cursor=pointer]
+              - button "Next song" [ref=e71] [cursor=pointer]
+          - slider "Song progress" [ref=e75] [cursor=pointer]: "0"
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: CO
+          - generic [ref=e81]:
+            - paragraph [ref=e82]: codexreview5fa6adb4
+            - paragraph [ref=e83]: codex-redesign-5fa6adb4@example.test
+        - generic [ref=e84]:
+          - button "Switch to dark theme" [ref=e85] [cursor=pointer]:
+            - generic [ref=e88]: Dark
+          - button "Open preferences" [expanded] [ref=e89] [cursor=pointer]
+          - button "Log out" [ref=e93] [cursor=pointer]
+  - main [ref=e97]:
+    - generic [ref=e98]:
+      - generic [ref=e103]:
+        - paragraph [ref=e104]: Quiet Room
+        - paragraph [ref=e105]: 3 people here · listening quietly.
+      - generic [ref=e106]:
+        - button "Switch to dark theme" [ref=e107] [cursor=pointer]
+        - button "Open preferences" [expanded] [ref=e110] [cursor=pointer]
+    - generic [ref=e115]:
+      - generic [ref=e116]: Thursday, May 29
+      - generic [ref=e120]:
+        - generic [ref=e121]: BB
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: bbfosho0
+            - generic [ref=e126]: 01:40 AM
+          - paragraph [ref=e129]: Heyo
+      - generic [ref=e130]:
+        - generic [ref=e131]: XE
+        - generic [ref=e133]:
+          - generic [ref=e134]:
+            - generic [ref=e135]: Xenamarie
+            - generic [ref=e136]: 01:41 AM
+          - paragraph [ref=e139]: Hiii I love it 😻
+      - generic [ref=e140]:
+        - generic [ref=e141]: BB
+        - generic [ref=e143]:
+          - generic [ref=e144]:
+            - generic [ref=e145]: bbfosho0
+            - generic [ref=e146]: 01:41 AM
+          - paragraph [ref=e149]: Thank you very much 😁
+      - generic [ref=e150]: Wednesday, June 18
+      - generic [ref=e154]:
+        - generic [ref=e155]: BB
+        - generic [ref=e157]:
+          - generic [ref=e158]:
+            - generic [ref=e159]: bbfosho0
+            - generic [ref=e160]: 10:26 PM
+          - paragraph [ref=e163]: goober
+      - generic [ref=e164]: Tuesday, July 1
+      - generic [ref=e168]:
+        - generic [ref=e169]: JE
+        - generic [ref=e171]:
+          - generic [ref=e172]:
+            - generic [ref=e173]: Jesse
+            - generic [ref=e174]: 08:02 PM
+          - paragraph [ref=e177]: Something magical
+      - generic [ref=e178]:
+        - generic [ref=e179]: BB
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e183]: bbfosho0
+            - generic [ref=e184]: 08:02 PM
+          - paragraph [ref=e187]: Wadup
+      - generic [ref=e188]:
+        - generic [ref=e189]: BB
+        - generic [ref=e191]:
+          - generic [ref=e192]:
+            - generic [ref=e193]: bbfosho0
+            - generic [ref=e194]: 08:03 PM
+          - paragraph [ref=e197]: Boys we're in the mainframe
+      - generic [ref=e198]:
+        - generic [ref=e199]: JE
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - generic [ref=e203]: Jesse
+            - generic [ref=e204]: 08:04 PM
+          - paragraph [ref=e207]: Hackerman
+      - generic [ref=e208]: Tuesday, July 15
+      - generic [ref=e212]:
+        - generic [ref=e213]: BB
+        - generic [ref=e215]:
+          - generic [ref=e216]:
+            - generic [ref=e217]: bbfosho0
+            - generic [ref=e218]: 08:51 PM
+          - paragraph [ref=e221]: Yjisjshe
+      - generic [ref=e222]: Sunday, September 28
+      - generic [ref=e226]:
+        - generic [ref=e227]: JH
+        - generic [ref=e229]:
+          - generic [ref=e230]:
+            - generic [ref=e231]: Jhas
+            - generic [ref=e232]: 03:39 AM
+          - paragraph [ref=e235]: infj ;)
+      - generic [ref=e236]:
+        - generic [ref=e237]: BB
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - generic [ref=e241]: bbfosho0
+            - generic [ref=e242]: 03:40 AM
+          - paragraph [ref=e245]: Hi
+      - generic [ref=e246]:
+        - generic [ref=e247]: BB
+        - generic [ref=e249]:
+          - generic [ref=e250]:
+            - generic [ref=e251]: bbfosho0
+            - generic [ref=e252]: 03:40 AM
+          - paragraph [ref=e255]: Hi infj
+      - generic [ref=e256]:
+        - generic [ref=e257]: JH
+        - generic [ref=e259]:
+          - generic [ref=e260]:
+            - generic [ref=e261]: Jhas
+            - generic [ref=e262]: 03:41 AM
+          - paragraph [ref=e265]: hi :D
+      - generic [ref=e266]: Tuesday, September 30
+      - generic [ref=e270]:
+        - generic [ref=e271]: BB
+        - generic [ref=e273]:
+          - generic [ref=e274]:
+            - generic [ref=e275]: bbfosho0
+            - generic [ref=e276]: 04:47 PM
+          - paragraph [ref=e279]: gabagooey gaba-ee
+      - generic [ref=e280]:
+        - generic [ref=e281]: BB
+        - generic [ref=e283]:
+          - generic [ref=e284]:
+            - generic [ref=e285]: bbfosho0
+            - generic [ref=e286]: 04:47 PM
+          - paragraph [ref=e289]: test
+      - generic [ref=e290]: Saturday, January 31
+      - generic [ref=e294]:
+        - generic [ref=e295]: PO
+        - generic [ref=e297]:
+          - generic [ref=e298]:
+            - generic [ref=e299]: poppi
+            - generic [ref=e300]: 12:30 AM
+          - paragraph [ref=e303]: meow
+      - generic [ref=e304]:
+        - generic [ref=e305]: BB
+        - generic [ref=e307]:
+          - generic [ref=e308]:
+            - generic [ref=e309]: bbfosho0
+            - generic [ref=e310]: 12:31 AM
+          - paragraph [ref=e313]: hi
+      - generic [ref=e314]:
+        - generic [ref=e315]: PO
+        - generic [ref=e317]:
+          - generic [ref=e318]:
+            - generic [ref=e319]: poppi
+            - generic [ref=e320]: 12:32 AM
+          - paragraph [ref=e323]: also an infj
+      - generic [ref=e324]: Wednesday, June 3
+      - generic [ref=e328]:
+        - generic [ref=e329]: HI
+        - generic [ref=e331]:
+          - generic [ref=e332]:
+            - generic [ref=e333]: hio
+            - generic [ref=e334]: 03:38 PM
+          - paragraph [ref=e337]: gang
+    - form "Message input form" [ref=e341]:
+      - textbox "Message input" [ref=e342]:
+        - /placeholder: Share what's on your mind...
+      - button "Send message" [disabled] [ref=e343]
+  - button "Close preferences" [ref=e440]
+  - dialog [ref=e441]:
+    - generic [ref=e442]:
+      - heading "Preferences" [level=2] [ref=e443]
+      - button "Close preferences" [active] [ref=e444] [cursor=pointer]
+    - generic [ref=e448]:
+      - generic [ref=e449]:
+        - generic [ref=e450]: CO
+        - generic [ref=e452]:
+          - paragraph [ref=e453]: codexreview5fa6adb4
+          - paragraph [ref=e454]: codex-redesign-5fa6adb4@example.test
+      - generic [ref=e455]:
+        - paragraph [ref=e456]: Appearance
+        - generic [ref=e457]:
+          - button "Light" [ref=e458] [cursor=pointer]
+          - button "Dark" [ref=e465] [cursor=pointer]
+      - generic [ref=e468]:
+        - paragraph [ref=e469]: Account
+        - generic [ref=e470]:
+          - generic [ref=e471]: Change password
+          - generic [ref=e475]: Current password
+          - textbox "Current password" [ref=e476]
+          - generic [ref=e477]: New password
+          - textbox "New password" [ref=e478]
+          - generic [ref=e479]: Confirm new password
+          - textbox "Confirm new password" [ref=e480]
+          - button "Save password" [ref=e481] [cursor=pointer]
+      - generic [ref=e482]:
+        - paragraph [ref=e483]: Ambient Music
+        - region "Ambient music player" [ref=e484]:
+          - generic [ref=e485]:
+            - generic [ref=e486]:
+              - paragraph [ref=e487]: Agosto
+              - paragraph [ref=e488]: Ambient
+            - generic [ref=e489]:
+              - button "Previous song" [ref=e490] [cursor=pointer]
+              - button "Play" [ref=e493] [cursor=pointer]
+              - button "Next song" [ref=e496] [cursor=pointer]
+              - button "Collapse music player" [ref=e499] [cursor=pointer]
+          - slider "Song progress" [ref=e503] [cursor=pointer]: "0"
+          - generic [ref=e504]:
+            - generic [ref=e505]:
+              - button "Mute" [ref=e506] [cursor=pointer]
+              - slider "Volume" [ref=e511] [cursor=pointer]: "0.2"
+            - generic [ref=e512]:
+              - button "Agosto" [ref=e513] [cursor=pointer]
+              - button "Benny Bronco - o k t o b u" [ref=e515] [cursor=pointer]
+              - button "Dor-c - Sunshine Rider" [ref=e517] [cursor=pointer]
+              - button "Johnny Gorillas - Blue Morning" [ref=e519] [cursor=pointer]
+              - button "Soulful" [ref=e521] [cursor=pointer]
+    - button "Log out" [ref=e524] [cursor=pointer]

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -21,6 +21,10 @@ const Login = () => {
   const { setUser } = useContext(AuthContext);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = resetOpen ? "Reset password — ShigoChat" : "Sign in — ShigoChat";
+  }, [resetOpen]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -93,7 +97,7 @@ const Login = () => {
     `sc-field px-4 py-3 text-[0.9rem] ${focusedField === field ? "ring-0" : ""}`;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-hidden px-4">
+    <div className="sc-auth-shell">
       <img
         src={darkMode ? desktopDark : desktopLight}
         alt=""
@@ -171,11 +175,12 @@ const Login = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.08em] sc-text-secondary">
+              <label htmlFor="login-email" className="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.08em] sc-text-secondary">
                 Email
               </label>
               <input
                 type="email"
+                id="login-email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
@@ -184,18 +189,20 @@ const Login = () => {
                 placeholder="your@email.com"
                 className={inputClass("email")}
                 aria-invalid={error.email ? "true" : "false"}
+                aria-describedby={error.email ? "login-email-error" : undefined}
                 autoComplete="email"
               />
-              {error.email && <p className="mt-1 text-xs text-[#e05b7a]">{error.email}</p>}
+              {error.email && <p id="login-email-error" className="mt-1 text-xs" style={{ color: "var(--sc-danger)" }}>{error.email}</p>}
             </div>
 
             <div>
-              <label className="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.08em] sc-text-secondary">
+              <label htmlFor="login-password" className="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.08em] sc-text-secondary">
                 Password
               </label>
               <div className="relative">
                 <input
                   type={showPass ? "text" : "password"}
+                  id="login-password"
                   name="password"
                   value={form.password}
                   onChange={handleChange}
@@ -204,6 +211,7 @@ const Login = () => {
                   placeholder="Password"
                   className={`${inputClass("password")} pr-11`}
                   aria-invalid={error.password ? "true" : "false"}
+                  aria-describedby={error.password ? "login-password-error" : undefined}
                   autoComplete="current-password"
                 />
                 <button
@@ -216,7 +224,7 @@ const Login = () => {
                   {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
-              {error.password && <p className="mt-1 text-xs text-[#e05b7a]">{error.password}</p>}
+              {error.password && <p id="login-password-error" className="mt-1 text-xs" style={{ color: "var(--sc-danger)" }}>{error.password}</p>}
               <button
                 type="button"
                 onClick={() => {
@@ -248,7 +256,9 @@ const Login = () => {
                   Reset your password for this ShigoChat account.
                 </p>
                 <div className="space-y-2">
+                  <label className="sc-visually-hidden" htmlFor="reset-email">Account email</label>
                   <input
+                    id="reset-email"
                     type="email"
                     value={resetForm.email}
                     onChange={(event) => setResetForm({ ...resetForm, email: event.target.value })}
@@ -256,7 +266,9 @@ const Login = () => {
                     className="sc-field px-3 py-2 text-[0.84rem]"
                     autoComplete="email"
                   />
+                  <label className="sc-visually-hidden" htmlFor="reset-password">New password</label>
                   <input
+                    id="reset-password"
                     type="password"
                     value={resetForm.password}
                     onChange={(event) => setResetForm({ ...resetForm, password: event.target.value })}
@@ -264,7 +276,9 @@ const Login = () => {
                     className="sc-field px-3 py-2 text-[0.84rem]"
                     autoComplete="new-password"
                   />
+                  <label className="sc-visually-hidden" htmlFor="reset-confirm-password">Confirm new password</label>
                   <input
+                    id="reset-confirm-password"
                     type="password"
                     value={resetForm.confirmPassword}
                     onChange={(event) => setResetForm({ ...resetForm, confirmPassword: event.target.value })}
@@ -295,7 +309,7 @@ const Login = () => {
 
           <div className="my-5 flex items-center gap-3">
             <div className="h-px flex-1" style={{ background: "var(--sc-border)" }} />
-            <span className="text-[0.72rem] sc-text-muted">or</span>
+            <span className="text-[0.72rem] sc-text-secondary">or</span>
             <div className="h-px flex-1" style={{ background: "var(--sc-border)" }} />
           </div>
 

@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-
 import agosto from "../music/Agosto.mp3";
 import bennyBronco from "../music/Benny Bronco - o k t o b u.mp3";
 import dorc from "../music/Dor-c - Sunshine Rider.mp3";
@@ -23,30 +22,19 @@ export const MusicProvider = ({ children }) => {
   const [volume, setVolume] = useState(0.2);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-
   const currentSong = SONGS[currentIndex];
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
     audio.volume = volume;
     audio.muted = muted;
-
     if (isPlaying) {
-      audio.play().catch((err) => {
-        console.error("Audio play error:", err);
-        setIsPlaying(false);
-      });
+      audio.play().catch(() => setIsPlaying(false));
     } else {
       audio.pause();
     }
   }, [currentIndex, isPlaying, muted, volume]);
-
-  const onTimeUpdate = () => {
-    const audio = audioRef.current;
-    if (audio?.duration) setProgress(audio.currentTime / audio.duration);
-  };
 
   const nextSong = useCallback(() => {
     setCurrentIndex((index) => (index + 1) % SONGS.length);
@@ -58,51 +46,43 @@ export const MusicProvider = ({ children }) => {
     setProgress(0);
   };
 
-  const selectSong = (index) => {
-    setCurrentIndex(index);
-    setProgress(0);
+  const value = {
+    songs: SONGS,
+    currentSong,
+    currentIndex,
+    isPlaying,
+    muted,
+    volume,
+    progress,
+    togglePlay: () => setIsPlaying((value) => !value),
+    toggleMute: () => setMuted((value) => !value),
+    setVolume: (value) => { setVolume(value); setMuted(false); },
+    nextSong,
+    prevSong,
+    selectSong: (index) => { setCurrentIndex(index); setProgress(0); },
+    seek: (value) => {
+      const audio = audioRef.current;
+      if (!audio?.duration) return;
+      const nextTime = Number(value) * audio.duration;
+      if (!Number.isFinite(nextTime)) return;
+      audio.currentTime = nextTime;
+      setProgress(nextTime / audio.duration);
+    },
   };
 
-  const seek = (value) => {
-    const audio = audioRef.current;
-    if (!audio?.duration) return;
-    const nextTime = Number(value) * audio.duration;
-    if (!Number.isFinite(nextTime)) return;
-    audio.currentTime = nextTime;
-    setProgress(nextTime / audio.duration);
-  };
-
-  return (
-    <MusicContext.Provider
-      value={{
-        songs: SONGS,
-        currentSong,
-        currentIndex,
-        isPlaying,
-        muted,
-        volume,
-        progress,
-        togglePlay: () => setIsPlaying((value) => !value),
-        toggleMute: () => setMuted((value) => !value),
-        setVolume: (value) => {
-          setVolume(value);
-          setMuted(false);
-        },
-        nextSong,
-        prevSong,
-        selectSong,
-        seek,
-      }}
-    >
-      <audio
-        ref={audioRef}
-        src={currentSong.src}
-        onEnded={nextSong}
-        onTimeUpdate={onTimeUpdate}
-        preload="metadata"
-      />
-      {children}
-    </MusicContext.Provider>
+  return React.createElement(
+    MusicContext.Provider,
+    { value },
+    React.createElement("audio", {
+      ref: audioRef,
+      src: currentSong.src,
+      onEnded: nextSong,
+      onTimeUpdate: () => {
+        if (audioRef.current?.duration) setProgress(audioRef.current.currentTime / audioRef.current.duration);
+      },
+      preload: "metadata",
+    }),
+    children,
   );
 };
 

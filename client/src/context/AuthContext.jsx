@@ -11,12 +11,12 @@ export const AuthProvider = ({ children }) => {
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
-      } catch (err) {
+      } catch {
         console.error("Invalid user data in localStorage");
         localStorage.removeItem("user");
       }
     }
-    setLoading(false); // ✅ always end loading
+    setLoading(false);
   }, []);
 
   return (

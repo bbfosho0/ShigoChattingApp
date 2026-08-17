@@ -1,0 +1,25 @@
+- generic [ref=e2]:
+  - generic [ref=e49]:
+    - text: A quieter place to connect.
+    - button "Dark" [ref=e50] [cursor=pointer]
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - heading "Create your space" [level=1] [ref=e61]
+        - paragraph [ref=e62]: Begin a quieter conversation.
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]: Username
+          - textbox "yourname" [ref=e66]: room632612
+        - generic [ref=e67]:
+          - generic [ref=e68]: Email
+          - textbox "your@email.com" [ref=e69]: shigo21st632612@example.com
+        - generic [ref=e70]:
+          - generic [ref=e71]: Password
+          - textbox "Password" [ref=e72]: QuietRoom!2026
+        - button "Create account" [ref=e73] [cursor=pointer]
+      - generic [ref=e74]: or
+      - paragraph [ref=e78]:
+        - text: Already have an account?
+        - link "Sign in" [ref=e79] [cursor=pointer]:
+          - /url: /login
+  - status [ref=e85]: Account created. Redirecting...

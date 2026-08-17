@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -15,6 +15,10 @@ const Register = () => {
   const [focusedField, setFocusedField] = useState(null);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = "Create account — ShigoChat";
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -48,7 +52,7 @@ const Register = () => {
   const inputClass = "sc-field px-4 py-3 text-[0.9rem]";
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-hidden px-4">
+    <div className="sc-auth-shell">
       <img
         src={darkMode ? desktopDark : desktopLight}
         alt=""
@@ -131,11 +135,12 @@ const Register = () => {
               ["password", "Password", "Password", "password", "new-password"],
             ].map(([name, label, placeholder, type, autoComplete]) => (
               <div key={name}>
-                <label className="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.08em] sc-text-secondary">
+                <label htmlFor={`register-${name}`} className="mb-2 block text-[0.72rem] font-semibold uppercase tracking-[0.08em] sc-text-secondary">
                   {label}
                 </label>
                 <input
                   type={type}
+                  id={`register-${name}`}
                   name={name}
                   value={form[name]}
                   onChange={handleChange}
@@ -144,6 +149,7 @@ const Register = () => {
                   placeholder={placeholder}
                   className={inputClass}
                   aria-invalid={error[name] ? "true" : "false"}
+                  aria-describedby={error[name] ? `register-${name}-error` : undefined}
                   autoComplete={autoComplete}
                   style={
                     focusedField === name
@@ -151,7 +157,7 @@ const Register = () => {
                       : undefined
                   }
                 />
-                {error[name] && <p className="mt-1 text-xs text-[#e05b7a]">{error[name]}</p>}
+                {error[name] && <p id={`register-${name}-error`} className="mt-1 text-xs" style={{ color: "var(--sc-danger)" }}>{error[name]}</p>}
               </div>
             ))}
 
@@ -166,7 +172,7 @@ const Register = () => {
 
           <div className="my-5 flex items-center gap-3">
             <div className="h-px flex-1" style={{ background: "var(--sc-border)" }} />
-            <span className="text-[0.72rem] sc-text-muted">or</span>
+            <span className="text-[0.72rem] sc-text-secondary">or</span>
             <div className="h-px flex-1" style={{ background: "var(--sc-border)" }} />
           </div>
 

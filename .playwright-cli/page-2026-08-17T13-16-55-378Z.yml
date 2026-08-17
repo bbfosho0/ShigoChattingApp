@@ -1,0 +1,6 @@
+- main "Splash screen" [ref=e3]:
+  - generic [ref=e5]:
+    - paragraph [ref=e9]: SHIGOCHAT / PRIVATE ROOM
+    - heading "A quieter place to connect." [level=1] [ref=e10]
+    - progressbar "Loading 5 percent" [ref=e11]
+  - paragraph [ref=e13]: Make room for the conversation.
