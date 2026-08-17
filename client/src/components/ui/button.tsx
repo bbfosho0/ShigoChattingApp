@@ -1,29 +1,47 @@
+"use client";
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import type { LucideIcon } from "lucide-react";
 
 import { cn } from "lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  [
+    "group relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-full font-medium outline-none",
+    "transition-all duration-[80ms]",
+    "disabled:pointer-events-none disabled:opacity-50",
+    "focus-visible:ring-1 focus-visible:ring-[#6B97FF] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+  ],
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        default:
+          "bg-foreground text-background hover:bg-foreground/90 active:bg-foreground/80",
+        primary:
+          "bg-foreground text-background hover:bg-foreground/90 active:bg-foreground/80",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+          "bg-accent text-foreground hover:bg-accent/80 active:bg-accent",
+        tertiary:
+          "border border-border bg-transparent text-foreground hover:bg-muted active:bg-muted/60",
+        outline:
+          "border border-border bg-transparent text-foreground hover:bg-muted active:bg-muted/60",
+        ghost:
+          "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground active:bg-muted/60",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "h-9 gap-1.5 px-4 text-[13px]",
+        sm: "h-8 gap-1 px-3 text-xs",
+        md: "h-9 gap-1.5 px-4 text-[13px]",
+        lg: "h-10 gap-1.5 px-5 text-sm",
+        "icon-sm": "size-8 p-0 [&_svg]:size-3.5",
+        icon: "size-9 p-0 [&_svg]:size-4",
+        "icon-lg": "size-10 p-0 [&_svg]:size-5",
       },
     },
     defaultVariants: {
@@ -33,12 +51,16 @@ const buttonVariants = cva(
   }
 );
 
-export interface ButtonProps
+interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
+  leadingIcon?: LucideIcon;
+  trailingIcon?: LucideIcon;
+  /** Backward-compatible arbitrary leading content. Prefer leadingIcon for Lucide icons. */
   leftIcon?: React.ReactNode;
+  /** Backward-compatible arbitrary trailing content. Prefer trailingIcon for Lucide icons. */
   rightIcon?: React.ReactNode;
 }
 
@@ -50,19 +72,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size,
       asChild = false,
       loading = false,
+      leadingIcon: LeadingIcon,
+      trailingIcon: TrailingIcon,
       leftIcon,
       rightIcon,
-      children,
       disabled,
+      children,
       ...props
     },
     ref
   ) => {
+    const isIconOnly =
+      size === "icon" || size === "icon-sm" || size === "icon-lg";
+    const iconSize = size === "sm" ? 14 : size === "lg" ? 20 : 16;
+    const classes = cn(buttonVariants({ variant, size }), className);
+
     if (asChild) {
       return (
         <Slot
-          className={cn(buttonVariants({ variant, size, className }))}
+          className={classes}
           ref={ref}
+          aria-busy={loading || undefined}
+          aria-disabled={disabled || loading || undefined}
           {...props}
         >
           {children}
@@ -70,44 +101,81 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       );
     }
 
+    const leadingContent = LeadingIcon ? (
+      <LeadingIcon
+        aria-hidden="true"
+        size={iconSize}
+        strokeWidth={1.5}
+        className="transition-[stroke-width] duration-[80ms] group-hover:[stroke-width:2]"
+      />
+    ) : (
+      leftIcon
+    );
+
+    const trailingContent = TrailingIcon ? (
+      <TrailingIcon
+        aria-hidden="true"
+        size={iconSize}
+        strokeWidth={1.5}
+        className="transition-[stroke-width] duration-[80ms] group-hover:[stroke-width:2]"
+      />
+    ) : (
+      rightIcon
+    );
+
     return (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        className={classes}
         disabled={disabled || loading}
         aria-busy={loading || undefined}
         {...props}
       >
         {loading ? (
-          <svg
-            aria-hidden="true"
-            className="size-4 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+          <>
+            <span
+              aria-hidden="true"
+              className="flex items-center justify-center gap-[inherit] opacity-0"
+            >
+              {!isIconOnly ? leadingContent : null}
+              {children}
+              {!isIconOnly ? trailingContent : null}
+            </span>
+            <span className="absolute inset-0 flex items-center justify-center">
+              <svg
+                aria-hidden="true"
+                className="size-8"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M 12 12 C 14 8.5 19 8.5 19 12 C 19 15.5 14 15.5 12 12 C 10 8.5 5 8.5 5 12 C 5 15.5 10 15.5 12 12 Z"
+                  stroke="currentColor"
+                  strokeWidth="1.125"
+                  strokeLinecap="round"
+                  pathLength="100"
+                  className="animate-button-infinity"
+                />
+              </svg>
+            </span>
+          </>
+        ) : isIconOnly ? (
+          <span className="[&_svg]:transition-[stroke-width] [&_svg]:duration-[80ms] group-hover:[&_svg]:[stroke-width:2]">
+            {children}
+          </span>
         ) : (
-          leftIcon
+          <>
+            {leadingContent}
+            <span>{children}</span>
+            {trailingContent}
+          </>
         )}
-        {children}
-        {!loading ? rightIcon : null}
       </button>
     );
   }
 );
+
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
+export type { ButtonProps };
