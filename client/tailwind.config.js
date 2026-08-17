@@ -59,11 +59,20 @@ module.exports = {
       },
       animation: {
         float: 'float 6s ease-in-out infinite',
+        'button-infinity': 'spinner-move 2s linear infinite, spinner-dash 4s ease-in-out infinite',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        'spinner-move': {
+          from: { strokeDashoffset: '100' },
+          to: { strokeDashoffset: '0' },
+        },
+        'spinner-dash': {
+          '0%, 100%': { strokeDasharray: '15 85' },
+          '50%': { strokeDasharray: '50 50' },
         },
       },
       boxShadow: {
