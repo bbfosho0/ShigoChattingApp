@@ -5,6 +5,27 @@
 @tailwind utilities;
 
 :root {
+  --background: 267 53% 97%;
+  --foreground: 253 55% 24%;
+  --card: 0 0% 100%;
+  --card-foreground: 253 55% 24%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 253 55% 24%;
+  --primary: 259 44% 56%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 265 50% 95%;
+  --secondary-foreground: 253 55% 24%;
+  --muted: 263 100% 98%;
+  --muted-foreground: 259 20% 45%;
+  --accent: 265 50% 95%;
+  --accent-foreground: 253 55% 24%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 260 24% 88%;
+  --input: 260 24% 88%;
+  --ring: 259 44% 56%;
+  --radius: 0.5rem;
+
   --sc-bg: #f6f2fb;
   --sc-surface: #ffffff;
   --sc-panel: #faf7ff;
@@ -24,6 +45,26 @@
 }
 
 .dark {
+  --background: 226 49% 7%;
+  --foreground: 255 35% 91%;
+  --card: 224 46% 11%;
+  --card-foreground: 255 35% 91%;
+  --popover: 224 46% 11%;
+  --popover-foreground: 255 35% 91%;
+  --primary: 256 43% 70%;
+  --primary-foreground: 226 49% 7%;
+  --secondary: 224 46% 15%;
+  --secondary-foreground: 255 35% 91%;
+  --muted: 223 42% 18%;
+  --muted-foreground: 255 17% 63%;
+  --accent: 223 42% 18%;
+  --accent-foreground: 255 35% 91%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 224 26% 24%;
+  --input: 224 26% 24%;
+  --ring: 256 43% 70%;
+
   --sc-bg: #090d1a;
   --sc-surface: #0f1629;
   --sc-panel: #141d36;
