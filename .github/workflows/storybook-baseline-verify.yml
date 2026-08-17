@@ -1,0 +1,49 @@
+name: Verify Storybook TypeScript baseline
+
+on:
+  push:
+    branches:
+      - storybook-typescript-baseline
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies and refresh lockfile
+        working-directory: client
+        run: npm install
+
+      - name: Build application
+        working-directory: client
+        run: npm run build
+
+      - name: Build Storybook
+        working-directory: client
+        run: npm run build-storybook
+
+      - name: Commit refreshed lockfile
+        run: |
+          if git diff --quiet -- client/package-lock.json; then
+            echo "package-lock.json already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add client/package-lock.json
+          git commit -m "chore: refresh Storybook dependency lockfile"
+          git push
