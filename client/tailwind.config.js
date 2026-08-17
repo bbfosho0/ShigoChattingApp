@@ -46,6 +46,9 @@ module.exports = {
         glass: 'rgba(255, 255, 255, 0.15)',
         darkglass: 'rgba(0, 0, 0, 0.35)',
       },
+      borderColor: {
+        DEFAULT: 'hsl(var(--border))',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
