@@ -4,13 +4,15 @@ on:
   push:
     branches:
       - storybook-typescript-baseline
+  pull_request:
+    branches:
+      - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
@@ -21,10 +23,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: client/package-lock.json
 
-      - name: Install dependencies and refresh lockfile
+      - name: Install dependencies
         working-directory: client
         run: npm install
 
@@ -35,15 +35,3 @@ jobs:
       - name: Build Storybook
         working-directory: client
         run: npm run build-storybook
-
-      - name: Commit refreshed lockfile
-        run: |
-          if git diff --quiet -- client/package-lock.json; then
-            echo "package-lock.json already current"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add client/package-lock.json
-          git commit -m "chore: refresh Storybook dependency lockfile"
-          git push
