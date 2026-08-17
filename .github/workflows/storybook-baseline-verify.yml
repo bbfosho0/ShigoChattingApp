@@ -28,6 +28,10 @@ jobs:
         working-directory: client
         run: npm install
 
+      - name: TypeScript check
+        working-directory: client
+        run: npx tsc --noEmit
+
       - name: Build application
         working-directory: client
         run: npm run build
