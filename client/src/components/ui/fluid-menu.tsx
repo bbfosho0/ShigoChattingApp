@@ -84,6 +84,8 @@ interface MenuItemProps {
   icon?: React.ReactNode;
   isActive?: boolean;
   label?: string;
+  className?: string;
+  ariaExpanded?: boolean;
 }
 
 export function MenuItem({
@@ -93,20 +95,23 @@ export function MenuItem({
   icon,
   isActive = false,
   label,
+  className = "",
+  ariaExpanded,
 }: MenuItemProps) {
   return (
     <button
       type="button"
-      className={`group relative block h-16 w-full text-center transition-colors ${
+      className={`group relative block h-16 w-full text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${
         disabled
           ? "cursor-not-allowed text-muted-foreground/50"
           : "text-muted-foreground hover:text-foreground"
-      } ${isActive ? "bg-accent" : ""}`}
+      } ${isActive ? "bg-accent" : ""} ${className}`}
       role="menuitem"
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
       aria-current={isActive ? "page" : undefined}
+      aria-expanded={ariaExpanded}
     >
       <span className="flex h-full items-center justify-center">
         {icon ? (
@@ -128,54 +133,56 @@ export function MenuContainer({ children }: { children: React.ReactNode }) {
     return null;
   }
 
+  const firstChild = childrenArray[0];
+  const toggleMenu = () => setIsExpanded((expanded) => !expanded);
+
+  const trigger = React.isValidElement<MenuItemProps>(firstChild) ? (
+    React.cloneElement(firstChild, {
+      onClick: () => {
+        if (firstChild.props.disabled) return;
+        firstChild.props.onClick?.();
+        toggleMenu();
+      },
+      ariaExpanded: isExpanded,
+    })
+  ) : (
+    <button
+      type="button"
+      onClick={toggleMenu}
+      aria-expanded={isExpanded}
+      aria-label={isExpanded ? "Close navigation menu" : "Open navigation menu"}
+      className="flex size-16 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+    >
+      {firstChild}
+    </button>
+  );
+
   return (
     <div className="relative w-16" data-expanded={isExpanded}>
       <div className="relative">
-        <div className="relative z-50 size-16 rounded-full bg-muted will-change-transform">
-          <div
-            onClick={() => setIsExpanded((expanded) => !expanded)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                setIsExpanded((expanded) => !expanded);
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            aria-expanded={isExpanded}
-            aria-label={isExpanded ? "Close navigation menu" : "Open navigation menu"}
-            className="size-full cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            {childrenArray[0]}
-          </div>
+        <div className="relative z-50 size-16 overflow-hidden rounded-full bg-muted will-change-transform">
+          {trigger}
         </div>
 
-        {childrenArray.slice(1).map((child, index) => {
-          const isLastItem = index === childrenArray.length - 2;
-
-          return (
-            <div
-              key={index}
-              className="absolute left-0 top-0 size-16 bg-muted will-change-transform"
-              style={{
-                transform: `translateY(${isExpanded ? (index + 1) * 48 : 0}px)`,
-                opacity: isExpanded ? 1 : 0,
-                pointerEvents: isExpanded ? "auto" : "none",
-                zIndex: 40 - index,
-                clipPath: isLastItem
-                  ? "circle(50% at 50% 50%)"
-                  : "circle(50% at 50% 55%)",
-                transition:
-                  "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms",
-                backfaceVisibility: "hidden",
-                WebkitFontSmoothing: "antialiased",
-              }}
-              aria-hidden={!isExpanded}
-            >
-              {child}
-            </div>
-          );
-        })}
+        {childrenArray.slice(1).map((child, index) => (
+          <div
+            key={index}
+            className="absolute left-0 top-0 size-16 overflow-hidden rounded-full bg-muted will-change-transform"
+            style={{
+              transform: `translateY(${isExpanded ? (index + 1) * 68 : 0}px)`,
+              opacity: isExpanded ? 1 : 0,
+              pointerEvents: isExpanded ? "auto" : "none",
+              zIndex: 40 - index,
+              transition:
+                "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 260ms ease",
+              backfaceVisibility: "hidden",
+              WebkitFontSmoothing: "antialiased",
+            }}
+            aria-hidden={!isExpanded}
+          >
+            {child}
+          </div>
+        ))}
       </div>
     </div>
   );
