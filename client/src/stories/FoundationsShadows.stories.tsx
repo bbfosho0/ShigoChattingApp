@@ -12,3 +12,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Dark: Story = {
+  render: () => (
+    <div className="dark rounded-2xl bg-background text-foreground">
+      <ShadowsFoundation />
+    </div>
+  ),
+};
