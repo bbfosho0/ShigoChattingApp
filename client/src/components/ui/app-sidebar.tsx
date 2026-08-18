@@ -64,7 +64,7 @@ export function AppSidebar({
             <div className="space-y-2">
               <SidebarIconButton label="Expand sidebar" onClick={() => onCollapsedChange?.(false)}><PanelLeftOpen size={17} strokeWidth={1.5} /></SidebarIconButton>
               <SidebarIconButton label="Quiet Room" active><Hash size={17} strokeWidth={1.8} /></SidebarIconButton>
-              <SidebarIconButton label="Ambient audio"><Music2 size={17} strokeWidth={1.5} /></SidebarIconButton>
+              <SidebarIconButton label="Ambient audio" onClick={() => onCollapsedChange?.(false)}><Music2 size={17} strokeWidth={1.5} /></SidebarIconButton>
               <SidebarIconButton label="Preferences" onClick={onPreferences}><Settings2 size={17} strokeWidth={1.5} /></SidebarIconButton>
             </div>
           ) : (
@@ -82,7 +82,7 @@ export function AppSidebar({
                 <div className="mt-2">{ambientContent ?? <div className="rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground shadow-panel">Ambient audio</div>}</div>
               </section>
 
-              <button type="button" onClick={onPreferences} className="mt-4 flex items-center gap-3 rounded-md px-3 py-2 text-[13px] text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:shadow-focus"><Settings2 size={15} strokeWidth={1.5} /> Preferences</button>
+              {onPreferences ? <button type="button" onClick={onPreferences} className="mt-4 flex items-center gap-3 rounded-md px-3 py-2 text-[13px] text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:shadow-focus"><Settings2 size={15} strokeWidth={1.5} /> Preferences</button> : null}
             </>
           )}
         </div>
