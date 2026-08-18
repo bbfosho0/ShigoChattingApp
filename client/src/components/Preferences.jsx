@@ -26,9 +26,14 @@ const Preferences = ({ open, onClose, user }) => {
   };
 
   const handleChangePassword = async (currentPassword, newPassword) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please sign in again before changing your password.");
+      return;
+    }
+
     try {
       setSecurityLoading(true);
-      const token = localStorage.getItem("token");
       await axios.patch(
         `${process.env.REACT_APP_API_URL}/api/auth/change-password`,
         { currentPassword, newPassword },
