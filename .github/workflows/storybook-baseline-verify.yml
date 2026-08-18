@@ -9,56 +9,39 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+          - "22.22.0"
+          - "24.x"
 
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:
-          node-version: 22.22.0
+          node-version: ${{ matrix.node }}
 
-      - name: Refresh root lockfile
-        run: npm install --package-lock-only
+      - name: Verify root lockfile
+        run: npm ci --ignore-scripts
 
-      - name: Refresh client lockfile and dependencies
+      - name: Audit root package
+        run: npm audit --omit=dev
+
+      - name: Check root dev launcher syntax
+        run: node --check scripts/dev.js
+
+      - name: Install client dependencies from lockfile
         working-directory: client
-        run: |
-          npm install
-          npm audit fix || true
-
-      - name: Refresh server lockfile and dependencies
-        working-directory: server
-        run: |
-          npm install
-          npm audit fix || true
-
-      - name: Commit npm-generated lockfiles
-        if: github.event_name == 'push'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json client/package-lock.json server/package-lock.json
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: refresh hardened lockfiles"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
-
-      - name: Audit client dependency tree
-        working-directory: client
-        continue-on-error: true
-        run: npm audit --json > client-audit-full.json || true
-
-      - name: Audit server production dependency tree
-        working-directory: server
-        continue-on-error: true
-        run: npm audit --omit=dev --json > server-audit-production.json || true
+        run: npm ci
 
       - name: Run client regression tests
         working-directory: client
@@ -75,6 +58,33 @@ jobs:
       - name: Build Storybook
         working-directory: client
         run: npm run build-storybook
+
+      - name: Capture client audit
+        working-directory: client
+        run: npm audit --json > client-audit.json || true
+
+      - name: Reject new direct client vulnerabilities
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const audit = JSON.parse(fs.readFileSync("client/client-audit.json", "utf8"));
+          const direct = Object.entries(audit.vulnerabilities || {})
+            .filter(([name, value]) => value.isDirect && name !== "react-scripts")
+            .map(([name, value]) => `${name}:${value.severity}`);
+          if (direct.length) {
+            console.error(`Unexpected vulnerable direct client dependencies: ${direct.join(", ")}`);
+            process.exit(1);
+          }
+          console.log("No vulnerable direct client dependencies outside the documented CRA 5 exception.");
+          NODE
+
+      - name: Install server dependencies from lockfile
+        working-directory: server
+        run: npm ci
+
+      - name: Audit server production dependencies
+        working-directory: server
+        run: npm audit --omit=dev
 
       - name: Check server JavaScript syntax
         working-directory: server
