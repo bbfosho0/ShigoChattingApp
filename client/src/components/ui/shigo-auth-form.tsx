@@ -19,6 +19,7 @@ export interface ShigoAuthFormProps {
   error?: string;
   initialEmail?: string;
   initialUsername?: string;
+  showForgotPassword?: boolean;
   onSubmit?: (values: AuthValues) => void;
   onModeChange?: (mode: AuthMode) => void;
 }
@@ -26,7 +27,7 @@ export interface ShigoAuthFormProps {
 const copy: Record<AuthMode, { title: string; description: string; submit: string }> = {
   login: { title: "Welcome back.", description: "Return to Quiet Room.", submit: "Sign in" },
   register: { title: "Create your space.", description: "Join ShigoChat without adding more noise.", submit: "Create account" },
-  forgot: { title: "Reset your password.", description: "We’ll send recovery instructions to your email.", submit: "Send reset link" },
+  forgot: { title: "Reset your password.", description: "Recovery UI preview. Production recovery requires a verified reset flow.", submit: "Continue" },
 };
 
 export function ShigoAuthForm({
@@ -35,6 +36,7 @@ export function ShigoAuthForm({
   error,
   initialEmail = "",
   initialUsername = "",
+  showForgotPassword = true,
   onSubmit,
   onModeChange,
 }: ShigoAuthFormProps) {
@@ -87,7 +89,7 @@ export function ShigoAuthForm({
         <div className="space-y-2"><Label htmlFor={`auth-${mode}-email`}>Email</Label><Input id={`auth-${mode}-email`} value={email} onChange={(event) => setEmail(event.target.value)} type="email" leftIcon={<Mail />} autoComplete="email" disabled={loading} required /></div>
         {mode !== "forgot" ? (
           <div className="space-y-2">
-            <div className="flex items-center justify-between"><Label htmlFor={`auth-${mode}-password`}>Password</Label>{mode === "login" ? <button type="button" onClick={() => onModeChange?.("forgot")} className="text-xs font-medium text-primary hover:underline">Forgot password?</button> : null}</div>
+            <div className="flex items-center justify-between"><Label htmlFor={`auth-${mode}-password`}>Password</Label>{mode === "login" && showForgotPassword ? <button type="button" onClick={() => onModeChange?.("forgot")} className="text-xs font-medium text-primary hover:underline">Forgot password?</button> : null}</div>
             <Input id={`auth-${mode}-password`} value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={mode === "register" ? 8 : undefined} autoComplete={mode === "login" ? "current-password" : "new-password"} disabled={loading} required />
             {mode === "register" ? <p className="text-[11px] leading-5 text-muted-foreground">Use at least 8 characters. The production API remains responsible for final validation.</p> : null}
           </div>
