@@ -17,7 +17,6 @@ import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
 import { PresenceAvatar } from "components/ui/presence-avatar";
-import { Toggle } from "components/ui/toggle";
 
 function SettingsSection({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
