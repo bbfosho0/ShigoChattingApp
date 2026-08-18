@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Hash, Menu, Settings2 } from "lucide-react";
 
 import { Button } from "components/ui/button";
@@ -34,8 +34,20 @@ export function MobileNav({
   roomStatus = "Shared conversation",
   ambientContent,
 }: MobileNavProps) {
+  const [open, setOpen] = useState(false);
+
+  const handlePreferences = () => {
+    setOpen(false);
+    onPreferences?.();
+  };
+
+  const handleLogout = () => {
+    setOpen(false);
+    onLogout?.();
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild><Button variant="ghost" size="icon" aria-label="Open navigation"><Menu size={18} strokeWidth={1.5} /></Button></SheetTrigger>
       <SheetContent side="left" className="max-w-[20rem] gap-0">
         <SheetHeader className="border-b border-border pb-5">
@@ -48,9 +60,9 @@ export function MobileNav({
           <p className="mt-7 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Ambient</p>
           <div className="mt-2">{ambientContent ?? <div className="rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground shadow-panel">Ambient audio</div>}</div>
 
-          <button type="button" onClick={onPreferences} className="mt-4 flex items-center gap-3 rounded-md px-3 py-2.5 text-[13px] text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:shadow-focus"><Settings2 size={16} strokeWidth={1.5} /> Preferences</button>
+          {onPreferences ? <button type="button" onClick={handlePreferences} className="mt-4 flex items-center gap-3 rounded-md px-3 py-2.5 text-[13px] text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:shadow-focus"><Settings2 size={16} strokeWidth={1.5} /> Preferences</button> : null}
 
-          <div className="mt-auto border-t border-border pt-4"><ProfileMenu name={name} email={email} theme={theme} onToggleTheme={onToggleTheme} onPreferences={onPreferences} onLogout={onLogout} /></div>
+          <div className="mt-auto border-t border-border pt-4"><ProfileMenu name={name} email={email} theme={theme} onToggleTheme={onToggleTheme} onPreferences={onPreferences ? handlePreferences : undefined} onLogout={onLogout ? handleLogout : undefined} /></div>
         </SheetBody>
       </SheetContent>
     </Sheet>
