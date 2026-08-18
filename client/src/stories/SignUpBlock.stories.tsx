@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: () => (
-    <div className="mx-auto max-w-md">
+    <div className="mx-auto w-full max-w-md">
       <SignUpBlockDemo />
     </div>
   ),
@@ -24,7 +24,7 @@ export const Default: Story = {
 
 export const Dark: Story = {
   render: () => (
-    <div className="dark mx-auto max-w-md rounded-2xl bg-background p-2 text-foreground">
+    <div className="dark mx-auto w-full max-w-md">
       <SignUpBlock />
     </div>
   ),
