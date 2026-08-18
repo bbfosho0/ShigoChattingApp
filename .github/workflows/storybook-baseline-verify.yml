@@ -96,3 +96,37 @@ jobs:
           node --check middleware/validators.js
           node --check models/User.js
           node --check models/Message.js
+
+  windows-dev-launcher:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+
+      - name: Install root dependencies from lockfile
+        run: npm ci --ignore-scripts
+
+      - name: Install client dependencies from lockfile
+        working-directory: client
+        run: npm ci
+
+      - name: Install server dependencies from lockfile
+        working-directory: server
+        run: npm ci
+
+      - name: Smoke test root dev launcher on Windows
+        shell: pwsh
+        run: |
+          $process = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" -WorkingDirectory $PWD -PassThru -NoNewWindow
+          Start-Sleep -Seconds 5
+          if ($process.HasExited) {
+            Write-Error "Root dev launcher exited during Windows smoke test with code $($process.ExitCode)."
+            exit 1
+          }
+          Stop-Process -Id $process.Id -Force
