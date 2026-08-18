@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 
@@ -15,7 +16,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const PreviewSurface = ({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) => (
+const PreviewSurface = ({ children, dark = false }: { children: ReactNode; dark?: boolean }) => (
   <div
     className={`${dark ? "dark " : ""}rounded-2xl border border-border bg-background p-8 text-foreground shadow-sm`}
   >
