@@ -15,6 +15,7 @@ export interface ShigoComposerProps {
   initialAttachments?: ShigoAttachment[];
   replyingTo?: string;
   onCancelReply?: () => void;
+  allowAttachments?: boolean;
   className?: string;
 }
 
@@ -25,10 +26,11 @@ export function ShigoComposer({
   initialAttachments = [],
   replyingTo,
   onCancelReply,
+  allowAttachments = true,
   className,
 }: ShigoComposerProps) {
   const [text, setText] = useState("");
-  const [attachments, setAttachments] = useState<ShigoAttachment[]>(initialAttachments);
+  const [attachments, setAttachments] = useState<ShigoAttachment[]>(initialAttachments.slice(0, 4));
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlsRef = useRef(new Set<string>());
@@ -61,17 +63,23 @@ export function ShigoComposer({
   };
 
   const addFiles = (files: FileList | null) => {
-    if (!files) return;
-    const next = Array.from(files).slice(0, 4).map((file, index) => {
-      const url = URL.createObjectURL(file);
-      objectUrlsRef.current.add(url);
-      return {
-        id: `${file.name}-${file.lastModified}-${index}`,
-        name: file.name,
-        type: file.type,
-        url,
-      } satisfies ShigoAttachment;
-    });
+    if (!files || !allowAttachments) return;
+    const slots = Math.max(0, 4 - attachments.length);
+    if (slots === 0) return;
+
+    const next = Array.from(files)
+      .slice(0, slots)
+      .map((file, index) => {
+        const url = URL.createObjectURL(file);
+        objectUrlsRef.current.add(url);
+        return {
+          id: `${file.name}-${file.lastModified}-${index}`,
+          name: file.name,
+          type: file.type,
+          url,
+        } satisfies ShigoAttachment;
+      });
+
     setAttachments((current) => [...current, ...next].slice(0, 4));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -118,26 +126,30 @@ export function ShigoComposer({
       ) : null}
 
       <div className="flex items-end gap-2 p-3">
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          className="hidden"
-          accept="image/*,.pdf,.txt,.doc,.docx"
-          onChange={(event) => addFiles(event.target.files)}
-          tabIndex={-1}
-        />
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          aria-label="Attach files"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || attachments.length >= 4}
-          className="shrink-0"
-        >
-          <Paperclip size={17} strokeWidth={1.5} />
-        </Button>
+        {allowAttachments ? (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="hidden"
+              accept="image/*,.pdf,.txt,.doc,.docx"
+              onChange={(event) => addFiles(event.target.files)}
+              tabIndex={-1}
+            />
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              aria-label="Attach files"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled || attachments.length >= 4}
+              className="shrink-0"
+            >
+              <Paperclip size={17} strokeWidth={1.5} />
+            </Button>
+          </>
+        ) : null}
 
         <Textarea
           ref={textareaRef}
