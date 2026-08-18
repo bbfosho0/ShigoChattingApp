@@ -134,6 +134,7 @@ export function MenuContainer({ children }: { children: React.ReactNode }) {
   }
 
   const firstChild = childrenArray[0];
+  const expandedHeight = 64 + Math.max(childrenArray.length - 1, 0) * 68;
   const toggleMenu = () => setIsExpanded((expanded) => !expanded);
 
   const trigger = React.isValidElement<MenuItemProps>(firstChild) ? (
@@ -158,7 +159,11 @@ export function MenuContainer({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="relative w-16" data-expanded={isExpanded}>
+    <div
+      className="relative w-16 transition-[height] duration-300 ease-out"
+      data-expanded={isExpanded}
+      style={{ height: isExpanded ? expandedHeight : 64 }}
+    >
       <div className="relative">
         <div className="relative z-50 size-16 overflow-hidden rounded-full bg-muted will-change-transform">
           {trigger}
