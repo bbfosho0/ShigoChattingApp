@@ -42,12 +42,20 @@ export function ShigoAuthForm({
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const current = copy[mode];
+  const passwordValid = mode === "forgot" || (mode === "register" ? password.length >= 8 : password.length > 0);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     const trimmedEmail = email.trim();
     const trimmedUsername = username.trim();
-    if (!trimmedEmail || (mode === "register" && !trimmedUsername) || (mode !== "forgot" && !password)) return;
+    if (!trimmedEmail || (mode === "register" && !trimmedUsername) || !passwordValid) return;
+
     onSubmit?.({
       email: trimmedEmail,
       username: mode === "register" ? trimmedUsername : undefined,
@@ -55,10 +63,10 @@ export function ShigoAuthForm({
     });
   };
 
-  const disabled = loading || !email.trim() || (mode === "register" && !username.trim()) || (mode !== "forgot" && !password);
+  const disabled = loading || !email.trim() || (mode === "register" && !username.trim()) || !passwordValid;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <div className="mb-6 flex items-center gap-2 lg:hidden"><div className="flex size-8 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">S</div><span className="text-sm font-semibold">ShigoChat</span></div>
         <h1 className="text-3xl font-semibold tracking-[-0.03em] text-foreground">{current.title}</h1>
@@ -69,13 +77,13 @@ export function ShigoAuthForm({
 
       <div className="space-y-4">
         {mode === "register" ? (
-          <div className="space-y-2"><Label htmlFor={`auth-${mode}-username`}>Display name</Label><Input id={`auth-${mode}-username`} value={username} onChange={(event) => setUsername(event.target.value)} leftIcon={<UserRound />} autoComplete="username" disabled={loading} /></div>
+          <div className="space-y-2"><Label htmlFor={`auth-${mode}-username`}>Display name</Label><Input id={`auth-${mode}-username`} value={username} onChange={(event) => setUsername(event.target.value)} leftIcon={<UserRound />} autoComplete="username" disabled={loading} required /></div>
         ) : null}
         <div className="space-y-2"><Label htmlFor={`auth-${mode}-email`}>Email</Label><Input id={`auth-${mode}-email`} value={email} onChange={(event) => setEmail(event.target.value)} type="email" leftIcon={<Mail />} autoComplete="email" disabled={loading} required /></div>
         {mode !== "forgot" ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between"><Label htmlFor={`auth-${mode}-password`}>Password</Label>{mode === "login" ? <button type="button" onClick={() => onModeChange?.("forgot")} className="text-xs font-medium text-primary hover:underline">Forgot password?</button> : null}</div>
-            <Input id={`auth-${mode}-password`} value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} disabled={loading} required />
+            <Input id={`auth-${mode}-password`} value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={mode === "register" ? 8 : undefined} autoComplete={mode === "login" ? "current-password" : "new-password"} disabled={loading} required />
             {mode === "register" ? <p className="text-[11px] leading-5 text-muted-foreground">Use at least 8 characters. The production API remains responsible for final validation.</p> : null}
           </div>
         ) : null}
