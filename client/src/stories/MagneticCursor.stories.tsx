@@ -1,26 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
-import MagneticCursorDemo from "components/ui/magnetic-cursor-demo";
+import { ShigoSplash } from "components/ui/shigo-splash";
 
 const meta = {
-  title: "Components/Magnetic Cursor",
-  component: MagneticCursorDemo,
-  parameters: {
-    layout: "fullscreen",
-  },
-} satisfies Meta<typeof MagneticCursorDemo>;
+  title: "Experience/Magnetic Cursor",
+  component: ShigoSplash,
+  parameters: { layout: "fullscreen" },
+} satisfies Meta<typeof ShigoSplash>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: () => <MagneticCursorDemo />,
-};
-
-export const Dark: Story = {
-  render: () => (
-    <div className="dark">
-      <MagneticCursorDemo />
-    </div>
-  ),
+export const SplashInteraction: Story = {
+  args: {
+    magnetic: true,
+    showAction: true,
+    onContinue: () => undefined,
+  },
 };
