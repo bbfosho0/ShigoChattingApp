@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Hash, Moon, Settings2, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -32,52 +26,48 @@ const Chatroom = () => {
   const navigate = useNavigate();
 
   const socketRef = useRef(null);
-  const mounted = useRef(false);
   const messagesViewportRef = useRef(null);
 
-  const fetchMessages = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setMessages([]);
-        return;
-      }
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/messages`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (mounted.current) setMessages(res.data);
-    } catch (err) {
-      console.error("Fetch messages error:", err);
-      if (mounted.current) toast.error("Could not load messages");
-    } finally {
-      if (mounted.current) setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    mounted.current = true;
-
     if (!user) {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
       }
       navigate("/login");
-      return () => {
-        mounted.current = false;
-      };
+      return undefined;
     }
-
-    setLoading(true);
-    fetchMessages();
 
     const token = localStorage.getItem("token");
     if (!token) {
+      localStorage.removeItem("user");
+      setUser(null);
       setLoading(false);
-      return () => {
-        mounted.current = false;
-      };
+      navigate("/login", { replace: true });
+      return undefined;
     }
+
+    let active = true;
+    const controller = new AbortController();
+    setLoading(true);
+
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        });
+        if (active) setMessages(res.data);
+      } catch (err) {
+        if (err?.code === "ERR_CANCELED" || err?.name === "CanceledError") return;
+        console.error("Fetch messages error:", err);
+        if (active) toast.error("Could not load messages");
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchMessages();
 
     const socket = io(process.env.REACT_APP_API_URL, {
       auth: { token },
@@ -92,6 +82,7 @@ const Chatroom = () => {
     });
 
     const onReceiveMessage = (msg) => {
+      if (!active) return;
       setMessages((prev) => {
         if (prev.find((message) => message._id === msg._id)) return prev;
         return [...prev, msg];
@@ -99,6 +90,7 @@ const Chatroom = () => {
     };
 
     const onEditMessage = (updatedMsg) => {
+      if (!active) return;
       setMessages((prev) =>
         prev.map((message) =>
           message._id === updatedMsg._id ? updatedMsg : message
@@ -107,6 +99,7 @@ const Chatroom = () => {
     };
 
     const onDeleteMessage = (deletedMsgId) => {
+      if (!active) return;
       setMessages((prev) =>
         prev.filter((message) => message._id !== deletedMsgId)
       );
@@ -117,19 +110,24 @@ const Chatroom = () => {
     socket.on("deleteMessage", onDeleteMessage);
 
     return () => {
+      active = false;
+      controller.abort();
       socket.off("receiveMessage", onReceiveMessage);
       socket.off("editMessage", onEditMessage);
       socket.off("deleteMessage", onDeleteMessage);
       socket.disconnect();
       if (socketRef.current === socket) socketRef.current = null;
-      mounted.current = false;
     };
-  }, [fetchMessages, navigate, user]);
+  }, [navigate, setUser, user]);
 
   useEffect(() => {
     const viewport = messagesViewportRef.current;
     if (!viewport || loading) return;
-    viewport.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    viewport.scrollTo({
+      top: viewport.scrollHeight,
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
   }, [loading, messages]);
 
   const logout = () => {
@@ -209,9 +207,11 @@ const Chatroom = () => {
     }
   };
 
+  if (!user) return null;
+
   const sidebarProps = {
-    name: user?.username || "User",
-    email: user?.email || "",
+    name: user.username || "User",
+    email: user.email || "",
     theme: darkMode ? "dark" : "light",
     roomStatus: "Shared conversation",
     onToggleTheme: toggleDarkMode,
@@ -301,7 +301,7 @@ const Chatroom = () => {
                     ) : null}
                     <MessageBubble
                       message={message}
-                      userId={user?._id}
+                      userId={user._id}
                       onDelete={handleDelete}
                       onEdit={handleEdit}
                     />
@@ -314,7 +314,7 @@ const Chatroom = () => {
 
         <footer className="shrink-0 border-t border-border bg-background/95 px-3 pb-4 pt-3 backdrop-blur-md sm:px-5 sm:pb-5">
           <div className="mx-auto max-w-3xl">
-            <MessageInput onSend={handleSend} disabled={loading || !user} />
+            <MessageInput onSend={handleSend} disabled={loading} />
           </div>
         </footer>
       </main>
