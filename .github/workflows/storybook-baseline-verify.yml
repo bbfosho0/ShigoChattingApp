@@ -22,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22.22.0
 
       - name: Install client dependencies from lockfile
         working-directory: client
@@ -59,3 +59,31 @@ jobs:
       - name: Build Storybook
         working-directory: client
         run: npm run build-storybook
+
+      - name: Install server dependencies from lockfile
+        working-directory: server
+        run: npm ci
+
+      - name: Audit server production dependency tree
+        working-directory: server
+        continue-on-error: true
+        run: npm audit --omit=dev --json > server-audit-production.json || true
+
+      - name: Check server JavaScript syntax
+        working-directory: server
+        run: |
+          node --check server.js
+          node --check routes/auth.js
+          node --check routes/messages.js
+          node --check middleware/auth.js
+          node --check middleware/validators.js
+          node --check models/User.js
+          node --check models/Message.js
+
+      - name: Upload server audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-audit-report
+          path: server/server-audit-production.json
+          if-no-files-found: error
+          retention-days: 1
