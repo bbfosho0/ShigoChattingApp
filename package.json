@@ -1,10 +1,14 @@
 {
   "name": "shigo-chat",
   "version": "1.0.0",
-  "description": "Simple chat application with CRUD and authentication",
-  "main": "server.js",
+  "private": true,
+  "description": "ShigoChat full-stack realtime chat application",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node scripts/dev.js",
+    "client": "npm --prefix client start",
+    "server": "npm --prefix server start",
+    "storybook": "npm --prefix client run storybook",
+    "verify:client": "npm --prefix client test -- --watchAll=false --runInBand && npm --prefix client exec tsc -- --noEmit && npm --prefix client run build && npm --prefix client run build-storybook"
   },
   "repository": {
     "type": "git",
@@ -12,9 +16,10 @@
   },
   "keywords": [
     "chat",
+    "react",
     "express",
-    "jwt",
-    "mongo"
+    "socket.io",
+    "mongodb"
   ],
   "author": "Yoshi Gomez Gutierrez",
   "license": "ISC",
@@ -22,16 +27,8 @@
     "url": "https://github.com/bbfosho0/ShigoChattingApp/issues"
   },
   "homepage": "https://github.com/bbfosho0/ShigoChattingApp#readme",
-  "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "chokidar": "^4.0.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.15.0",
-    "openai": "^4.103.0",
-    "react-router-dom": "^7.6.0",
-    "readline": "^1.3.0"
+  "engines": {
+    "node": ">=22.12 <25",
+    "npm": ">=10"
   }
 }
