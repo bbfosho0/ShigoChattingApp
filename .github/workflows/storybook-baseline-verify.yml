@@ -29,11 +29,15 @@ jobs:
 
       - name: Refresh client lockfile and dependencies
         working-directory: client
-        run: npm install
+        run: |
+          npm install
+          npm audit fix || true
 
       - name: Refresh server lockfile and dependencies
         working-directory: server
-        run: npm install
+        run: |
+          npm install
+          npm audit fix || true
 
       - name: Upload refreshed lockfiles
         uses: actions/upload-artifact@v4
