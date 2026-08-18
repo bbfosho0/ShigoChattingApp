@@ -8,12 +8,20 @@ const meta = {
   title: "Components/Button",
   component: Button,
   parameters: {
-    layout: "fullscreen",
+    layout: "centered",
   },
 } satisfies Meta<typeof Button>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+const PreviewSurface = ({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) => (
+  <div
+    className={`${dark ? "dark " : ""}rounded-2xl border border-border bg-background p-8 text-foreground shadow-sm`}
+  >
+    {children}
+  </div>
+);
 
 export const Default: Story = {
   render: () => <ButtonDemo />,
@@ -21,7 +29,7 @@ export const Default: Story = {
 
 export const Variants: Story = {
   render: () => (
-    <main className="flex min-h-screen items-center justify-center bg-background p-8 text-foreground">
+    <PreviewSurface>
       <div className="flex max-w-3xl flex-wrap items-center justify-center gap-3">
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
@@ -31,13 +39,13 @@ export const Variants: Story = {
         <Button variant="outline">Legacy Outline</Button>
         <Button variant="link">Legacy Link</Button>
       </div>
-    </main>
+    </PreviewSurface>
   ),
 };
 
 export const SizesAndIcons: Story = {
   render: () => (
-    <main className="flex min-h-screen items-center justify-center bg-background p-8 text-foreground">
+    <PreviewSurface>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button size="sm" leadingIcon={Plus}>Small</Button>
         <Button size="md" trailingIcon={ArrowRight}>Medium</Button>
@@ -46,31 +54,31 @@ export const SizesAndIcons: Story = {
         <Button size="icon" aria-label="Add item"><Plus /></Button>
         <Button size="icon-lg" variant="destructive" aria-label="Delete item"><Trash2 /></Button>
       </div>
-    </main>
+    </PreviewSurface>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <main className="flex min-h-screen items-center justify-center bg-background p-8 text-foreground">
+    <PreviewSurface>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button loading>Loading</Button>
         <Button loading variant="secondary" leadingIcon={Plus}>Creating</Button>
         <Button loading size="icon" aria-label="Loading action"><Plus /></Button>
       </div>
-    </main>
+    </PreviewSurface>
   ),
 };
 
 export const Dark: Story = {
   render: () => (
-    <main className="dark flex min-h-screen items-center justify-center bg-background p-8 text-foreground">
+    <PreviewSurface dark>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>
         <Button variant="ghost">Ghost</Button>
       </div>
-    </main>
+    </PreviewSurface>
   ),
 };
