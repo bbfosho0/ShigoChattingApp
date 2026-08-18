@@ -19,9 +19,12 @@ export const SmokeyBackground: Story = {
 };
 
 export const FormOnly: Story = {
+  parameters: {
+    layout: "centered",
+  },
   render: () => (
-    <main className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
+    <div className="rounded-3xl bg-gray-900 p-8 shadow-xl">
       <LoginForm />
-    </main>
+    </div>
   ),
 };
