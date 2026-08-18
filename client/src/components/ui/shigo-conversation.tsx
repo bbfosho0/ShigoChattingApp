@@ -57,18 +57,20 @@ export function ShigoConversation({
   onReact,
   className,
 }: ShigoConversationProps) {
-  const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!autoScroll || loading) return;
-    endRef.current?.scrollIntoView({ block: "end" });
+    const element = scrollRef.current;
+    if (!element) return;
+    element.scrollTop = element.scrollHeight;
   }, [autoScroll, loading, messages.length]);
 
   if (loading) return <ConversationLoading />;
   if (messages.length === 0) return <ConversationEmpty />;
 
   return (
-    <div className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}>
+    <div ref={scrollRef} className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}>
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
         {messages.map((message) => (
           <ShigoMessage
@@ -81,7 +83,6 @@ export function ShigoConversation({
             onReact={onReact}
           />
         ))}
-        <div ref={endRef} aria-hidden="true" />
       </div>
     </div>
   );
