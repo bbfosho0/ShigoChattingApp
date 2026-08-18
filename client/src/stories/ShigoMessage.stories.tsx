@@ -45,9 +45,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Other: Story = { render: () => <div className="w-[min(44rem,86vw)]"><ShigoMessage message={otherMessage} currentUserId="yoshi" onReply={() => undefined} onReact={() => undefined} /></div> };
-export const Own: Story = { render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage /></div> };
-export const Edited: Story = { render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage initial={{ ...ownMessage, edited: true }} /></div> };
-export const Actions: Story = { render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage /></div> };
-export const EditMode: Story = { render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage defaultEditing /></div> };
-export const Dark: Story = { render: () => <div className="dark w-[min(48rem,90vw)] rounded-xl bg-background p-6 text-foreground"><InteractiveMessage /></div> };
+const requiredArgs = { message: ownMessage, currentUserId: "yoshi" };
+
+export const Other: Story = { args: requiredArgs, render: () => <div className="w-[min(44rem,86vw)]"><ShigoMessage message={otherMessage} currentUserId="yoshi" onReply={() => undefined} onReact={() => undefined} /></div> };
+export const Own: Story = { args: requiredArgs, render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage /></div> };
+export const Edited: Story = { args: requiredArgs, render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage initial={{ ...ownMessage, edited: true }} /></div> };
+export const Actions: Story = { args: requiredArgs, render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage /></div> };
+export const EditMode: Story = { args: requiredArgs, render: () => <div className="w-[min(44rem,86vw)]"><InteractiveMessage defaultEditing /></div> };
+export const Dark: Story = { args: requiredArgs, render: () => <div className="dark w-[min(48rem,90vw)] rounded-xl bg-background p-6 text-foreground"><InteractiveMessage /></div> };
