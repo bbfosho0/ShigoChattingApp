@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Moon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -12,8 +12,13 @@ import { ShigoAuthForm } from "../components/ui/shigo-auth-form";
 const Register = () => {
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState("");
+  const redirectTimerRef = useRef(null);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
+
+  useEffect(() => () => {
+    if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
+  }, []);
 
   const handleRegister = async ({ username, email, password }) => {
     try {
@@ -25,7 +30,7 @@ const Register = () => {
         password,
       });
       toast.success("Account created. Redirecting...");
-      window.setTimeout(() => navigate("/login"), 900);
+      redirectTimerRef.current = window.setTimeout(() => navigate("/login"), 900);
     } catch (err) {
       const message =
         err.response?.data?.message ||
