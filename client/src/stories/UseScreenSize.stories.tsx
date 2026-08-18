@@ -6,7 +6,7 @@ const meta = {
   title: "Hooks/useScreenSize",
   component: ScreenSizeDemo,
   parameters: {
-    layout: "fullscreen",
+    layout: "padded",
   },
 } satisfies Meta<typeof ScreenSizeDemo>;
 
@@ -15,16 +15,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: () => (
-    <main className="min-h-screen bg-background text-foreground">
+    <div className="rounded-2xl bg-background text-foreground">
       <ScreenSizeDemo />
-    </main>
+    </div>
   ),
 };
 
 export const Dark: Story = {
   render: () => (
-    <main className="dark min-h-screen bg-background text-foreground">
+    <div className="dark rounded-2xl bg-background text-foreground">
       <ScreenSizeDemo />
-    </main>
+    </div>
   ),
 };
