@@ -156,15 +156,15 @@ const SignUpBlock = () => {
   }
 
   return (
-    <Card className="mx-auto flex w-full max-w-sm flex-col gap-6">
-      <CardHeader className="text-center">
+    <Card className="mx-auto w-full max-w-md">
+      <CardHeader className="pb-4 text-center">
         <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
         <CardDescription>
           Enter your information to create a new account
         </CardDescription>
       </CardHeader>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-8" noValidate>
+      <form onSubmit={handleSubmit} className="flex flex-col" noValidate>
         <CardContent className="flex flex-col gap-4">
           {errors.general ? (
             <div
