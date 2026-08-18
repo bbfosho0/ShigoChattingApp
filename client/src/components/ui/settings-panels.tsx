@@ -22,10 +22,7 @@ import { Toggle } from "components/ui/toggle";
 function SettingsSection({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
     <section className="rounded-xl border border-border bg-card p-5 shadow-panel">
-      <div className="mb-5">
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
-      </div>
+      <div className="mb-5"><h3 className="text-sm font-semibold text-foreground">{title}</h3><p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p></div>
       {children}
     </section>
   );
@@ -40,24 +37,20 @@ export interface AccountSettingsPanelProps {
 export function AccountSettingsPanel({ name = "Yoshi", email = "yoshi@example.com", onSave }: AccountSettingsPanelProps) {
   const [draftName, setDraftName] = useState(name);
   const [draftEmail, setDraftEmail] = useState(email);
-
   useEffect(() => setDraftName(name), [name]);
   useEffect(() => setDraftEmail(email), [email]);
-
-  const canSave = draftName.trim().length > 0 && draftEmail.trim().length > 0;
+  const editable = Boolean(onSave);
+  const canSave = editable && draftName.trim().length > 0 && draftEmail.trim().length > 0;
 
   return (
     <div className="space-y-4">
-      <SettingsSection title="Profile" description="The identity people see when you talk in Quiet Room.">
-        <div className="flex items-center gap-4">
-          <PresenceAvatar fallback={(draftName || "?").slice(0, 2).toUpperCase()} presence="online" avatarClassName="size-12" />
-          <div><p className="text-sm font-medium text-foreground">{draftName || "Unnamed"}</p><p className="text-xs text-muted-foreground">Online</p></div>
-        </div>
+      <SettingsSection title="Profile" description={editable ? "The identity people see when you talk in Quiet Room." : "Your ShigoChat account identity."}>
+        <div className="flex items-center gap-4"><PresenceAvatar fallback={(draftName || "?").slice(0, 2).toUpperCase()} presence="online" avatarClassName="size-12" /><div><p className="text-sm font-medium text-foreground">{draftName || "Unnamed"}</p><p className="text-xs text-muted-foreground">{draftEmail}</p></div></div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2"><Label htmlFor="settings-name">Display name</Label><Input id="settings-name" value={draftName} onChange={(event) => setDraftName(event.target.value)} leftIcon={<UserRound />} autoComplete="nickname" /></div>
-          <div className="space-y-2"><Label htmlFor="settings-email">Email</Label><Input id="settings-email" value={draftEmail} onChange={(event) => setDraftEmail(event.target.value)} type="email" autoComplete="email" /></div>
+          <div className="space-y-2"><Label htmlFor="settings-name">Display name</Label><Input id="settings-name" value={draftName} onChange={(event) => setDraftName(event.target.value)} leftIcon={<UserRound />} autoComplete="nickname" readOnly={!editable} /></div>
+          <div className="space-y-2"><Label htmlFor="settings-email">Email</Label><Input id="settings-email" value={draftEmail} onChange={(event) => setDraftEmail(event.target.value)} type="email" autoComplete="email" readOnly={!editable} /></div>
         </div>
-        <div className="mt-5 flex justify-end"><Button disabled={!canSave} onClick={() => onSave?.(draftName.trim(), draftEmail.trim())}>Save changes</Button></div>
+        {editable ? <div className="mt-5 flex justify-end"><Button disabled={!canSave} onClick={() => onSave?.(draftName.trim(), draftEmail.trim())}>Save changes</Button></div> : null}
       </SettingsSection>
     </div>
   );
@@ -72,17 +65,10 @@ export function AppearanceSettingsPanel({ theme = "dark", onThemeChange }: Appea
   return (
     <SettingsSection title="Appearance" description="Choose the same quiet hierarchy in light or dark mode.">
       <div className="grid gap-3 sm:grid-cols-2">
-        <button type="button" aria-pressed={theme === "light"} onClick={() => onThemeChange?.("light")} className={`rounded-lg border p-4 text-left outline-none transition-colors focus-visible:shadow-focus ${theme === "light" ? "border-primary bg-primary/[0.06]" : "border-border bg-secondary"}`}>
-          <Sun size={17} strokeWidth={1.5} /><p className="mt-4 text-sm font-medium">Light</p><p className="mt-1 text-xs text-muted-foreground">Alabaster surfaces with violet actions.</p>
-        </button>
-        <button type="button" aria-pressed={theme === "dark"} onClick={() => onThemeChange?.("dark")} className={`rounded-lg border p-4 text-left outline-none transition-colors focus-visible:shadow-focus ${theme === "dark" ? "border-primary bg-primary/[0.06]" : "border-border bg-secondary"}`}>
-          <Moon size={17} strokeWidth={1.5} /><p className="mt-4 text-sm font-medium">Dark</p><p className="mt-1 text-xs text-muted-foreground">Near-black surfaces with restrained contrast.</p>
-        </button>
+        <button type="button" aria-pressed={theme === "light"} onClick={() => onThemeChange?.("light")} className={`rounded-lg border p-4 text-left outline-none transition-colors focus-visible:shadow-focus ${theme === "light" ? "border-primary bg-primary/[0.06]" : "border-border bg-secondary"}`}><Sun size={17} strokeWidth={1.5} /><p className="mt-4 text-sm font-medium">Light</p><p className="mt-1 text-xs text-muted-foreground">Alabaster surfaces with violet actions.</p></button>
+        <button type="button" aria-pressed={theme === "dark"} onClick={() => onThemeChange?.("dark")} className={`rounded-lg border p-4 text-left outline-none transition-colors focus-visible:shadow-focus ${theme === "dark" ? "border-primary bg-primary/[0.06]" : "border-border bg-secondary"}`}><Moon size={17} strokeWidth={1.5} /><p className="mt-4 text-sm font-medium">Dark</p><p className="mt-1 text-xs text-muted-foreground">Near-black surfaces with restrained contrast.</p></button>
       </div>
-      <div className="mt-5 flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary p-4">
-        <div><p className="text-sm font-medium">Reduce decorative motion</p><p className="mt-1 text-xs text-muted-foreground">System reduced-motion preferences always take priority.</p></div>
-        <Toggle size="icon" variant="outline" aria-label="Reduce decorative motion"><Monitor size={16} /></Toggle>
-      </div>
+      <div className="mt-5 flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary p-4"><div><p className="text-sm font-medium">Reduced motion</p><p className="mt-1 text-xs text-muted-foreground">Shigo automatically honors your operating-system reduced-motion preference.</p></div><Monitor size={18} strokeWidth={1.5} className="text-muted-foreground" /></div>
     </SettingsSection>
   );
 }
@@ -92,49 +78,52 @@ export interface AmbientSettingsPanelProps {
   progress?: number;
   volume?: number;
   onTogglePlay?: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onSeek?: (value: number) => void;
   onVolumeChange?: (value: number) => void;
 }
 
 export function AmbientSettingsPanel(props: AmbientSettingsPanelProps) {
-  return (
-    <div className="space-y-4">
-      <AmbientPlayer {...props} />
-      <SettingsSection title="Ambient behavior" description="Audio remains optional and never competes with conversation.">
-        <div className="flex items-center justify-between gap-4"><div><p className="text-sm font-medium">Remember volume</p><p className="mt-1 text-xs text-muted-foreground">Restore your last volume on this device.</p></div><Toggle variant="outline" aria-label="Remember volume">On</Toggle></div>
-      </SettingsSection>
-    </div>
-  );
+  return <AmbientPlayer {...props} />;
 }
 
 export interface SecuritySettingsPanelProps {
+  minPasswordLength?: number;
+  loading?: boolean;
   onUpdatePassword?: (currentPassword: string, newPassword: string) => void;
   onDeleteAccount?: () => void;
 }
 
-export function SecuritySettingsPanel({ onUpdatePassword, onDeleteAccount }: SecuritySettingsPanelProps) {
+export function SecuritySettingsPanel({ minPasswordLength = 6, loading = false, onUpdatePassword, onDeleteAccount }: SecuritySettingsPanelProps) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const canUpdate = currentPassword.length > 0 && newPassword.length >= 8;
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const matches = newPassword === confirmPassword;
+  const canUpdate = !loading && currentPassword.length > 0 && newPassword.length >= minPasswordLength && matches;
+
+  const submitPassword = () => {
+    if (!canUpdate) return;
+    onUpdatePassword?.(currentPassword, newPassword);
+  };
 
   return (
     <div className="space-y-4">
-      <SettingsSection title="Password" description="Use a strong password you do not reuse elsewhere.">
+      <SettingsSection title="Password" description={`Use at least ${minPasswordLength} characters and do not reuse passwords from other services.`}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2"><Label htmlFor="current-password">Current password</Label><Input id="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} type="password" leftIcon={<KeyRound />} autoComplete="current-password" /></div>
-          <div className="space-y-2"><Label htmlFor="new-password">New password</Label><Input id="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} type="password" leftIcon={<ShieldCheck />} autoComplete="new-password" /></div>
+          <div className="space-y-2"><Label htmlFor="new-password">New password</Label><Input id="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} type="password" minLength={minPasswordLength} leftIcon={<ShieldCheck />} autoComplete="new-password" /></div>
+          <div className="space-y-2 sm:col-start-2"><Label htmlFor="confirm-password">Confirm password</Label><Input id="confirm-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} type="password" minLength={minPasswordLength} autoComplete="new-password" aria-invalid={Boolean(confirmPassword) && !matches} /></div>
         </div>
-        <div className="mt-5 flex justify-end"><Button disabled={!canUpdate} onClick={() => onUpdatePassword?.(currentPassword, newPassword)}>Update password</Button></div>
+        {confirmPassword && !matches ? <p className="mt-2 text-xs text-destructive">Passwords do not match.</p> : null}
+        <div className="mt-5 flex justify-end"><Button loading={loading} disabled={!canUpdate} onClick={submitPassword}>Update password</Button></div>
       </SettingsSection>
 
-      <SettingsSection title="Danger zone" description="Destructive account actions require explicit confirmation.">
-        <AlertDialog>
-          <AlertDialogTrigger asChild><Button variant="destructive">Delete account</Button></AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader><AlertDialogTitle>Delete your ShigoChat account?</AlertDialogTitle><AlertDialogDescription>This permanently removes the account. This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={onDeleteAccount}>Delete account</AlertDialogAction></AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </SettingsSection>
+      {onDeleteAccount ? (
+        <SettingsSection title="Danger zone" description="Destructive account actions require explicit confirmation.">
+          <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive">Delete account</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete your ShigoChat account?</AlertDialogTitle><AlertDialogDescription>This permanently removes the account. This action cannot be undone.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={onDeleteAccount}>Delete account</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+        </SettingsSection>
+      ) : null}
     </div>
   );
 }
