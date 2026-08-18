@@ -66,6 +66,10 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+      - name: Run client regression tests
+        working-directory: client
+        run: npm test -- --watchAll=false --runInBand
+
       - name: TypeScript check
         working-directory: client
         run: npx tsc --noEmit
