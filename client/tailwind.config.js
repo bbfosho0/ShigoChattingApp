@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Inter', ...fontFamily.sans],
+        brand: ['Playfair Display', 'Georgia', 'serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -43,6 +44,26 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        shigo: {
+          shell: 'hsl(var(--shigo-shell))',
+          raised: 'hsl(var(--shigo-raised))',
+          signal: {
+            DEFAULT: 'hsl(var(--shigo-signal))',
+            foreground: 'hsl(var(--shigo-signal-foreground))',
+          },
+          warning: {
+            DEFAULT: 'hsl(var(--shigo-warning))',
+            foreground: 'hsl(var(--shigo-warning-foreground))',
+          },
+          presence: {
+            online: 'hsl(var(--shigo-presence-online))',
+            away: 'hsl(var(--shigo-presence-away))',
+            offline: 'hsl(var(--shigo-presence-offline))',
+          },
+          ambient: 'hsl(var(--shigo-ambient))',
+          'own-message': 'hsl(var(--shigo-own-message))',
+          'other-message': 'hsl(var(--shigo-other-message))',
+        },
         glass: 'rgba(255, 255, 255, 0.15)',
         darkglass: 'rgba(0, 0, 0, 0.35)',
       },
@@ -50,12 +71,26 @@ module.exports = {
         DEFAULT: 'hsl(var(--border))',
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        xs: 'var(--radius-xs)',
+        sm: 'var(--radius-sm)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+        xl: 'var(--radius-xl)',
+        '2xl': 'var(--radius-2xl)',
       },
       backdropBlur: {
         xs: '2px',
+      },
+      transitionDuration: {
+        fast: 'var(--motion-fast)',
+        base: 'var(--motion-base)',
+        slow: 'var(--motion-slow)',
+        panel: 'var(--motion-panel)',
+        expressive: 'var(--motion-expressive)',
+      },
+      transitionTimingFunction: {
+        shigo: 'var(--ease-standard)',
+        'shigo-emphasized': 'var(--ease-emphasized)',
       },
       animation: {
         float: 'float 6s ease-in-out infinite',
@@ -76,6 +111,10 @@ module.exports = {
         },
       },
       boxShadow: {
+        panel: 'var(--shadow-panel)',
+        floating: 'var(--shadow-floating)',
+        dialog: 'var(--shadow-dialog)',
+        focus: 'var(--shadow-focus)',
         glass: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
       },
     },
