@@ -4,7 +4,7 @@ import { Button } from "components/ui/button";
 
 export function ButtonDemo() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+    <div className="rounded-2xl border border-border bg-background p-8 text-foreground shadow-sm">
       <Button>Click me</Button>
     </div>
   );
