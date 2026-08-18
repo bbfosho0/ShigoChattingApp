@@ -11,23 +11,28 @@ const SplashScreen = () => {
   const navigationTimerRef = useRef(null);
 
   useEffect(() => {
+    let currentProgress = 0;
+    setProgress(0);
+
     const intervalId = window.setInterval(() => {
-      setProgress((current) => {
-        const next = Math.min(100, current + 2.5);
-        if (next >= 100) {
-          window.clearInterval(intervalId);
-          navigationTimerRef.current = window.setTimeout(
-            () => navigate(user ? "/chat" : "/login", { replace: true }),
-            400
-          );
-        }
-        return next;
-      });
+      currentProgress = Math.min(100, currentProgress + 2.5);
+      setProgress(currentProgress);
+
+      if (currentProgress >= 100) {
+        window.clearInterval(intervalId);
+        navigationTimerRef.current = window.setTimeout(
+          () => navigate(user ? "/chat" : "/login", { replace: true }),
+          400
+        );
+      }
     }, 50);
 
     return () => {
       window.clearInterval(intervalId);
-      if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current);
+      if (navigationTimerRef.current) {
+        window.clearTimeout(navigationTimerRef.current);
+        navigationTimerRef.current = null;
+      }
     };
   }, [navigate, user]);
 
