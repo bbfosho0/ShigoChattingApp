@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, MoreHorizontal, Pencil, Reply, Smile, Trash2, X } from "lucide-react";
 
 import { Button } from "components/ui/button";
@@ -39,10 +39,13 @@ function MessageActions({
   onReply?: () => void;
   onReact?: () => void;
 }) {
+  const hasActions = Boolean(onReply || onReact || (own && (onEdit || onDelete)));
+  if (!hasActions) return null;
+
   return (
     <div className="flex items-center rounded-md border border-border bg-popover p-1 text-muted-foreground shadow-floating">
-      <Button size="icon-sm" variant="ghost" aria-label="Reply" onClick={onReply}><Reply size={14} /></Button>
-      <Button size="icon-sm" variant="ghost" aria-label="React" onClick={onReact}><Smile size={14} /></Button>
+      {onReply ? <Button size="icon-sm" variant="ghost" aria-label="Reply" onClick={onReply}><Reply size={14} /></Button> : null}
+      {onReact ? <Button size="icon-sm" variant="ghost" aria-label="React" onClick={onReact}><Smile size={14} /></Button> : null}
       {own && onEdit ? <Button size="icon-sm" variant="ghost" aria-label="Edit message" onClick={onEdit}><Pencil size={14} /></Button> : null}
       {own && onDelete ? <Button size="icon-sm" variant="ghost" aria-label="Delete message" onClick={onDelete} className="text-destructive hover:text-destructive"><Trash2 size={14} /></Button> : null}
     </div>
@@ -61,6 +64,11 @@ export function ShigoMessage({
   const own = message.senderId === currentUserId;
   const [editing, setEditing] = useState(defaultEditing);
   const [draft, setDraft] = useState(message.content);
+  const hasActions = Boolean(onReply || onReact || (own && (onEdit || onDelete)));
+
+  useEffect(() => {
+    if (!editing) setDraft(message.content);
+  }, [editing, message.content]);
 
   const time = useMemo(() => {
     const date = message.createdAt instanceof Date ? message.createdAt : new Date(message.createdAt);
@@ -79,6 +87,11 @@ export function ShigoMessage({
   const cancelEdit = () => {
     setDraft(message.content);
     setEditing(false);
+  };
+
+  const beginEdit = () => {
+    setDraft(message.content);
+    setEditing(true);
   };
 
   return (
@@ -137,19 +150,19 @@ export function ShigoMessage({
             </div>
           )}
 
-          {!editing ? (
+          {hasActions && !editing ? (
             <div className="hidden opacity-0 transition-opacity duration-fast group-focus-within/message:opacity-100 group-hover/message:opacity-100 sm:block">
               <MessageActions
                 own={own}
                 onReply={onReply ? () => onReply(message) : undefined}
                 onReact={onReact ? () => onReact(message) : undefined}
-                onEdit={own && onEdit ? () => setEditing(true) : undefined}
+                onEdit={own && onEdit ? beginEdit : undefined}
                 onDelete={own && onDelete ? () => onDelete(message.id) : undefined}
               />
             </div>
           ) : null}
 
-          {!editing ? (
+          {hasActions && !editing ? (
             <div className="sm:hidden">
               <Popover>
                 <PopoverTrigger asChild>
@@ -160,7 +173,7 @@ export function ShigoMessage({
                     own={own}
                     onReply={onReply ? () => onReply(message) : undefined}
                     onReact={onReact ? () => onReact(message) : undefined}
-                    onEdit={own && onEdit ? () => setEditing(true) : undefined}
+                    onEdit={own && onEdit ? beginEdit : undefined}
                     onDelete={own && onDelete ? () => onDelete(message.id) : undefined}
                   />
                 </PopoverContent>
