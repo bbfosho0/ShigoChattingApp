@@ -34,6 +34,8 @@ export function ProfileMenu({
   compact = false,
   className,
 }: ProfileMenuProps) {
+  const hasAccountActions = Boolean(onProfile || onPreferences || onToggleTheme);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -65,21 +67,29 @@ export function ProfileMenu({
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={onProfile} className="gap-2.5 py-2 text-[13px]">
-          <UserRound size={15} strokeWidth={1.5} /> Profile
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={onPreferences} className="gap-2.5 py-2 text-[13px]">
-          <Settings2 size={15} strokeWidth={1.5} /> Preferences
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={onToggleTheme} className="gap-2.5 py-2 text-[13px]">
-          {theme === "dark" ? <Sun size={15} strokeWidth={1.5} /> : <Moon size={15} strokeWidth={1.5} />}
-          {theme === "dark" ? "Light mode" : "Dark mode"}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={onLogout} className="gap-2.5 py-2 text-[13px] text-destructive focus:text-destructive">
-          <LogOut size={15} strokeWidth={1.5} /> Sign out
-        </DropdownMenuItem>
+        {hasAccountActions ? <DropdownMenuSeparator /> : null}
+        {onProfile ? (
+          <DropdownMenuItem onSelect={onProfile} className="gap-2.5 py-2 text-[13px]">
+            <UserRound size={15} strokeWidth={1.5} /> Profile
+          </DropdownMenuItem>
+        ) : null}
+        {onPreferences ? (
+          <DropdownMenuItem onSelect={onPreferences} className="gap-2.5 py-2 text-[13px]">
+            <Settings2 size={15} strokeWidth={1.5} /> Preferences
+          </DropdownMenuItem>
+        ) : null}
+        {onToggleTheme ? (
+          <DropdownMenuItem onSelect={onToggleTheme} className="gap-2.5 py-2 text-[13px]">
+            {theme === "dark" ? <Sun size={15} strokeWidth={1.5} /> : <Moon size={15} strokeWidth={1.5} />}
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </DropdownMenuItem>
+        ) : null}
+        {onLogout ? <DropdownMenuSeparator /> : null}
+        {onLogout ? (
+          <DropdownMenuItem onSelect={onLogout} className="gap-2.5 py-2 text-[13px] text-destructive focus:text-destructive">
+            <LogOut size={15} strokeWidth={1.5} /> Sign out
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );
