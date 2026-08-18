@@ -21,5 +21,5 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const States: Story = { render: () => <PresenceSet /> };
-export const Dark: Story = { render: () => <div className="dark rounded-xl bg-background p-8 text-foreground"><PresenceSet /></div> };
+export const States: Story = { args: { fallback: "YG" }, render: () => <PresenceSet /> };
+export const Dark: Story = { args: { fallback: "YG" }, render: () => <div className="dark rounded-xl bg-background p-8 text-foreground"><PresenceSet /></div> };
