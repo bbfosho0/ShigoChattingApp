@@ -6,7 +6,7 @@ const meta = {
   title: "Components/Fluid Menu",
   component: MenuDemo,
   parameters: {
-    layout: "fullscreen",
+    layout: "centered",
   },
 } satisfies Meta<typeof MenuDemo>;
 
@@ -15,16 +15,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: () => (
-    <main className="flex min-h-screen items-start justify-center bg-background p-12 text-foreground">
+    <div className="min-h-[26rem] min-w-[22rem] rounded-3xl border border-border bg-background p-6 text-foreground shadow-sm">
       <MenuDemo />
-    </main>
+    </div>
   ),
 };
 
 export const Dark: Story = {
   render: () => (
-    <main className="dark flex min-h-screen items-start justify-center bg-background p-12 text-foreground">
+    <div className="dark min-h-[26rem] min-w-[22rem] rounded-3xl border border-border bg-background p-6 text-foreground shadow-sm">
       <MenuDemo />
-    </main>
+    </div>
   ),
 };
