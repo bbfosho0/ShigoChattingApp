@@ -35,7 +35,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = { render: () => <ConversationDemo /> };
-export const Empty: Story = { render: () => <div className="flex h-[30rem] w-[min(48rem,88vw)] flex-col overflow-hidden rounded-xl border border-border bg-background"><ShigoConversation messages={[]} currentUserId="yoshi" /></div> };
-export const Loading: Story = { render: () => <div className="flex h-[30rem] w-[min(48rem,88vw)] flex-col overflow-hidden rounded-xl border border-border bg-background"><ShigoConversation messages={[]} currentUserId="yoshi" loading /></div> };
-export const Dark: Story = { render: () => <div className="dark rounded-xl bg-background p-4 text-foreground"><ConversationDemo /></div> };
+const requiredArgs = { messages: [] as ShigoMessageData[], currentUserId: "yoshi" };
+
+export const Default: Story = { args: requiredArgs, render: () => <ConversationDemo /> };
+export const Empty: Story = { args: requiredArgs, render: () => <div className="flex h-[30rem] w-[min(48rem,88vw)] flex-col overflow-hidden rounded-xl border border-border bg-background"><ShigoConversation messages={[]} currentUserId="yoshi" /></div> };
+export const Loading: Story = { args: requiredArgs, render: () => <div className="flex h-[30rem] w-[min(48rem,88vw)] flex-col overflow-hidden rounded-xl border border-border bg-background"><ShigoConversation messages={[]} currentUserId="yoshi" loading /></div> };
+export const Dark: Story = { args: requiredArgs, render: () => <div className="dark rounded-xl bg-background p-4 text-foreground"><ConversationDemo /></div> };
