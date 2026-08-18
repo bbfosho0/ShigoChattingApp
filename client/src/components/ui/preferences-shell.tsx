@@ -30,9 +30,16 @@ export interface PreferencesShellProps {
   playing?: boolean;
   progress?: number;
   volume?: number;
+  securityLoading?: boolean;
+  onAccountSave?: (name: string, email: string) => void;
   onThemeChange?: (theme: "light" | "dark") => void;
   onTogglePlay?: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onSeek?: (value: number) => void;
   onVolumeChange?: (value: number) => void;
+  onUpdatePassword?: (currentPassword: string, newPassword: string) => void;
+  onDeleteAccount?: () => void;
 }
 
 export function PreferencesContent({
@@ -43,9 +50,16 @@ export function PreferencesContent({
   playing,
   progress,
   volume,
+  securityLoading,
+  onAccountSave,
   onThemeChange,
   onTogglePlay,
+  onPrevious,
+  onNext,
+  onSeek,
   onVolumeChange,
+  onUpdatePassword,
+  onDeleteAccount,
 }: Omit<PreferencesShellProps, "children" | "open" | "onOpenChange">) {
   const [section, setSection] = useState<PreferencesSection>(defaultSection);
 
@@ -60,10 +74,10 @@ export function PreferencesContent({
         </TabsList>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
-        <TabsContent value="account"><AccountSettingsPanel name={name} email={email} /></TabsContent>
+        <TabsContent value="account"><AccountSettingsPanel name={name} email={email} onSave={onAccountSave} /></TabsContent>
         <TabsContent value="appearance"><AppearanceSettingsPanel theme={theme} onThemeChange={onThemeChange} /></TabsContent>
-        <TabsContent value="ambient"><AmbientSettingsPanel playing={playing} progress={progress} volume={volume} onTogglePlay={onTogglePlay} onVolumeChange={onVolumeChange} /></TabsContent>
-        <TabsContent value="security"><SecuritySettingsPanel /></TabsContent>
+        <TabsContent value="ambient"><AmbientSettingsPanel playing={playing} progress={progress} volume={volume} onTogglePlay={onTogglePlay} onPrevious={onPrevious} onNext={onNext} onSeek={onSeek} onVolumeChange={onVolumeChange} /></TabsContent>
+        <TabsContent value="security"><SecuritySettingsPanel minPasswordLength={6} loading={securityLoading} onUpdatePassword={onUpdatePassword} onDeleteAccount={onDeleteAccount} /></TabsContent>
       </div>
     </Tabs>
   );
