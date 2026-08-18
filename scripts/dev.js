@@ -1,18 +1,24 @@
 const { spawn } = require("child_process");
 const path = require("path");
 
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmCli = process.env.npm_execpath;
 const root = path.resolve(__dirname, "..");
 
+if (!npmCli) {
+  console.error("Unable to locate npm's CLI. Start ShigoChat with `npm run dev` from the repository root.");
+  process.exit(1);
+}
+
+function spawnNpm(args, cwd) {
+  return spawn(process.execPath, [npmCli, ...args], {
+    cwd,
+    stdio: "inherit",
+  });
+}
+
 const processes = [
-  spawn(npmCommand, ["run", "dev"], {
-    cwd: path.join(root, "server"),
-    stdio: "inherit",
-  }),
-  spawn(npmCommand, ["start"], {
-    cwd: path.join(root, "client"),
-    stdio: "inherit",
-  }),
+  spawnNpm(["run", "dev"], path.join(root, "server")),
+  spawnNpm(["start"], path.join(root, "client")),
 ];
 
 let shuttingDown = false;
