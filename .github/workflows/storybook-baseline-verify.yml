@@ -24,27 +24,45 @@ jobs:
         with:
           node-version: 22.22.0
 
-      - name: Install client dependencies from lockfile
-        working-directory: client
-        run: npm ci
+      - name: Refresh root lockfile
+        run: npm install --package-lock-only
 
-      - name: Audit client full dependency tree
+      - name: Refresh client lockfile and dependencies
+        working-directory: client
+        run: npm install
+
+      - name: Refresh server lockfile and dependencies
+        working-directory: server
+        run: npm install
+
+      - name: Upload refreshed lockfiles
+        uses: actions/upload-artifact@v4
+        with:
+          name: hardened-lockfiles
+          path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Audit client dependency tree
         working-directory: client
         continue-on-error: true
         run: npm audit --json > client-audit-full.json || true
 
-      - name: Audit client production dependency tree
-        working-directory: client
+      - name: Audit server production dependency tree
+        working-directory: server
         continue-on-error: true
-        run: npm audit --omit=dev --json > client-audit-production.json || true
+        run: npm audit --omit=dev --json > server-audit-production.json || true
 
-      - name: Upload client audit reports
+      - name: Upload hardened audit reports
         uses: actions/upload-artifact@v4
         with:
-          name: client-audit-reports
+          name: hardened-audit-reports
           path: |
             client/client-audit-full.json
-            client/client-audit-production.json
+            server/server-audit-production.json
           if-no-files-found: error
           retention-days: 1
 
@@ -60,15 +78,6 @@ jobs:
         working-directory: client
         run: npm run build-storybook
 
-      - name: Install server dependencies from lockfile
-        working-directory: server
-        run: npm ci
-
-      - name: Audit server production dependency tree
-        working-directory: server
-        continue-on-error: true
-        run: npm audit --omit=dev --json > server-audit-production.json || true
-
       - name: Check server JavaScript syntax
         working-directory: server
         run: |
@@ -79,11 +88,3 @@ jobs:
           node --check middleware/validators.js
           node --check models/User.js
           node --check models/Message.js
-
-      - name: Upload server audit report
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-audit-report
-          path: server/server-audit-production.json
-          if-no-files-found: error
-          retention-days: 1
