@@ -8,15 +8,11 @@ import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
 import { AuthShell } from "../components/ui/auth-shell";
 import { Button } from "../components/ui/button";
-import { ResetPasswordDialog } from "../components/ui/reset-password-dialog";
 import { ShigoAuthForm } from "../components/ui/shigo-auth-form";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState("");
-  const [resetOpen, setResetOpen] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetLoading, setResetLoading] = useState(false);
   const { setUser } = useContext(AuthContext);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
@@ -46,27 +42,6 @@ const Login = () => {
     }
   };
 
-  const handleReset = async ({ email, password }) => {
-    try {
-      setResetLoading(true);
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/forgot-password`, {
-        email,
-        password,
-      });
-      setResetEmail(email);
-      setResetOpen(false);
-      toast.success("Password reset. Sign in with the new password.");
-    } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        err.response?.data?.errors?.[0]?.msg ||
-        "Password reset failed";
-      toast.error(message);
-    } finally {
-      setResetLoading(false);
-    }
-  };
-
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-x-hidden bg-background p-4 text-foreground sm:p-6">
       <div className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6">
@@ -87,22 +62,13 @@ const Login = () => {
           mode="login"
           loading={loading}
           error={authError}
-          initialEmail={resetEmail}
+          showForgotPassword={false}
           onSubmit={handleLogin}
           onModeChange={(mode) => {
             if (mode === "register") navigate("/register");
-            if (mode === "forgot") setResetOpen(true);
           }}
         />
       </AuthShell>
-
-      <ResetPasswordDialog
-        open={resetOpen}
-        onOpenChange={setResetOpen}
-        initialEmail={resetEmail}
-        loading={resetLoading}
-        onSubmit={handleReset}
-      />
     </main>
   );
 };
