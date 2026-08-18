@@ -1,163 +1,77 @@
 # ShigoChat
 
-ShigoChat is a full-stack real-time chat application built around one shared conversation space called **Quiet Room**. The production app combines a React client, JWT authentication, MongoDB persistence, Socket.IO realtime updates, message CRUD, light/dark themes, account controls, and synced ambient audio.
+ShigoChat is a full-stack real-time chat application built around one shared conversation space called **Quiet Room**. The production application combines a React client, JWT authentication, MongoDB persistence, Socket.IO realtime updates, message CRUD, light/dark themes, account controls, and shared ambient audio.
 
-This repository also contains a clean **Storybook + TypeScript + shadcn-compatible UI component lab** on the `storybook-typescript-baseline` branch. That branch is intentionally incremental: the existing Create React App application stays intact while new TS/TSX components are integrated and tested one at a time.
+The `storybook-typescript-baseline` branch contains the **Shigo Midnight** frontend migration plus a Storybook + TypeScript + shadcn-compatible component lab. The production presentation layer now consumes the new TSX system through compatibility-preserving JSX adapters while the existing REST, Socket.IO, context, storage, and routing contracts remain intact.
 
 Live site: https://shigochat.onrender.com/
 
-## Repository Tracks
+## Architecture
 
-### Production application
+### Client
 
-The existing ShigoChat app remains a Create React App project with the original JSX application structure and Express backend.
+- React 19
+- Create React App 5
+- React Router 7
+- Storybook 10.5 using React Webpack5 + `@storybook/preset-create-react-app`
+- TypeScript 5.1.6 with mixed JS/TS support
+- Tailwind CSS 3.4
+- Radix UI primitives
+- Lucide React
+- Framer Motion and GSAP
+- Axios and Socket.IO Client
 
-### Storybook TypeScript baseline
+### Server
 
-Branch: `storybook-typescript-baseline`
+- Node.js
+- Express 5
+- Socket.IO 4
+- Mongoose 8
+- JWT + bcryptjs
+- express-validator
+- MongoDB
 
-Purpose:
+## Supported Runtime
 
-- add Storybook without replacing CRA
-- allow JSX and TSX to coexist
-- support shadcn-style component organization
-- integrate 21st.dev and other TSX components incrementally
-- keep each component independently reviewable and recoverable
-- avoid bundler hacks, bulk conversions, and unrelated redesign changes
+Use **Node.js 22.12 or newer in the Node 22 line** as the primary development/runtime baseline. The client and server manifests allow Node 22 through Node 24 so CI can verify both supported LTS/runtime families.
 
-The branch uses **Storybook React Webpack5 + the CRA preset**, not Vite.
-
-## Screenshots
-
-The production UI supports light and dark themes.
-
-### Main Application
-
-| Light | Dark |
-| --- | --- |
-| ![Quiet Room light](docs/screenshots/chat-room-light.png) | ![Quiet Room dark](docs/screenshots/chat-room-dark.png) |
-| ![Preferences light](docs/screenshots/preferences-light.png) | ![Preferences dark](docs/screenshots/preferences-dark.png) |
-
-### Authentication
-
-| Light | Dark |
-| --- | --- |
-| ![Login light](docs/screenshots/login-light.png) | ![Login dark](docs/screenshots/login-dark.png) |
-| ![Forgot password light](docs/screenshots/forgot-password-light.png) | ![Forgot password dark](docs/screenshots/forgot-password-dark.png) |
-| ![Register light](docs/screenshots/register-light.png) | ![Register dark](docs/screenshots/register-dark.png) |
-
-## Highlights
-
-- **Full-stack chat workflow**: register, log in, fetch message history, send messages, edit/delete owned messages, and receive live updates.
-- **Realtime architecture**: Socket.IO shares the Express HTTP server and authenticates socket handshakes with JWTs.
-- **MongoDB persistence**: users and messages are stored with Mongoose models.
-- **Responsive product UI**: desktop and mobile layouts, light/dark themes, polished auth flows, preferences, and shared ambient audio state.
-- **Storybook component lab**: isolated TSX stories for new UI primitives, forms, interactions, hooks, and motion experiments.
-- **Mixed JSX + TSX migration path**: existing JSX stays untouched while new TypeScript components can be added safely.
-
-## Tech Stack
-
-| Area | Tools |
-| --- | --- |
-| Frontend | React 19, Create React App, React Router 7 |
-| Styling | Tailwind CSS 3, CSS custom properties, `tailwindcss-animate` |
-| UI | shadcn-compatible structure, Radix UI primitives, Lucide React, CVA |
-| Motion | Framer Motion, GSAP |
-| Storybook | Storybook 10.5, React Webpack5, CRA preset, Docs, a11y |
-| TypeScript | TypeScript 5.8 with mixed JS/TS support |
-| API Client | Axios, Socket.IO Client |
-| Backend | Node.js, Express 5, Socket.IO, Mongoose |
-| Auth | JWT, bcryptjs, express-validator |
-| Database | MongoDB Atlas |
-
-## UI Component Lab
-
-### Canonical paths
-
-The Storybook branch uses these locations:
+Required package-manager baseline:
 
 ```text
-client/
-├─ .storybook/
-│  ├─ main.js
-│  └─ preview.js
-├─ components.json
-├─ tailwind.config.js
-├─ tsconfig.json
-└─ src/
-   ├─ components/
-   │  └─ ui/              # reusable shadcn-style UI components
-   ├─ hooks/              # reusable React hooks
-   ├─ lib/
-   │  └─ utils.ts         # cn() helper
-   ├─ stories/            # Storybook stories
-   └─ index.css           # global styles + semantic theme tokens
+npm >= 10
 ```
 
-The default UI component path is:
+The final compatibility workflow verifies from committed lockfiles with `npm ci`.
+
+## Shigo Midnight Frontend
+
+The canonical design and migration decisions live in:
 
 ```text
-client/src/components/ui
+SHIGO_FRONTEND_MANIFEST.md
 ```
 
-The default global style entry is:
+The implementation includes:
 
-```text
-client/src/index.css
-```
-
-Hooks belong in:
-
-```text
-client/src/hooks
-```
-
-### Import convention
-
-This repository is still Create React App. To avoid custom webpack aliasing, TypeScript uses:
-
-```json
-"baseUrl": "src"
-```
-
-Use CRA-safe absolute imports:
-
-```tsx
-import { Button } from "components/ui/button";
-import { cn } from "lib/utils";
-import { useScreenSize } from "hooks/use-screen-size";
-```
-
-Do **not** introduce `@/...` imports unless the entire build system is intentionally migrated and verified. The current branch deliberately avoids that migration.
-
-### Current integrated UI
-
-The baseline currently includes:
-
-- Avatar
-- Button with compatibility-preserving variants, icon modes, and loading state
-- Card
-- Checkbox
-- Dropdown Menu
-- Fluid Menu
-- Input
-- Label
-- Login Form + interactive WebGL smokey background
-- Magnetic Cursor
-- Messaging Conversation
-- Scroll Area
-- Separator
-- Sign Up Block
-- `useScreenSize` responsive hook
-
-Dedicated demos and Storybook stories live beside or under `src/stories/` so components can be inspected independently from the production app.
+- semantic light/dark design tokens
+- typography, spacing, radius, elevation, motion, and Lucide icon foundations
+- reusable Radix-backed UI primitives
+- desktop sidebar and collapsed navigation
+- mobile Sheet navigation
+- presence-aware profile surfaces
+- composable message, conversation, composer, attachment, and emoji UI
+- account, appearance, ambient, and security preferences
+- unified login/register presentation
+- custom Shigo shader/splash experience
+- canonical Quiet Room Storybook compositions
+- production wiring that preserves the existing application contracts
 
 ## Storybook
 
 From `client/`:
 
 ```bash
-npm install
+npm ci
 npm run storybook
 ```
 
@@ -173,107 +87,53 @@ Build the static Storybook bundle with:
 npm run build-storybook
 ```
 
-### Story conventions
+## Repository Guardrails
 
-New integrations should normally receive a dedicated story:
-
-```text
-src/stories/<ComponentName>.stories.tsx
-```
-
-Use a stable title such as:
-
-```tsx
-title: "Components/Fluid Menu"
-```
-
-When useful, include both light and dark stories.
-
-## Integrating a New shadcn or 21st.dev Component
-
-1. **Inspect first.** Check whether required primitives and packages already exist.
-2. **Do not replace shared primitives blindly.** Extend existing `Button`, `Card`, `Input`, etc. only when backward compatibility can be preserved.
-3. **Keep native TSX.** Do not rewrite TypeScript components to JSX to work around parsing issues.
-4. **Adapt imports to CRA.** Replace `@/components/ui/...` with `components/ui/...` and `@/lib/utils` with `lib/utils`.
-5. **Avoid framework contamination.** Do not install Next.js just because a copied component imports `next/link`; adapt it to the current React Router or plain anchor behavior instead.
-6. **Respect Tailwind 3.** Do not paste Tailwind 4 `@theme` or `@import "tailwindcss"` blocks into this branch.
-7. **Reuse semantic tokens.** Prefer `bg-background`, `text-foreground`, `border-border`, `bg-card`, `text-muted-foreground`, and related theme tokens.
-8. **Create a uniquely named demo.** Use `<component>-demo.tsx` rather than a generic `demo.tsx` that another integration can overwrite.
-9. **Add Storybook coverage.** Include meaningful states and interactions.
-10. **Verify before merging.** Run the full client verification commands below.
-
-## Architectural Guardrails
-
-The `storybook-typescript-baseline` branch intentionally does **not** use:
+This branch intentionally does **not** use:
 
 - Vite
 - `@storybook/react-vite`
 - `@vitejs/plugin-react`
-- custom esbuild TSX loaders
+- custom TSX loaders
 - CRACO
 - `react-app-rewired`
-- arbitrary webpack alias hacks
+- arbitrary webpack aliases
 - Next.js
 - Tailwind CSS 4
 - bulk JSX-to-TSX conversion
 
-Those changes are outside the purpose of this branch and should not be introduced as side effects of component integration.
+Create React App 5 is retained intentionally as compatibility debt for this branch. It has an old dependency tree and stale TypeScript peer metadata, so `client/.npmrc` contains a repository-local peer-resolution compatibility shim. Do not interpret residual vulnerabilities trapped exclusively below `react-scripts@5.0.1` as permission to run `npm audit fix --force`; replacing CRA must be a deliberate migration with its own verification plan.
 
-## Frontend Structure
+## Import Convention
 
-The production application and the component lab coexist:
+TypeScript uses:
 
-```text
-client/src/
-├─ components/
-│  ├─ ui/                 # new reusable TSX component lab
-│  ├─ MessageBubble.jsx   # existing production components
-│  ├─ MessageInput.jsx
-│  ├─ MusicPlayer.jsx
-│  └─ Preferences.jsx
-├─ hooks/
-├─ lib/
-├─ context/
-│  ├─ AuthContext.js
-│  ├─ MusicContext.js
-│  └─ ThemeContext.js
-├─ pages/
-│  ├─ Chatroom.jsx
-│  ├─ Login.jsx
-│  ├─ Register.jsx
-│  └─ SplashScreen.jsx
-├─ stories/
-├─ App.jsx
-├─ index.css
-└─ index.js
+```json
+"baseUrl": "src"
 ```
 
-## Backend Structure
+Use CRA-safe absolute imports:
 
-```text
-server/
-├─ middleware/
-│  ├─ auth.js
-│  └─ validators.js
-├─ models/
-│  ├─ Message.js
-│  └─ User.js
-├─ routes/
-│  ├─ auth.js
-│  └─ messages.js
-└─ server.js
+```tsx
+import { Button } from "components/ui/button";
+import { cn } from "lib/utils";
+import { useScreenSize } from "hooks/use-screen-size";
 ```
+
+Do not introduce `@/...` aliases unless the build system is intentionally migrated.
 
 ## API Overview
 
-### Auth
+### Authentication
 
 | Method | Route | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/auth/register` | Create a new user |
-| `POST` | `/api/auth/login` | Log in and receive JWT |
-| `POST` | `/api/auth/forgot-password` | Reset a password for an account email |
-| `PATCH` | `/api/auth/change-password` | Change password for authenticated user |
+| `POST` | `/api/auth/register` | Create a user |
+| `POST` | `/api/auth/login` | Log in and receive a JWT |
+| `POST` | `/api/auth/forgot-password` | Disabled until a verified reset-token/email challenge exists |
+| `PATCH` | `/api/auth/change-password` | Change password for an authenticated user after current-password verification |
+
+Self-service password reset is intentionally unavailable in production. The previous email-only mutation path was removed because password recovery must prove control of a trusted recovery channel before changing credentials.
 
 ### Messages
 
@@ -284,32 +144,11 @@ server/
 | `PATCH` | `/api/messages/:id` | Edit an owned message |
 | `DELETE` | `/api/messages/:id` | Delete an owned message |
 
+Socket.IO uses the same JWT identity model as REST and preserves the existing `sendMessage`, `receiveMessage`, `editMessage`, and `deleteMessage` contracts.
+
 ## Local Setup
 
-### Prerequisites
-
-- Node.js 20 recommended for the Storybook verification workflow
-- npm
-- MongoDB connection string for backend development
-
-### Install
-
-```bash
-git clone https://github.com/bbfosho0/ShigoChattingApp.git
-cd ShigoChattingApp
-
-git switch storybook-typescript-baseline
-
-cd server
-npm install
-
-cd ../client
-npm install
-```
-
-`npm install` is important after pulling component integrations because dependency changes should regenerate `client/package-lock.json` through npm rather than by hand.
-
-### Environment Variables
+### Environment variables
 
 Create `server/.env`:
 
@@ -326,7 +165,21 @@ Create `client/.env`:
 REACT_APP_API_URL=http://localhost:5000
 ```
 
-### Run the production app locally
+### Install from committed lockfiles
+
+```bash
+git clone https://github.com/bbfosho0/ShigoChattingApp.git
+cd ShigoChattingApp
+git switch storybook-typescript-baseline
+
+cd server
+npm ci
+
+cd ../client
+npm ci
+```
+
+### Run
 
 Backend:
 
@@ -342,57 +195,65 @@ cd client
 npm start
 ```
 
-## Verification
-
-Before considering a component integration complete, run from `client/`:
+Storybook:
 
 ```bash
-npm install
+cd client
+npm run storybook
+```
+
+## Verification Contract
+
+The permanent compatibility gate must use committed lockfiles rather than an uncommitted install state.
+
+Client verification:
+
+```bash
+cd client
+npm ci
+npm test -- --watchAll=false --runInBand
 npx tsc --noEmit
 npm run build
 npm run build-storybook
 ```
 
-For interactive inspection:
+Server verification:
 
 ```bash
-npm run storybook
+cd server
+npm ci
+npm audit --omit=dev --json
+node --check server.js
+node --check routes/auth.js
+node --check routes/messages.js
+node --check middleware/auth.js
+node --check middleware/validators.js
+node --check models/User.js
+node --check models/Message.js
 ```
 
-The branch also contains `.github/workflows/storybook-baseline-verify.yml`, which is intended to run dependency installation, TypeScript checking, the CRA production build, and the Storybook static build.
+Do not claim the branch is ready unless the exact committed head passes the required CI gate.
 
-Do not claim a component is fully verified unless these commands, or the equivalent CI workflow, actually complete successfully.
-
-## Engineering Notes
-
-- The frontend never talks directly to MongoDB. It only talks to the Express API.
-- Message ownership is enforced server-side before edits/deletes.
-- Socket connections use the same JWT model as REST requests.
-- Existing JSX is valid and should remain JSX unless a targeted migration is intentionally requested.
-- New reusable UI work should prefer TypeScript and the `components/ui` structure.
-- Shared primitives should remain backward compatible with existing stories and production usage.
-- CSS custom properties in `src/index.css` are the source of truth for semantic light/dark tokens.
-
-## Security Considerations
+## Security Notes
 
 Implemented:
 
 - bcrypt password hashing
-- JWT authentication
-- authenticated message routes
-- authenticated Socket.IO handshake
+- JWT-authenticated REST routes
+- JWT-authenticated Socket.IO handshakes
+- server-side message ownership enforcement
 - request validation
 - CORS allowlist through `CLIENT_URL`
+- authenticated current-password verification for password changes
+- unsafe email-only password mutation disabled
+- targeted dependency auditing in CI
 
-Recommended before production hardening:
+Still recommended as separate future work:
 
-- email-based reset tokens for forgot-password
-- rate limiting on authentication endpoints
-- automated API tests for auth and message ownership
-- periodic secret rotation
+- verified email/token password-recovery workflow
+- authentication rate limiting
+- broader automated API integration tests
+- secret rotation policy
+- intentional migration away from the legacy CRA 5 build toolchain
 
-## Why This Project Matters
-
-ShigoChat demonstrates both end-to-end product engineering and controlled frontend evolution: a working full-stack realtime application can continue shipping while a modern TypeScript component system is introduced incrementally, visibly, and without destabilizing the original architecture.
-
-For automated coding guidance, see [`AGENTS.md`](AGENTS.md).
+For frontend design decisions, see [`SHIGO_FRONTEND_MANIFEST.md`](SHIGO_FRONTEND_MANIFEST.md). For automated coding guidance, see [`AGENTS.md`](AGENTS.md).
