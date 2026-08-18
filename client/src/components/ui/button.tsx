@@ -10,7 +10,7 @@ import { cn } from "lib/utils";
 const buttonVariants = cva(
   [
     "group relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-full font-medium outline-none",
-    "transition-all duration-[80ms]",
+    "transition-all duration-75",
     "disabled:pointer-events-none disabled:opacity-50",
     "focus-visible:ring-1 focus-visible:ring-[#6B97FF] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -106,7 +106,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-hidden="true"
         size={iconSize}
         strokeWidth={1.5}
-        className="transition-[stroke-width] duration-[80ms] group-hover:[stroke-width:2]"
+        className="transition-[stroke-width] duration-75 group-hover:[stroke-width:2]"
       />
     ) : (
       leftIcon
@@ -117,7 +117,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-hidden="true"
         size={iconSize}
         strokeWidth={1.5}
-        className="transition-[stroke-width] duration-[80ms] group-hover:[stroke-width:2]"
+        className="transition-[stroke-width] duration-75 group-hover:[stroke-width:2]"
       />
     ) : (
       rightIcon
@@ -160,7 +160,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             </span>
           </>
         ) : isIconOnly ? (
-          <span className="[&_svg]:transition-[stroke-width] [&_svg]:duration-[80ms] group-hover:[&_svg]:[stroke-width:2]">
+          <span className="[&_svg]:transition-[stroke-width] [&_svg]:duration-75 group-hover:[&_svg]:[stroke-width:2]">
             {children}
           </span>
         ) : (
