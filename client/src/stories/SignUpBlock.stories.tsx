@@ -7,7 +7,7 @@ const meta = {
   title: "Components/Sign Up Block",
   component: SignUpBlock,
   parameters: {
-    layout: "fullscreen",
+    layout: "centered",
   },
 } satisfies Meta<typeof SignUpBlock>;
 
@@ -20,8 +20,8 @@ export const Default: Story = {
 
 export const Dark: Story = {
   render: () => (
-    <main className="dark flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
+    <div className="dark rounded-2xl bg-background p-2 text-foreground">
       <SignUpBlock />
-    </main>
+    </div>
   ),
 };
