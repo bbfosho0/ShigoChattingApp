@@ -273,12 +273,12 @@ export function LoginForm() {
         </div>
 
         <div className="flex items-center justify-between">
-          <a
-            href="#"
+          <button
+            type="button"
             className="text-xs text-gray-300 transition hover:text-white"
           >
             Forgot Password?
-          </a>
+          </button>
         </div>
 
         <button
@@ -313,12 +313,12 @@ export function LoginForm() {
 
       <p className="text-center text-xs text-gray-400">
         Don&apos;t have an account?{" "}
-        <a
-          href="#"
+        <button
+          type="button"
           className="font-semibold text-blue-400 transition hover:text-blue-300"
         >
           Sign Up
-        </a>
+        </button>
       </p>
     </div>
   );

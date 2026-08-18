@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import gsap from "gsap";
-import { vec2, type Vec2 } from "vecteur";
+import { vec2, type Vector2 } from "vecteur";
 
 interface MagneticCursorProps {
   children: ReactNode;
@@ -31,9 +31,9 @@ interface MagneticCursorProps {
 interface CursorState {
   el: HTMLDivElement | null;
   pos: {
-    current: Vec2;
-    target: Vec2;
-    previous: Vec2;
+    current: Vector2;
+    target: Vector2;
+    previous: Vector2;
   };
   hover: { isHovered: boolean };
   isDetaching: boolean;
@@ -297,7 +297,7 @@ export const MagneticCursor: FC<MagneticCursorProps> = ({
           rotate: 0,
           duration: prefersReducedMotion ? 0 : 0.3,
           ease: "power3.out",
-          overwrite: "all",
+          overwrite: "auto",
         });
       };
 
@@ -326,7 +326,7 @@ export const MagneticCursor: FC<MagneticCursorProps> = ({
           rotate: 0,
           duration: detachDuration,
           ease: "power3.out",
-          overwrite: "all",
+          overwrite: "auto",
           onComplete: () => {
             state.isDetaching = false;
           },

@@ -7,9 +7,11 @@ const Baseline = () => (
   </div>
 );
 
-export default {
+const meta = {
   title: "Baseline/JSX",
-  component: Baseline
+  component: Baseline,
 };
+
+export default meta;
 
 export const Default = {};

@@ -2,6 +2,7 @@ import "../src/index.css";
 
 const preview = {
   parameters: {
+    layout: "padded",
     controls: {
       matchers: {
         color: /(background|color)$/i,
