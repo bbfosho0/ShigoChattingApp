@@ -154,7 +154,6 @@ export function ShigoShader({ className }: ShigoShaderProps) {
     };
 
     const draw = (now: number) => {
-      resize();
       if (timeLocation) {
         const elapsed = reducedMotion ? 0 : (now - startTime) / 1000;
         gl.uniform1f(timeLocation, elapsed);
