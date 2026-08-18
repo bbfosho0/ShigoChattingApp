@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Mail, UserRound } from "lucide-react";
 
 import { Button } from "components/ui/button";
@@ -41,6 +41,11 @@ export function ShigoAuthForm({
   const [username, setUsername] = useState(initialUsername);
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
+
+  useEffect(() => setEmail(initialEmail), [initialEmail]);
+  useEffect(() => setUsername(initialUsername), [initialUsername]);
+  useEffect(() => setPassword(""), [mode]);
+
   const current = copy[mode];
   const passwordValid = mode === "forgot" || (mode === "register" ? password.length >= 8 : password.length > 0);
 
