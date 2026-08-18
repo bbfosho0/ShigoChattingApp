@@ -5,82 +5,145 @@
 @tailwind utilities;
 
 :root {
-  --background: 267 53% 97%;
-  --foreground: 253 55% 24%;
-  --card: 0 0% 100%;
-  --card-foreground: 253 55% 24%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 253 55% 24%;
-  --primary: 259 44% 56%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 265 50% 95%;
-  --secondary-foreground: 253 55% 24%;
-  --muted: 263 100% 98%;
-  --muted-foreground: 259 20% 45%;
-  --accent: 265 50% 95%;
-  --accent-foreground: 253 55% 24%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 260 24% 88%;
-  --input: 260 24% 88%;
-  --ring: 259 44% 56%;
-  --radius: 0.5rem;
+  color-scheme: light;
 
-  --sc-bg: #f6f2fb;
-  --sc-surface: #ffffff;
-  --sc-panel: #faf7ff;
-  --sc-panel-2: #f2edf9;
-  --sc-accent: #7c5cbf;
-  --sc-accent-strong: #6b4fa8;
-  --sc-accent-soft: rgba(124, 92, 191, 0.15);
-  --sc-accent-glow: rgba(124, 92, 191, 0.08);
-  --sc-text-primary: #2a1b5e;
-  --sc-text-secondary: #6b5d8a;
-  --sc-text-muted: #9b8eb5;
-  --sc-border: rgba(124, 92, 191, 0.12);
-  --sc-bubble-own: rgba(155, 120, 220, 0.18);
-  --sc-bubble-other: rgba(255, 255, 255, 0.9);
-  --sc-moon: #9b8ec4;
-  --sc-shadow: rgba(100, 70, 180, 0.08);
+  /* Shigo Midnight: light semantic system */
+  --background: 255 28.6% 97.3%;
+  --foreground: 250 11.5% 10.2%;
+  --card: 0 0% 100%;
+  --card-foreground: 250 11.5% 10.2%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 250 11.5% 10.2%;
+  --primary: 247.9 62.3% 59.4%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 250 23.1% 94.9%;
+  --secondary-foreground: 250 11.5% 10.2%;
+  --muted: 255 23.5% 93.3%;
+  --muted-foreground: 260 5.7% 41.2%;
+  --accent: 255 23.5% 93.3%;
+  --accent-foreground: 250 11.5% 10.2%;
+  --destructive: 349.3 69.2% 61.8%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 260 17.6% 90%;
+  --input: 260 17.6% 90%;
+  --ring: 246.5 86.7% 70.6%;
+
+  /* Shigo-specific semantic signals */
+  --shigo-shell: 250 23.1% 94.9%;
+  --shigo-raised: 0 0% 100%;
+  --shigo-signal: 173.1 57% 42%;
+  --shigo-signal-foreground: 0 0% 100%;
+  --shigo-warning: 34.9 61.6% 61.2%;
+  --shigo-warning-foreground: 250 11.5% 10.2%;
+  --shigo-presence-online: 154 48% 42%;
+  --shigo-presence-away: 34.9 61.6% 61.2%;
+  --shigo-presence-offline: 265 5.2% 54.5%;
+  --shigo-ambient: 173.1 57% 42%;
+  --shigo-own-message: 247.9 62.3% 59.4% / 0.1;
+  --shigo-other-message: 0 0% 100% / 0.92;
+
+  /* Radius scale: 6 / 8 / 12 / 16 / 20 / 24 */
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius: var(--radius-md);
+
+  /* Elevation: surface contrast first, shadow second */
+  --shadow-panel: 0 1px 2px rgba(24, 23, 29, 0.04), 0 8px 24px rgba(24, 23, 29, 0.04);
+  --shadow-floating: 0 12px 40px rgba(24, 23, 29, 0.1);
+  --shadow-dialog: 0 24px 80px rgba(24, 23, 29, 0.16);
+  --shadow-focus: 0 0 0 3px hsl(var(--ring) / 0.24);
+
+  /* Motion language */
+  --motion-fast: 90ms;
+  --motion-base: 150ms;
+  --motion-slow: 180ms;
+  --motion-panel: 260ms;
+  --motion-expressive: 560ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Legacy production aliases. New TSX should use semantic tokens above. */
+  --sc-bg: hsl(var(--background));
+  --sc-surface: hsl(var(--card));
+  --sc-panel: hsl(var(--secondary));
+  --sc-panel-2: hsl(var(--muted));
+  --sc-accent: hsl(var(--primary));
+  --sc-accent-strong: #6857d8;
+  --sc-accent-soft: hsl(var(--primary) / 0.14);
+  --sc-accent-glow: hsl(var(--primary) / 0.08);
+  --sc-text-primary: hsl(var(--foreground));
+  --sc-text-secondary: hsl(var(--muted-foreground));
+  --sc-text-muted: hsl(var(--muted-foreground) / 0.72);
+  --sc-border: hsl(var(--border));
+  --sc-bubble-own: hsl(var(--shigo-own-message));
+  --sc-bubble-other: hsl(var(--shigo-other-message));
+  --sc-moon: hsl(var(--primary));
+  --sc-shadow: rgba(24, 23, 29, 0.08);
 }
 
 .dark {
-  --background: 226 49% 7%;
-  --foreground: 255 35% 91%;
-  --card: 224 46% 11%;
-  --card-foreground: 255 35% 91%;
-  --popover: 224 46% 11%;
-  --popover-foreground: 255 35% 91%;
-  --primary: 256 43% 70%;
-  --primary-foreground: 226 49% 7%;
-  --secondary: 224 46% 15%;
-  --secondary-foreground: 255 35% 91%;
-  --muted: 223 42% 18%;
-  --muted-foreground: 255 17% 63%;
-  --accent: 223 42% 18%;
-  --accent-foreground: 255 35% 91%;
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 224 26% 24%;
-  --input: 224 26% 24%;
-  --ring: 256 43% 70%;
+  color-scheme: dark;
 
-  --sc-bg: #090d1a;
-  --sc-surface: #0f1629;
-  --sc-panel: #141d36;
-  --sc-panel-2: #1a2540;
-  --sc-accent: #a492d4;
-  --sc-accent-strong: #6b4fa8;
-  --sc-accent-soft: rgba(164, 146, 212, 0.18);
-  --sc-accent-glow: rgba(164, 146, 212, 0.06);
-  --sc-text-primary: #e4e0f0;
-  --sc-text-secondary: #9890b0;
-  --sc-text-muted: #5c5478;
-  --sc-border: rgba(155, 142, 196, 0.12);
-  --sc-bubble-own: rgba(107, 82, 179, 0.35);
-  --sc-bubble-other: rgba(20, 29, 54, 0.9);
-  --sc-moon: #c4b8e8;
-  --sc-shadow: rgba(0, 0, 0, 0.4);
+  /* Shigo Midnight: dark semantic system */
+  --background: 230 25% 4.7%;
+  --foreground: 240 15.8% 96.3%;
+  --card: 226.2 25.5% 10%;
+  --card-foreground: 240 15.8% 96.3%;
+  --popover: 226.2 25.5% 10%;
+  --popover-foreground: 240 15.8% 96.3%;
+  --primary: 246.5 86.7% 70.6%;
+  --primary-foreground: 230 25% 4.7%;
+  --secondary: 226.7 24.3% 7.3%;
+  --secondary-foreground: 240 15.8% 96.3%;
+  --muted: 227.1 21.9% 12.5%;
+  --muted-foreground: 232 8.7% 66.1%;
+  --accent: 225.9 21% 15.9%;
+  --accent-foreground: 240 15.8% 96.3%;
+  --destructive: 349.3 69.2% 61.8%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 100% / 0.09;
+  --input: 0 0% 100% / 0.12;
+  --ring: 247.3 100% 77.5%;
+
+  --shigo-shell: 226.7 24.3% 7.3%;
+  --shigo-raised: 225.9 21% 15.9%;
+  --shigo-signal: 172.4 55.3% 57.8%;
+  --shigo-signal-foreground: 230 25% 4.7%;
+  --shigo-warning: 34.9 61.6% 61.2%;
+  --shigo-warning-foreground: 230 25% 4.7%;
+  --shigo-presence-online: 154 57% 53%;
+  --shigo-presence-away: 34.9 61.6% 61.2%;
+  --shigo-presence-offline: 229.4 7.1% 46.9%;
+  --shigo-ambient: 172.4 55.3% 57.8%;
+  --shigo-own-message: 246.5 86.7% 70.6% / 0.14;
+  --shigo-other-message: 226.2 25.5% 10% / 0.94;
+
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.025), 0 10px 32px rgba(0, 0, 0, 0.18);
+  --shadow-floating: 0 16px 48px rgba(0, 0, 0, 0.34);
+  --shadow-dialog: 0 28px 96px rgba(0, 0, 0, 0.5);
+  --shadow-focus: 0 0 0 3px hsl(var(--ring) / 0.24);
+
+  /* Legacy aliases follow the dark semantic system. */
+  --sc-bg: hsl(var(--background));
+  --sc-surface: hsl(var(--card));
+  --sc-panel: hsl(var(--secondary));
+  --sc-panel-2: hsl(var(--muted));
+  --sc-accent: hsl(var(--primary));
+  --sc-accent-strong: #8173f5;
+  --sc-accent-soft: hsl(var(--primary) / 0.16);
+  --sc-accent-glow: hsl(var(--primary) / 0.08);
+  --sc-text-primary: hsl(var(--foreground));
+  --sc-text-secondary: hsl(var(--muted-foreground));
+  --sc-text-muted: #6f7280;
+  --sc-border: hsl(var(--border));
+  --sc-bubble-own: hsl(var(--shigo-own-message));
+  --sc-bubble-other: hsl(var(--shigo-other-message));
+  --sc-moon: hsl(var(--primary));
+  --sc-shadow: rgba(0, 0, 0, 0.34);
 }
 
 html,
@@ -94,9 +157,13 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--sc-bg);
-  color: var(--sc-text-primary);
-  transition: background-color 240ms ease, color 240ms ease;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  transition:
+    background-color var(--motion-panel) var(--ease-standard),
+    color var(--motion-panel) var(--ease-standard);
 }
 
 * {
@@ -104,7 +171,8 @@ body {
 }
 
 ::selection {
-  background-color: rgba(164, 146, 212, 0.32);
+  background-color: hsl(var(--primary) / 0.24);
+  color: hsl(var(--foreground));
 }
 
 button,
@@ -148,9 +216,12 @@ button {
   justify-content: center;
   border: 1px solid var(--sc-border);
   color: var(--sc-text-secondary);
-  background: rgba(255, 255, 255, 0.05);
+  background: hsl(var(--card) / 0.58);
   cursor: pointer;
-  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+  transition:
+    background var(--motion-base) var(--ease-standard),
+    color var(--motion-base) var(--ease-standard),
+    transform var(--motion-base) var(--ease-standard);
 }
 
 .sc-icon-button:hover {
@@ -160,46 +231,54 @@ button {
 
 .sc-field {
   width: 100%;
-  border-radius: 0.75rem;
-  border: 1.5px solid var(--sc-border);
-  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--sc-border);
+  background: hsl(var(--card) / 0.76);
   color: var(--sc-text-primary);
   outline: none;
-  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  transition:
+    border-color var(--motion-slow) var(--ease-standard),
+    box-shadow var(--motion-slow) var(--ease-standard),
+    background var(--motion-slow) var(--ease-standard);
 }
 
 .dark .sc-field {
-  background: rgba(9, 13, 26, 0.6);
+  background: hsl(var(--secondary) / 0.74);
 }
 
 .sc-field:focus {
-  border-color: var(--sc-accent);
-  box-shadow: 0 0 0 3px var(--sc-accent-soft);
+  border-color: hsl(var(--ring) / 0.72);
+  box-shadow: var(--shadow-focus);
 }
 
 .sc-primary-button {
   border: 0;
-  border-radius: 0.85rem;
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--sc-accent-strong) 0%, var(--sc-accent) 100%);
+  border-radius: var(--radius-md);
+  color: hsl(var(--primary-foreground));
+  background: hsl(var(--primary));
   cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
-  box-shadow: 0 6px 24px rgba(107, 79, 168, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition:
+    transform var(--motion-base) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard),
+    opacity var(--motion-base) var(--ease-standard),
+    background-color var(--motion-base) var(--ease-standard);
+  box-shadow: var(--shadow-panel);
 }
 
 .sc-primary-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 10px 32px rgba(107, 79, 168, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  background: color-mix(in srgb, hsl(var(--primary)) 92%, white);
+  box-shadow: var(--shadow-floating);
 }
 
 .sc-primary-button:disabled {
   cursor: not-allowed;
-  opacity: 0.72;
+  opacity: 0.58;
 }
 
 .sc-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: var(--sc-border) transparent;
+  scrollbar-color: hsl(var(--border)) transparent;
 }
 
 .sc-scrollbar::-webkit-scrollbar {
@@ -211,8 +290,17 @@ button {
 }
 
 .sc-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--sc-border);
+  background: hsl(var(--border));
   border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .sc-icon-button,
+  .sc-field,
+  .sc-primary-button {
+    transition-duration: 0.01ms;
+  }
 }
 
 @keyframes sc-spin {
