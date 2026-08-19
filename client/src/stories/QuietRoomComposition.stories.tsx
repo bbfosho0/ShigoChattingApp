@@ -5,7 +5,7 @@ import { QuietRoomComposition } from "components/ui/quiet-room-composition";
 const meta = {
   title: "Compositions/Quiet Room",
   component: QuietRoomComposition,
-  parameters: { layout: "centered" },
+  parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof QuietRoomComposition>;
 
 export default meta;
