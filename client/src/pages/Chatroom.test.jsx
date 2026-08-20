@@ -5,27 +5,30 @@ import { ThemeContext } from "../context/ThemeContext";
 import Chatroom from "./Chatroom";
 
 const mockNavigate = jest.fn();
-const mockSocket = {
-  on: jest.fn(),
-  off: jest.fn(),
-  emit: jest.fn(),
-  disconnect: jest.fn(),
-  connected: false,
-};
 
 jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
 jest.mock("axios", () => ({
-  get: jest.fn(() => Promise.resolve({ data: [] })),
-  post: jest.fn(),
-  patch: jest.fn(),
-  delete: jest.fn(),
+  __esModule: true,
+  default: {
+    get: jest.fn(() => Promise.resolve({ data: [] })),
+    post: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
+  },
 }));
 
 jest.mock("socket.io-client", () => ({
-  io: jest.fn(() => mockSocket),
+  __esModule: true,
+  io: jest.fn(() => ({
+    on: jest.fn(),
+    off: jest.fn(),
+    emit: jest.fn(),
+    disconnect: jest.fn(),
+    connected: false,
+  })),
 }));
 
 jest.mock("react-hot-toast", () => ({
@@ -52,9 +55,6 @@ describe("Chatroom responsive shell", () => {
   beforeEach(() => {
     localStorage.setItem("token", "test-token");
     mockNavigate.mockClear();
-    mockSocket.on.mockClear();
-    mockSocket.off.mockClear();
-    mockSocket.disconnect.mockClear();
   });
 
   afterEach(() => {
