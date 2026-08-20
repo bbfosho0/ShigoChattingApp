@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import MenuDemo from "components/ui/fluid-menu-demo";
 
 const meta = {
-  title: "Components/Fluid Menu",
+  title: "Reference/Fluid Menu",
   component: MenuDemo,
   parameters: {
     layout: "centered",
