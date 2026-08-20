@@ -1,8 +1,8 @@
 # ShigoChat
 
-ShigoChat is a full-stack real-time chat application built around one shared conversation space called **Quiet Room**. The production application combines a React client, JWT authentication, MongoDB persistence, Socket.IO realtime updates, message CRUD, light/dark themes, account controls, and shared ambient audio.
+ShigoChat is a full-stack real-time chat application built around one shared conversation space called **Quiet Room**. The production application combines a React client, JWT authentication, MongoDB persistence, Socket.IO realtime updates, message CRUD, light/dark themes, account controls, shared ambient audio, and secure email-based password recovery.
 
-The `storybook-typescript-baseline` branch contains the **Shigo Midnight** frontend migration plus a Storybook + TypeScript + shadcn-compatible component lab. The production presentation layer now consumes the new TSX system through compatibility-preserving JSX adapters while the existing REST, Socket.IO, context, storage, and routing contracts remain intact.
+The `storybook-typescript-baseline` branch contains the **Shigo Midnight** frontend migration plus a Storybook + TypeScript + shadcn-compatible component lab. The production presentation layer consumes the TSX system through compatibility-preserving JSX adapters while the existing REST, Socket.IO, context, storage, and routing contracts remain intact.
 
 Live site: https://shigochat.onrender.com/
 
@@ -29,6 +29,8 @@ Live site: https://shigochat.onrender.com/
 - Mongoose 8
 - JWT + bcryptjs
 - express-validator
+- express-rate-limit
+- Nodemailer
 - MongoDB
 
 ## Supported Runtime
@@ -41,7 +43,7 @@ Required package-manager baseline:
 npm >= 10
 ```
 
-The final compatibility workflow verifies from committed lockfiles with `npm ci`.
+The compatibility workflow verifies from committed lockfiles with `npm ci`.
 
 ## Shigo Midnight Frontend
 
@@ -61,9 +63,9 @@ The implementation includes:
 - presence-aware profile surfaces
 - composable message, conversation, composer, attachment, and emoji UI
 - account, appearance, ambient, and security preferences
-- unified login/register presentation
+- unified login/register/recovery presentation
 - custom Shigo shader/splash experience
-- canonical Quiet Room Storybook compositions
+- canonical Quiet Room and authentication Storybook compositions
 - production wiring that preserves the existing application contracts
 
 ## Storybook
@@ -128,12 +130,15 @@ Do not introduce `@/...` aliases unless the build system is intentionally migrat
 
 | Method | Route | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/auth/register` | Create a user |
+| `POST` | `/api/auth/register` | Create a user and receive a JWT |
 | `POST` | `/api/auth/login` | Log in and receive a JWT |
-| `POST` | `/api/auth/forgot-password` | Disabled until a verified reset-token/email challenge exists |
-| `PATCH` | `/api/auth/change-password` | Change password for an authenticated user after current-password verification |
+| `POST` | `/api/auth/forgot-password` | Request a neutral, email-based recovery challenge |
+| `POST` | `/api/auth/reset-password` | Consume a one-time recovery token and set a new password |
+| `PATCH` | `/api/auth/change-password` | Change an authenticated user's password and return a replacement JWT |
 
-Self-service password reset is intentionally unavailable in production. The previous email-only mutation path was removed because password recovery must prove control of a trusted recovery channel before changing credentials.
+Password recovery uses opaque 32-byte random tokens. Only SHA-256 token hashes are stored in MongoDB. Recovery tokens expire after 30 minutes and are consumed atomically once. Forgot-password responses intentionally do not reveal whether an account exists.
+
+Successful password reset increments the user's authentication version, revoking previously issued REST and Socket.IO JWT sessions. Recovery does **not** automatically log the user in. Authenticated password change also revokes older sessions, but returns a replacement JWT so the current client can remain signed in.
 
 ### Messages
 
@@ -144,7 +149,7 @@ Self-service password reset is intentionally unavailable in production. The prev
 | `PATCH` | `/api/messages/:id` | Edit an owned message |
 | `DELETE` | `/api/messages/:id` | Delete an owned message |
 
-Socket.IO uses the same JWT identity model as REST and preserves the existing `sendMessage`, `receiveMessage`, `editMessage`, and `deleteMessage` contracts.
+Socket.IO uses the same version-aware JWT identity model as REST and preserves the existing `sendMessage`, `receiveMessage`, `editMessage`, and `deleteMessage` contracts.
 
 ## Local Setup
 
@@ -157,6 +162,18 @@ PORT=5000
 MONGO_URI=mongodb+srv://your-user:your-password@your-cluster.mongodb.net/your-db
 JWT_SECRET=replace-with-a-long-random-secret
 CLIENT_URL=http://localhost:3000
+
+# SMTP provider configuration for recovery/security email
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-username
+SMTP_PASS=your-smtp-password
+SMTP_FROM=ShigoChat <no-reply@example.com>
+
+# Optional. Configure only to match the trusted reverse-proxy topology.
+# Example for one trusted proxy hop:
+TRUST_PROXY=1
 ```
 
 Create `client/.env`:
@@ -164,6 +181,12 @@ Create `client/.env`:
 ```env
 REACT_APP_API_URL=http://localhost:5000
 ```
+
+`CLIENT_URL` is the trusted origin used for CORS and recovery-link generation. Password reset URLs are never derived from the request `Host` header.
+
+Real recovery email will not send until valid `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM` values are configured on the deployed server. `SMTP_SECURE` controls TLS mode for the selected provider. Do not commit SMTP credentials, JWT secrets, database credentials, or recovery tokens.
+
+`TRUST_PROXY` is optional and must reflect the deployment's actual reverse-proxy topology. Leaving it unset keeps Express's default direct-client behavior.
 
 ### Install from committed lockfiles
 
@@ -204,7 +227,7 @@ npm run storybook
 
 ## Verification Contract
 
-The permanent compatibility gate must use committed lockfiles rather than an uncommitted install state.
+The permanent compatibility gate uses committed lockfiles rather than an uncommitted install state.
 
 Client verification:
 
@@ -215,6 +238,7 @@ npm test -- --watchAll=false --runInBand
 npx tsc --noEmit
 npm run build
 npm run build-storybook
+node --check scripts/capture-visual-audit.mjs
 ```
 
 Server verification:
@@ -222,38 +246,50 @@ Server verification:
 ```bash
 cd server
 npm ci
-npm audit --omit=dev --json
+npm test
+npm audit --omit=dev
 node --check server.js
 node --check routes/auth.js
 node --check routes/messages.js
 node --check middleware/auth.js
+node --check middleware/authRateLimits.js
 node --check middleware/validators.js
+node --check lib/authTokens.js
+node --check lib/passwordRecovery.js
+node --check services/email.js
 node --check models/User.js
 node --check models/Message.js
+node --check models/PasswordResetToken.js
 ```
 
-Do not claim the branch is ready unless the exact committed head passes the required CI gate.
+Do not claim the branch is ready unless the exact committed head passes the required CI gate and the visual-evidence workflow captures every required Storybook state without failures.
 
 ## Security Notes
 
 Implemented:
 
 - bcrypt password hashing
-- JWT-authenticated REST routes
-- JWT-authenticated Socket.IO handshakes
+- versioned JWT-authenticated REST routes
+- versioned JWT-authenticated Socket.IO handshakes
+- password-triggered session revocation through `authVersion`
 - server-side message ownership enforcement
 - request validation
 - CORS allowlist through `CLIENT_URL`
 - authenticated current-password verification for password changes
-- unsafe email-only password mutation disabled
-- targeted dependency auditing in CI
+- fresh current-session JWT after authenticated password change
+- opaque, hash-only, one-time password reset tokens with a 30-minute TTL
+- account-enumeration-resistant forgot-password responses and minimum route timing
+- recovery rate limiting per IP and normalized email
+- trusted `CLIENT_URL` recovery-link generation
+- provider-neutral SMTP recovery and password-changed notifications
+- reset-token removal from browser history and a `no-referrer` document policy
+- eight-character minimum password policy aligned across registration, reset, and authenticated change flows
+- targeted dependency auditing and server regression tests in CI
 
 Still recommended as separate future work:
 
-- verified email/token password-recovery workflow
-- authentication rate limiting
-- broader automated API integration tests
 - secret rotation policy
+- broader abuse monitoring/alerting around authentication endpoints
 - intentional migration away from the legacy CRA 5 build toolchain
 
 For frontend design decisions, see [`SHIGO_FRONTEND_MANIFEST.md`](SHIGO_FRONTEND_MANIFEST.md). For automated coding guidance, see [`AGENTS.md`](AGENTS.md).
