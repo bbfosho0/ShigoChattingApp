@@ -17,17 +17,32 @@ const targets = [
   { title: "Compositions/Quiet Room", name: "Empty", width: 900, height: 700, theme: "dark" },
   { title: "Compositions/Quiet Room", name: "Loading", width: 900, height: 700, theme: "dark" },
   { title: "Compositions/Quiet Room", name: "Preferences Open", width: 1440, height: 1000, theme: "dark" },
+  { title: "Compositions/Quiet Room", name: "Light Desktop", width: 1440, height: 1000, theme: "light" },
+  { title: "Compositions/Quiet Room", name: "Light Mobile", width: 390, height: 844, theme: "light" },
 
   { title: "Messaging/Conversation", name: "One Message", width: 900, height: 700, theme: "light" },
   { title: "Messaging/Conversation", name: "Two Messages Grouped", width: 900, height: 700, theme: "light" },
   { title: "Messaging/Conversation", name: "Alternating Senders", width: 900, height: 700, theme: "light" },
   { title: "Messaging/Conversation", name: "Long Transcript", width: 900, height: 700, theme: "light" },
   { title: "Messaging/Conversation", name: "Dark", width: 900, height: 700, theme: "dark" },
+  { title: "Messaging/Message", name: "Grouped Other", width: 900, height: 420, theme: "light" },
+  { title: "Messaging/Message", name: "Grouped Own", width: 900, height: 420, theme: "light" },
+  {
+    title: "Messaging/Composer",
+    name: "Audit Surface",
+    width: 900,
+    height: 500,
+    theme: "dark",
+    focusSelector: '[aria-label="Message Quiet Room"]',
+    fillValue: "A quiet message with just enough energy.",
+  },
 
   { title: "Settings/Preferences Shell", name: "Account", width: 900, height: 800, theme: "dark" },
   { title: "Settings/Preferences Shell", name: "Security", width: 900, height: 800, theme: "dark" },
   { title: "Settings/Preferences Shell", name: "Mobile Appearance", width: 390, height: 844, theme: "dark" },
   { title: "Settings/Preferences Shell", name: "Mobile Security", width: 360, height: 800, theme: "dark" },
+  { title: "Settings/Preferences Shell", name: "Light Appearance", width: 900, height: 800, theme: "light" },
+  { title: "Settings/Preferences Shell", name: "Light Mobile Appearance", width: 390, height: 844, theme: "light" },
 
   { title: "Auth/Login", name: "Default", width: 1440, height: 1000, theme: "dark" },
   { title: "Auth/Login", name: "Error", width: 1440, height: 1000, theme: "dark" },
@@ -69,6 +84,17 @@ async function waitForStory(page) {
   await page.waitForTimeout(250);
 }
 
+async function prepareTarget(page, target) {
+  if (!target.focusSelector) return;
+  const control = page.locator(target.focusSelector).first();
+  await control.waitFor({ state: "visible", timeout: 10000 });
+  if (typeof target.fillValue === "string") {
+    await control.fill(target.fillValue);
+  }
+  await control.focus();
+  await page.waitForTimeout(100);
+}
+
 await mkdir(screenshotsDir, { recursive: true });
 
 const indexResponse = await fetch(`${baseUrl}/index.json`);
@@ -79,7 +105,7 @@ const index = await indexResponse.json();
 
 const browser = await chromium.launch({ headless: true });
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   repository: process.env.GITHUB_REPOSITORY || "bbfosho0/ShigoChattingApp",
   sha: process.env.VISUAL_SHA || process.env.GITHUB_SHA || null,
   ref: process.env.VISUAL_REF || process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || null,
@@ -119,12 +145,13 @@ try {
 
     const url = `${baseUrl}/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`;
     const motionSuffix = target.reducedMotion ? "-reduced-motion" : "";
+    const interactionSuffix = target.focusSelector ? "-focused" : "";
     const fileName = [
       slug(target.title),
       slug(target.name),
       `${target.width}x${target.height}`,
       target.theme,
-    ].join("--") + `${motionSuffix}.png`;
+    ].join("--") + `${motionSuffix}${interactionSuffix}.png`;
     const filePath = path.join(screenshotsDir, fileName);
 
     try {
@@ -133,6 +160,7 @@ try {
         throw new Error(`Story returned HTTP ${response?.status() ?? "unknown"}`);
       }
       await waitForStory(page);
+      await prepareTarget(page, target);
       await page.screenshot({ path: filePath, fullPage: false, animations: "disabled" });
 
       manifest.screenshots.push({
@@ -142,6 +170,7 @@ try {
         viewport: { width: target.width, height: target.height },
         theme: target.theme,
         reducedMotion: Boolean(target.reducedMotion),
+        interaction: target.focusSelector ? { focusSelector: target.focusSelector, fillValue: target.fillValue || null } : null,
         file: `screenshots/${fileName}`,
         browserEvents,
       });
@@ -169,7 +198,7 @@ await writeFile(
   `# Shigo visual audit artifact\n\n` +
     `Commit: \`${manifest.sha || "unknown"}\`\n\n` +
     `This artifact contains browser-rendered Storybook screenshots for the official Shigo visual audit set. ` +
-    `Use \`manifest.json\` to map each PNG to its story, viewport, theme, reduced-motion state, and browser warnings/errors.\n\n` +
+    `Use \`manifest.json\` to map each PNG to its story, viewport, theme, reduced-motion state, interaction preparation, and browser warnings/errors.\n\n` +
     `Captured: ${manifest.screenshots.length}\n\n` +
     `Failures: ${manifest.failures.length}\n`,
   "utf8"
