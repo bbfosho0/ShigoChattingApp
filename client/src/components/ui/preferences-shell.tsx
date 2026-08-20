@@ -62,7 +62,7 @@ export function PreferencesContent({
   onDeleteAccount,
 }: Omit<PreferencesShellProps, "children" | "open" | "onOpenChange">) {
   const [section, setSection] = useState<PreferencesSection>(defaultSection);
-  const triggerClassName = "w-full px-2 data-[state=active]:bg-accent data-[state=active]:shadow-none";
+  const triggerClassName = "relative w-full overflow-hidden border-b border-transparent px-2 pb-2.5 pt-2 text-muted-foreground data-[state=active]:border-primary/55 data-[state=active]:bg-primary/[0.035] data-[state=active]:text-foreground data-[state=active]:shadow-none";
 
   return (
     <Tabs value={section} onValueChange={(value) => setSection(value as PreferencesSection)} className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -90,7 +90,7 @@ export function PreferencesShell({ children, open, onOpenChange, ...props }: Pre
       {children ? <SheetTrigger asChild>{children}</SheetTrigger> : null}
       <SheetContent className="gap-0 overflow-hidden bg-card sm:max-w-xl">
         <SheetHeader className="pb-3 pr-10 sm:pb-4">
-          <SheetTitle>Preferences</SheetTitle>
+          <SheetTitle className="tracking-[-0.02em]">Preferences</SheetTitle>
           <SheetDescription>Account, appearance, ambient audio, and security.</SheetDescription>
         </SheetHeader>
         <SheetBody className="flex min-w-0 overflow-hidden p-0">
