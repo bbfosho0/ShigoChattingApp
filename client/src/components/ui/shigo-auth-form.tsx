@@ -86,7 +86,7 @@ export function ShigoAuthForm({
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="space-y-7"
+      className="space-y-7 text-center"
       initial="hidden"
       animate="visible"
       variants={shigoEnter}
@@ -145,7 +145,7 @@ export function ShigoAuthForm({
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={`auth-fields-${mode}`}
-          className="space-y-4"
+          className="space-y-4 text-left"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
