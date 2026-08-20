@@ -7,6 +7,7 @@ jest.mock("components/ui/popover", () => ({
   PopoverContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
+import { FileAttachment } from "components/ui/file-attachment";
 import { Input } from "components/ui/input";
 import { ShigoAuthForm } from "components/ui/shigo-auth-form";
 import { ShigoComposer } from "components/ui/shigo-composer";
@@ -39,5 +40,19 @@ describe("Shigo Midnight final polish", () => {
     const createAccount = screen.getByRole("button", { name: "Create an account" });
     expect(createAccount.className).toContain("focus-visible:ring-2");
     expect(createAccount.className).toContain("focus-visible:ring-ring");
+  });
+
+  it("keeps attachment removal visually small but gives it a larger hit area", () => {
+    render(
+      <FileAttachment
+        attachment={{ id: "spec", name: "spec.pdf", type: "application/pdf" }}
+        onRemove={jest.fn()}
+      />
+    );
+
+    const remove = screen.getByRole("button", { name: "Remove spec.pdf" });
+    expect(remove.className).toContain("size-9");
+    expect(remove.className).toContain("focus-visible:ring-2");
+    expect(remove.querySelector("svg")?.getAttribute("width")).toBe("14");
   });
 });
