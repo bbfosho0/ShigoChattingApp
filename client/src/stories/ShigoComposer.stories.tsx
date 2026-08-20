@@ -37,3 +37,14 @@ export const Disabled: Story = {
 export const Dark: Story = {
   render: () => <div className="dark rounded-xl bg-background p-6 text-foreground"><div className="w-[min(46rem,80vw)]"><ShigoComposer onSend={() => undefined} /></div></div>,
 };
+
+export const AuditSurface: Story = {
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="dark shigo-quiet-room-atmosphere flex h-screen w-full items-end bg-background px-4 pb-8 text-foreground sm:px-8">
+      <div className="mx-auto w-full max-w-3xl">
+        <ShigoComposer onSend={() => undefined} />
+      </div>
+    </div>
+  ),
+};
