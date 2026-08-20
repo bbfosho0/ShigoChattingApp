@@ -9,19 +9,19 @@ import { cn } from "lib/utils";
 
 const buttonVariants = cva(
   [
-    "group relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-full font-medium outline-none",
-    "transition-all duration-75",
+    "group relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md font-medium outline-none",
+    "transition-[background-color,color,border-color,box-shadow,transform] duration-fast ease-shigo",
     "disabled:pointer-events-none disabled:opacity-50",
-    "focus-visible:ring-1 focus-visible:ring-[#6B97FF] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   ],
   {
     variants: {
       variant: {
         default:
-          "bg-foreground text-background hover:bg-foreground/90 active:bg-foreground/80",
+          "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80",
         primary:
-          "bg-foreground text-background hover:bg-foreground/90 active:bg-foreground/80",
+          "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80",
         secondary:
           "bg-accent text-foreground hover:bg-accent/80 active:bg-accent",
         tertiary:
@@ -39,9 +39,9 @@ const buttonVariants = cva(
         sm: "h-8 gap-1 px-3 text-xs",
         md: "h-9 gap-1.5 px-4 text-[13px]",
         lg: "h-10 gap-1.5 px-5 text-sm",
-        "icon-sm": "size-8 p-0 [&_svg]:size-3.5",
-        icon: "size-9 p-0 [&_svg]:size-4",
-        "icon-lg": "size-10 p-0 [&_svg]:size-5",
+        "icon-sm": "size-8 rounded-full p-0 [&_svg]:size-3.5",
+        icon: "size-9 rounded-full p-0 [&_svg]:size-4",
+        "icon-lg": "size-10 rounded-full p-0 [&_svg]:size-5",
       },
     },
     defaultVariants: {

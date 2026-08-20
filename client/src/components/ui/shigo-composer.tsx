@@ -106,9 +106,9 @@ export function ShigoComposer({
   const canSend = !disabled && (text.trim().length > 0 || attachments.length > 0);
 
   return (
-    <div className={cn("rounded-xl border border-border bg-card shadow-panel", className)}>
+    <div className={cn("rounded-lg border border-border/70 bg-shigo-raised shadow-none", className)}>
       {replyingTo ? (
-        <div className="flex items-center gap-3 border-b border-border px-4 py-2.5">
+        <div className="flex items-center gap-3 bg-secondary/40 px-3.5 py-2.5">
           <div className="min-w-0 flex-1 border-l-2 border-primary pl-3">
             <p className="text-[11px] font-semibold text-primary">Replying</p>
             <p className="truncate text-xs text-muted-foreground">{replyingTo}</p>
@@ -118,14 +118,14 @@ export function ShigoComposer({
       ) : null}
 
       {attachments.length > 0 ? (
-        <div className="grid gap-2 border-b border-border p-3 sm:grid-cols-2">
+        <div className="grid gap-2 border-b border-border/60 p-3 sm:grid-cols-2">
           {attachments.map((attachment) => (
             <FileAttachment key={attachment.id} attachment={attachment} onRemove={removeAttachment} />
           ))}
         </div>
       ) : null}
 
-      <div className="flex items-end gap-2 p-3">
+      <div className="flex items-end gap-1.5 p-2.5 sm:gap-2 sm:p-3">
         {allowAttachments ? (
           <>
             <input
@@ -167,7 +167,7 @@ export function ShigoComposer({
               send();
             }
           }}
-          className="max-h-32 min-h-[2.25rem] flex-1 resize-none border-0 bg-transparent px-1 py-2 shadow-none focus-visible:border-transparent focus-visible:shadow-none"
+          className="max-h-32 min-h-[2.25rem] flex-1 resize-none border-0 bg-transparent px-1.5 py-2 shadow-none focus-visible:border-transparent focus-visible:shadow-none"
           aria-label="Message Quiet Room"
         />
 
@@ -186,7 +186,7 @@ export function ShigoComposer({
           <ArrowUp size={16} strokeWidth={2} />
         </Button>
       </div>
-      <div className="flex justify-end px-4 pb-2 text-[10px] text-muted-foreground">Enter to send · Shift+Enter for new line</div>
+      <div className="hidden justify-end px-3.5 pb-2 text-[11px] text-muted-foreground sm:flex">Enter to send · Shift+Enter for new line</div>
     </div>
   );
 }

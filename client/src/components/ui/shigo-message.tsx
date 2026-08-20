@@ -47,7 +47,7 @@ function MessageActions({
   if (!hasActions) return null;
 
   return (
-    <div className="flex items-center rounded-md border border-border bg-popover p-1 text-muted-foreground shadow-floating">
+    <div className="flex items-center rounded-md bg-popover/95 p-0.5 text-muted-foreground shadow-panel">
       {onReply ? <Button size="icon-sm" variant="ghost" aria-label="Reply" onClick={onReply}><Reply size={14} /></Button> : null}
       {onReact ? <Button size="icon-sm" variant="ghost" aria-label="React" onClick={onReact}><Smile size={14} /></Button> : null}
       {own && onEdit ? <Button size="icon-sm" variant="ghost" aria-label="Edit message" onClick={onEdit}><Pencil size={14} /></Button> : null}
@@ -117,10 +117,10 @@ export function ShigoMessage({
         )
       ) : null}
 
-      <div className={cn("min-w-0 max-w-[82%] sm:max-w-[72%]", own && "flex flex-col items-end")}>
+      <div className={cn("min-w-0 max-w-[84%] sm:max-w-[72%]", own && "flex flex-col items-end")}>
         {!own && groupStart ? (
           <div className="mb-1.5 flex items-baseline gap-2 px-1">
-            <span className="text-[12px] font-semibold text-foreground">{message.senderName}</span>
+            <span className="text-xs font-semibold text-foreground">{message.senderName}</span>
             <span className="text-[11px] text-muted-foreground">{time}</span>
           </div>
         ) : null}
@@ -151,14 +151,14 @@ export function ShigoMessage({
           ) : (
             <div
               className={cn(
-                "rounded-lg border px-4 py-2.5 text-[14px] leading-6 shadow-panel",
+                "rounded-xl px-3.5 py-2 text-sm leading-6",
                 own
-                  ? "border-primary/15 bg-shigo-own-message text-foreground"
-                  : "border-border bg-shigo-other-message text-foreground"
+                  ? "rounded-br-md bg-shigo-own-message text-foreground"
+                  : "rounded-bl-md bg-shigo-other-message text-foreground"
               )}
             >
               <p className="whitespace-pre-wrap break-words">{message.content}</p>
-              {message.edited ? <span className="mt-1 block text-[10px] text-muted-foreground">edited</span> : null}
+              {message.edited ? <span className="mt-1 block text-[11px] text-muted-foreground">edited</span> : null}
             </div>
           )}
 
@@ -174,7 +174,7 @@ export function ShigoMessage({
             </div>
           ) : null}
 
-          {hasActions && !editing ? (
+          {hasActions && !editing && groupEnd ? (
             <div className="sm:hidden">
               <Popover>
                 <PopoverTrigger asChild>
@@ -195,7 +195,7 @@ export function ShigoMessage({
         </div>
 
         {own && !editing && groupEnd ? (
-          <span className="mt-1.5 px-1 text-[11px] text-muted-foreground">{time}</span>
+          <span className="mt-1 px-1 text-[11px] text-muted-foreground">{time}</span>
         ) : null}
       </div>
     </article>

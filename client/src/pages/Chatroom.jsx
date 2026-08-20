@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Hash, Moon, Settings2, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -7,14 +7,34 @@ import toast from "react-hot-toast";
 
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
-import MessageBubble from "../components/MessageBubble";
 import MessageInput from "../components/MessageInput";
 import MusicPlayer from "../components/MusicPlayer";
 import Preferences from "../components/Preferences";
 import { AppSidebar } from "../components/ui/app-sidebar";
 import { Button } from "../components/ui/button";
-import { ConversationEmpty, ConversationLoading } from "../components/ui/shigo-conversation";
+import { CONVERSATION_MEASURE_CLASS } from "../components/ui/conversation-measure";
 import { MobileNav } from "../components/ui/mobile-nav";
+import { ShigoConversation } from "../components/ui/shigo-conversation";
+
+const normalizeMessage = (message) => {
+  const sender = typeof message.sender === "object" ? message.sender : null;
+  const senderId = sender?._id || message.sender || message.senderId || "";
+  const senderName = sender?.username || message.username || message.senderName || "Guest";
+  const edited = Boolean(
+    message.updatedAt &&
+      message.createdAt &&
+      new Date(message.updatedAt).getTime() !== new Date(message.createdAt).getTime()
+  );
+
+  return {
+    id: String(message._id || message.id),
+    senderId: String(senderId),
+    senderName,
+    content: message.content || "",
+    createdAt: message.createdAt,
+    edited,
+  };
+};
 
 const Chatroom = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -24,9 +44,7 @@ const Chatroom = () => {
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
-
   const socketRef = useRef(null);
-  const messagesViewportRef = useRef(null);
 
   useEffect(() => {
     if (!user) {
@@ -120,15 +138,7 @@ const Chatroom = () => {
     };
   }, [navigate, setUser, user]);
 
-  useEffect(() => {
-    const viewport = messagesViewportRef.current;
-    if (!viewport || loading) return;
-    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    viewport.scrollTo({
-      top: viewport.scrollHeight,
-      behavior: reducedMotion ? "auto" : "smooth",
-    });
-  }, [loading, messages]);
+  const conversationMessages = useMemo(() => messages.map(normalizeMessage), [messages]);
 
   const logout = () => {
     setUser(null);
@@ -222,26 +232,27 @@ const Chatroom = () => {
 
   return (
     <div className="fixed inset-0 flex overflow-hidden bg-background text-foreground">
-      <div className="hidden h-full md:block">
+      <div className="hidden h-full lg:block">
         <AppSidebar
           {...sidebarProps}
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
         />
       </div>
+      <div className="hidden h-full md:block lg:hidden">
+        <AppSidebar {...sidebarProps} collapsed />
+      </div>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background/95 px-3 backdrop-blur-md sm:px-5">
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border/50 bg-background px-3 sm:px-4">
           <div className="md:hidden">
             <MobileNav {...sidebarProps} />
           </div>
 
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/[0.08] text-primary">
-            <Hash size={15} strokeWidth={1.8} />
-          </div>
+          <Hash size={17} strokeWidth={1.8} className="shrink-0 text-primary" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-semibold">Quiet Room</p>
-            <p className="truncate text-[11px] text-muted-foreground">
+            <p className="truncate text-sm font-semibold">Quiet Room</p>
+            <p className="truncate text-xs text-muted-foreground">
               A calm shared space for conversation.
             </p>
           </div>
@@ -266,54 +277,16 @@ const Chatroom = () => {
           </div>
         </header>
 
-        <section
-          ref={messagesViewportRef}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
-          aria-label="Quiet Room messages"
-        >
-          {loading ? (
-            <ConversationLoading />
-          ) : messages.length === 0 ? (
-            <ConversationEmpty />
-          ) : (
-            <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 sm:px-6">
-              {messages.map((message, index) => {
-                const previous = messages[index - 1];
-                const showDayLabel =
-                  !previous ||
-                  new Date(message.createdAt).toDateString() !==
-                    new Date(previous.createdAt).toDateString();
+        <ShigoConversation
+          messages={conversationMessages}
+          currentUserId={String(user._id || "")}
+          loading={loading}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
 
-                return (
-                  <React.Fragment key={message._id}>
-                    {showDayLabel ? (
-                      <div className="my-1 flex items-center gap-3" role="separator">
-                        <div className="h-px flex-1 bg-border" />
-                        <span className="text-[11px] font-medium text-muted-foreground">
-                          {new Date(message.createdAt).toLocaleDateString([], {
-                            weekday: "long",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </span>
-                        <div className="h-px flex-1 bg-border" />
-                      </div>
-                    ) : null}
-                    <MessageBubble
-                      message={message}
-                      userId={user._id}
-                      onDelete={handleDelete}
-                      onEdit={handleEdit}
-                    />
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        <footer className="shrink-0 border-t border-border bg-background/95 px-3 pb-4 pt-3 backdrop-blur-md sm:px-5 sm:pb-5">
-          <div className="mx-auto max-w-3xl">
+        <footer className="shrink-0 bg-background px-3 pb-3 pt-2 sm:px-4 sm:pb-4">
+          <div className={CONVERSATION_MEASURE_CLASS}>
             <MessageInput onSend={handleSend} disabled={loading} />
           </div>
         </footer>
