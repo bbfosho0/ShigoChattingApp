@@ -72,7 +72,7 @@ export function PreferencesContent({
       ? <AppearanceSettingsPanel theme={theme} onThemeChange={onThemeChange} />
       : section === "ambient"
         ? <AmbientSettingsPanel playing={playing} progress={progress} volume={volume} onTogglePlay={onTogglePlay} onPrevious={onPrevious} onNext={onNext} onSeek={onSeek} onVolumeChange={onVolumeChange} />
-        : <SecuritySettingsPanel minPasswordLength={6} loading={securityLoading} onUpdatePassword={onUpdatePassword} onDeleteAccount={onDeleteAccount} />;
+        : <SecuritySettingsPanel minPasswordLength={8} loading={securityLoading} onUpdatePassword={onUpdatePassword} onDeleteAccount={onDeleteAccount} />;
 
   return (
     <Tabs value={section} onValueChange={(value) => setSection(value as PreferencesSection)} className="flex min-h-0 min-w-0 flex-1 flex-col">
