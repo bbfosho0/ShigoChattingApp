@@ -45,11 +45,7 @@ const Preferences = ({ open, onClose, user }) => {
         throw new Error("Password change response did not include a replacement session token");
       }
       localStorage.setItem("token", res.data.token);
-      window.dispatchEvent(
-        new CustomEvent(AUTH_TOKEN_UPDATED_EVENT, {
-          detail: { token: res.data.token },
-        })
-      );
+      window.dispatchEvent(new Event(AUTH_TOKEN_UPDATED_EVENT));
       toast.success("Password changed");
     } catch (err) {
       const message =
