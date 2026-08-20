@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { ShigoAuthPage } from "components/ui/shigo-auth-page";
@@ -12,18 +11,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const darkDecorator = (Story: () => ReactNode) => (
-  <div className="dark min-h-screen w-full bg-background text-foreground">
-    <Story />
-  </div>
-);
-
 export const Login: Story = {
   args: { initialMode: "login", compact: true, onSubmit: () => undefined },
-  decorators: [darkDecorator],
+  decorators: [(Story) => <div className="dark min-h-screen w-full bg-background text-foreground"><Story /></div>],
 };
 
 export const Register: Story = {
   args: { initialMode: "register", compact: true, onSubmit: () => undefined },
-  decorators: [darkDecorator],
+  decorators: [(Story) => <div className="dark min-h-screen w-full bg-background text-foreground"><Story /></div>],
 };
