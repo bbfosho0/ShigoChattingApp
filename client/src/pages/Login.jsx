@@ -14,14 +14,21 @@ import { ShigoBrandArtwork } from "../components/ui/shigo-brand-artwork.tsx";
 const Login = () => {
   const { setUser } = useContext(AuthContext);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
+  const [mode, setMode] = useState("login");
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
   const navigate = useNavigate();
+
+  const clearFeedback = () => {
+    setAuthError("");
+    setAuthSuccess("");
+  };
 
   const handleLogin = async ({ email, password }) => {
     try {
       setLoading(true);
-      setAuthError("");
+      clearFeedback();
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
         email,
         password,
@@ -40,6 +47,40 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotPassword = async ({ email }) => {
+    try {
+      setLoading(true);
+      clearFeedback();
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/forgot-password`,
+        { email }
+      );
+      setAuthSuccess(
+        res.data?.message ||
+          "If an account exists for that email, a recovery link has been sent."
+      );
+    } catch (err) {
+      const message =
+        err.response?.status === 429
+          ? "Too many recovery requests. Try again later."
+          : "Recovery request could not be completed. Try again later.";
+      setAuthError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleModeChange = (nextMode) => {
+    clearFeedback();
+    setLoading(false);
+    if (nextMode === "register") {
+      navigate("/register");
+      return;
+    }
+    setMode(nextMode);
   };
 
   return (
@@ -63,14 +104,13 @@ const Login = () => {
       <div className="relative z-10 w-full">
         <AuthShell>
           <ShigoAuthForm
-            mode="login"
+            mode={mode}
             loading={loading}
             error={authError}
-            onSubmit={handleLogin}
-            showForgotPassword={false}
-            onModeChange={(mode) => {
-              if (mode === "register") navigate("/register");
-            }}
+            success={authSuccess}
+            onSubmit={mode === "forgot" ? handleForgotPassword : handleLogin}
+            showForgotPassword
+            onModeChange={handleModeChange}
           />
         </AuthShell>
       </div>
