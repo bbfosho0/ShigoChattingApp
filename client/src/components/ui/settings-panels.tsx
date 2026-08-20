@@ -114,7 +114,7 @@ export interface SecuritySettingsPanelProps {
   onDeleteAccount?: () => void;
 }
 
-export function SecuritySettingsPanel({ minPasswordLength = 6, loading = false, onUpdatePassword, onDeleteAccount }: SecuritySettingsPanelProps) {
+export function SecuritySettingsPanel({ minPasswordLength = 8, loading = false, onUpdatePassword, onDeleteAccount }: SecuritySettingsPanelProps) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
