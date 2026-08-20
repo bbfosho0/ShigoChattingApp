@@ -18,3 +18,5 @@ export const Mobile: Story = { args: { mobile: true } };
 export const Empty: Story = { args: { state: "empty" } };
 export const Loading: Story = { args: { state: "loading" } };
 export const PreferencesOpen: Story = { args: { preferencesOpen: true } };
+export const LightDesktop: Story = { args: { theme: "light" } };
+export const LightMobile: Story = { args: { mobile: true, theme: "light" } };
