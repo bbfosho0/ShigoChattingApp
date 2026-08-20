@@ -62,6 +62,15 @@ test("production login exposes secure forgot-password recovery and submits email
   expect(axios.post.mock.calls[0][1]).not.toHaveProperty("password");
 });
 
+test("login auth shell wrapper centers its constrained content", () => {
+  renderLogin();
+
+  expect(document.querySelector("main > div.relative.z-10")).toHaveClass(
+    "flex",
+    "justify-center"
+  );
+});
+
 test("switching recovery modes clears stale auth errors", async () => {
   renderLogin();
   fireEvent.click(screen.getByRole("button", { name: /forgot password/i }));

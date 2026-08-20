@@ -101,7 +101,7 @@ const Login = () => {
         </Button>
       </div>
 
-      <div className="relative z-10 w-full">
+      <div className="relative z-10 flex w-full justify-center">
         <AuthShell>
           <ShigoAuthForm
             mode={mode}
