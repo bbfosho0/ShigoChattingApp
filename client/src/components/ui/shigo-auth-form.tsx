@@ -30,6 +30,9 @@ const copy: Record<AuthMode, { title: string; description: string; submit: strin
   forgot: { title: "Reset your password.", description: "Recovery UI preview. Production recovery requires a verified reset flow.", submit: "Continue" },
 };
 
+const authTextActionClass =
+  "rounded-sm font-medium text-primary outline-none underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 export function ShigoAuthForm({
   mode = "login",
   loading = false,
@@ -89,7 +92,7 @@ export function ShigoAuthForm({
         <div className="space-y-2"><Label htmlFor={`auth-${mode}-email`}>Email</Label><Input id={`auth-${mode}-email`} value={email} onChange={(event) => setEmail(event.target.value)} type="email" leftIcon={<Mail />} autoComplete="email" disabled={loading} required /></div>
         {mode !== "forgot" ? (
           <div className="space-y-2">
-            <div className="flex items-center justify-between"><Label htmlFor={`auth-${mode}-password`}>Password</Label>{mode === "login" && showForgotPassword ? <button type="button" onClick={() => onModeChange?.("forgot")} className="text-xs font-medium text-primary hover:underline">Forgot password?</button> : null}</div>
+            <div className="flex items-center justify-between"><Label htmlFor={`auth-${mode}-password`}>Password</Label>{mode === "login" && showForgotPassword ? <button type="button" onClick={() => onModeChange?.("forgot")} className={`${authTextActionClass} text-xs`}>Forgot password?</button> : null}</div>
             <Input id={`auth-${mode}-password`} value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={mode === "register" ? 8 : undefined} autoComplete={mode === "login" ? "current-password" : "new-password"} disabled={loading} required />
             {mode === "register" ? <p className="text-[11px] leading-5 text-muted-foreground">Use at least 8 characters. The production API remains responsible for final validation.</p> : null}
           </div>
@@ -99,9 +102,9 @@ export function ShigoAuthForm({
       <Button type="submit" className="w-full" loading={loading} disabled={disabled}>{current.submit}</Button>
 
       <div className="text-center text-sm text-muted-foreground">
-        {mode === "login" ? <>New here? <button type="button" onClick={() => onModeChange?.("register")} className="font-medium text-primary hover:underline">Create an account</button></> : null}
-        {mode === "register" ? <>Already have an account? <button type="button" onClick={() => onModeChange?.("login")} className="font-medium text-primary hover:underline">Sign in</button></> : null}
-        {mode === "forgot" ? <button type="button" onClick={() => onModeChange?.("login")} className="font-medium text-primary hover:underline">Back to sign in</button> : null}
+        {mode === "login" ? <>New here? <button type="button" onClick={() => onModeChange?.("register")} className={authTextActionClass}>Create an account</button></> : null}
+        {mode === "register" ? <>Already have an account? <button type="button" onClick={() => onModeChange?.("login")} className={authTextActionClass}>Sign in</button></> : null}
+        {mode === "forgot" ? <button type="button" onClick={() => onModeChange?.("login")} className={authTextActionClass}>Back to sign in</button> : null}
       </div>
     </form>
   );
