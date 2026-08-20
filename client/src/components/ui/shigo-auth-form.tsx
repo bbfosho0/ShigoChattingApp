@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Mail, UserRound } from "lucide-react";
+import { CheckCircle2, Mail, UserRound } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { Button } from "components/ui/button";
@@ -19,6 +19,7 @@ export interface ShigoAuthFormProps {
   mode?: AuthMode;
   loading?: boolean;
   error?: string;
+  success?: string;
   initialEmail?: string;
   initialUsername?: string;
   showForgotPassword?: boolean;
@@ -29,7 +30,11 @@ export interface ShigoAuthFormProps {
 const copy: Record<AuthMode, { title: string; description: string; submit: string }> = {
   login: { title: "Welcome back.", description: "Return to Quiet Room.", submit: "Sign in" },
   register: { title: "Create your space.", description: "Join ShigoChat without adding more noise.", submit: "Create account" },
-  forgot: { title: "Reset your password.", description: "Recovery UI preview. Production recovery requires a verified reset flow.", submit: "Continue" },
+  forgot: {
+    title: "Find your way back.",
+    description: "Enter your email and we will send a secure recovery link if an account exists.",
+    submit: "Send recovery link",
+  },
 };
 
 const authTextActionClass =
@@ -39,6 +44,7 @@ export function ShigoAuthForm({
   mode = "login",
   loading = false,
   error,
+  success,
   initialEmail = "",
   initialUsername = "",
   showForgotPassword = true,
@@ -119,6 +125,19 @@ export function ShigoAuthForm({
             className="border-l-2 border-destructive/70 bg-destructive/[0.045] px-3 py-2.5 text-sm text-destructive"
           >
             {error}
+          </motion.div>
+        ) : success ? (
+          <motion.div
+            key="auth-success"
+            role="status"
+            aria-live="polite"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="flex items-start gap-2.5 border-l-2 border-emerald-500/55 bg-emerald-500/[0.045] px-3 py-2.5 text-sm text-foreground"
+          >
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-500" aria-hidden="true" />
+            <span>{success}</span>
           </motion.div>
         ) : null}
       </AnimatePresence>
