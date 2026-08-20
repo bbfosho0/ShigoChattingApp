@@ -20,9 +20,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24.x"
-      - name: Add recovery dependencies and regenerate lockfile
+      - name: Add recovery test dependency and regenerate lockfile
         working-directory: server
-        run: npm install --package-lock-only --save nodemailer@^7 express-rate-limit@^8
+        run: npm install --package-lock-only --save-dev supertest@^7
       - name: Commit package metadata
         run: |
           if git diff --quiet -- server/package.json server/package-lock.json; then
@@ -32,5 +32,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add server/package.json server/package-lock.json
-          git commit -m "build: add secure recovery server dependencies"
+          git commit -m "build: add recovery route test dependency"
           git push origin HEAD:secure-password-recovery
