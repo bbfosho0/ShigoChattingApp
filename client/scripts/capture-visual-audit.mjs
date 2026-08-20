@@ -37,6 +37,8 @@ const targets = [
     fillValue: "A quiet message with just enough energy.",
   },
 
+  { title: "Media/Ambient Player", name: "Dark", width: 900, height: 600, theme: "dark" },
+
   { title: "Settings/Preferences Shell", name: "Account", width: 900, height: 800, theme: "dark" },
   { title: "Settings/Preferences Shell", name: "Security", width: 900, height: 800, theme: "dark" },
   { title: "Settings/Preferences Shell", name: "Mobile Appearance", width: 390, height: 844, theme: "dark" },
@@ -52,6 +54,8 @@ const targets = [
 
   { title: "Experience/Splash", name: "Default", width: 1280, height: 900, theme: "dark" },
   { title: "Experience/Splash", name: "Default", width: 390, height: 844, theme: "dark" },
+  { title: "Experience/Splash", name: "Progress", width: 1280, height: 900, theme: "dark" },
+  { title: "Experience/Splash", name: "Progress", width: 390, height: 844, theme: "dark" },
   { title: "Experience/Splash", name: "Default", width: 1280, height: 900, theme: "dark", reducedMotion: true },
 ];
 
@@ -84,6 +88,13 @@ async function waitForStory(page) {
   await page.waitForTimeout(250);
 }
 
+async function applyTheme(page, theme) {
+  await page.evaluate((nextTheme) => {
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    document.documentElement.style.colorScheme = nextTheme;
+  }, theme);
+}
+
 async function prepareTarget(page, target) {
   if (!target.focusSelector) return;
   const control = page.locator(target.focusSelector).first();
@@ -105,7 +116,7 @@ const index = await indexResponse.json();
 
 const browser = await chromium.launch({ headless: true });
 const manifest = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   repository: process.env.GITHUB_REPOSITORY || "bbfosho0/ShigoChattingApp",
   sha: process.env.VISUAL_SHA || process.env.GITHUB_SHA || null,
   ref: process.env.VISUAL_REF || process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || null,
@@ -159,6 +170,7 @@ try {
       if (!response?.ok()) {
         throw new Error(`Story returned HTTP ${response?.status() ?? "unknown"}`);
       }
+      await applyTheme(page, target.theme);
       await waitForStory(page);
       await prepareTarget(page, target);
       await page.screenshot({ path: filePath, fullPage: false, animations: "disabled" });
