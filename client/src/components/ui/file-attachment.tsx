@@ -32,7 +32,7 @@ export function FileAttachment({ attachment, onRemove, className }: FileAttachme
         <button
           type="button"
           onClick={() => onRemove(attachment.id)}
-          className="flex size-7 shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:shadow-focus"
+          className="flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label={`Remove ${attachment.name}`}
         >
           <X size={14} strokeWidth={1.5} />
