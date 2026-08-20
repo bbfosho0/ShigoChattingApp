@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 
 const { buildSmtpConfig, buildPasswordResetMessage } = require("../services/email");
 
-test("SMTP configuration is provider-neutral and environment driven", () => {
+test("SMTP configuration is provider-neutral, environment driven, and requires TLS for STARTTLS transports", () => {
   const config = buildSmtpConfig({
     SMTP_HOST: "smtp.example.com",
     SMTP_PORT: "587",
@@ -16,8 +16,22 @@ test("SMTP configuration is provider-neutral and environment driven", () => {
     host: "smtp.example.com",
     port: 587,
     secure: false,
+    requireTLS: true,
     auth: { user: "smtp-user", pass: "smtp-pass" },
   });
+});
+
+test("implicit TLS transports do not request a STARTTLS upgrade", () => {
+  const config = buildSmtpConfig({
+    SMTP_HOST: "smtp.example.com",
+    SMTP_PORT: "465",
+    SMTP_SECURE: "true",
+    SMTP_USER: "smtp-user",
+    SMTP_PASS: "smtp-pass",
+  });
+
+  assert.equal(config.secure, true);
+  assert.equal(config.requireTLS, false);
 });
 
 test("reset email contains the trusted reset URL but never a password", () => {
