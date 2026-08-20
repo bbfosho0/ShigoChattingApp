@@ -48,10 +48,10 @@ function MessageActions({
 
   return (
     <div className="flex items-center rounded-md bg-popover/95 p-0.5 text-muted-foreground shadow-panel">
-      {onReply ? <Button size="icon-sm" variant="ghost" aria-label="Reply" onClick={onReply}><Reply size={14} /></Button> : null}
-      {onReact ? <Button size="icon-sm" variant="ghost" aria-label="React" onClick={onReact}><Smile size={14} /></Button> : null}
-      {own && onEdit ? <Button size="icon-sm" variant="ghost" aria-label="Edit message" onClick={onEdit}><Pencil size={14} /></Button> : null}
-      {own && onDelete ? <Button size="icon-sm" variant="ghost" aria-label="Delete message" onClick={onDelete} className="text-destructive hover:text-destructive"><Trash2 size={14} /></Button> : null}
+      {onReply ? <Button size="icon" variant="ghost" aria-label="Reply" onClick={onReply}><Reply size={14} /></Button> : null}
+      {onReact ? <Button size="icon" variant="ghost" aria-label="React" onClick={onReact}><Smile size={14} /></Button> : null}
+      {own && onEdit ? <Button size="icon" variant="ghost" aria-label="Edit message" onClick={onEdit}><Pencil size={14} /></Button> : null}
+      {own && onDelete ? <Button size="icon" variant="ghost" aria-label="Delete message" onClick={onDelete} className="text-destructive hover:text-destructive"><Trash2 size={14} /></Button> : null}
     </div>
   );
 }
@@ -178,7 +178,7 @@ export function ShigoMessage({
             <div className="sm:hidden">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button size="icon-sm" variant="ghost" aria-label="Message actions"><MoreHorizontal size={15} /></Button>
+                  <Button size="icon" variant="ghost" aria-label="Message actions"><MoreHorizontal size={15} /></Button>
                 </PopoverTrigger>
                 <PopoverContent align={own ? "end" : "start"} className="w-auto p-1">
                   <MessageActions
