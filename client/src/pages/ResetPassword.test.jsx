@@ -1,12 +1,16 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
-import { MemoryRouter } from "react-router-dom";
 
 import ResetPassword from "./ResetPassword";
 import { ThemeContext } from "../context/ThemeContext";
 
+const navigate = jest.fn();
+
 jest.mock("axios");
+jest.mock("react-router-dom", () => ({
+  useNavigate: () => navigate,
+}));
 jest.mock("react-hot-toast", () => ({
   __esModule: true,
   default: { success: jest.fn(), error: jest.fn() },
@@ -15,11 +19,9 @@ jest.mock("react-hot-toast", () => ({
 function renderReset(entry = "/reset-password?token=secret-reset-token") {
   window.history.replaceState({}, "", entry);
   return render(
-    <MemoryRouter initialEntries={[entry]}>
-      <ThemeContext.Provider value={{ darkMode: true, toggleDarkMode: jest.fn() }}>
-        <ResetPassword />
-      </ThemeContext.Provider>
-    </MemoryRouter>
+    <ThemeContext.Provider value={{ darkMode: true, toggleDarkMode: jest.fn() }}>
+      <ResetPassword />
+    </ThemeContext.Provider>
   );
 }
 
