@@ -62,4 +62,21 @@ describe("ShigoMessage production behavior", () => {
       "Updated from the server"
     );
   });
+
+  it("gives routine message actions a larger hit target without enlarging their icons", () => {
+    render(
+      <ShigoMessage
+        message={baseMessage}
+        currentUserId="yoshi"
+        onReply={() => undefined}
+        onReact={() => undefined}
+        onEdit={() => undefined}
+        onDelete={() => undefined}
+      />
+    );
+
+    const reply = screen.getAllByRole("button", { name: "Reply" })[0];
+    expect(reply.className).toContain("size-9");
+    expect(reply.querySelector("svg")?.getAttribute("width")).toBe("14");
+  });
 });
