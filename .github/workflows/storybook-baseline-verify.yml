@@ -82,6 +82,10 @@ jobs:
         working-directory: server
         run: npm ci
 
+      - name: Run server regression tests
+        working-directory: server
+        run: npm test
+
       - name: Audit server production dependencies
         working-directory: server
         run: npm audit --omit=dev
