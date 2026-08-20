@@ -28,6 +28,9 @@ const inputVariants = cva(
   }
 );
 
+const inputActionClass =
+  "flex size-10 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
     VariantProps<typeof inputVariants> {
@@ -104,7 +107,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             inputVariants({ variant: resolvedVariant, size }),
             leftIcon ? "pl-10" : undefined,
-            rightIcon || isPassword || showClearButton ? "pr-10" : undefined,
+            rightIcon || isPassword || showClearButton ? "pr-12" : undefined,
             className
           )}
           value={value}
@@ -115,7 +118,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         />
 
         {rightIcon || isPassword || showClearButton ? (
-          <div className="absolute right-3 top-1/2 z-10 flex -translate-y-1/2 items-center gap-1">
+          <div className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 items-center gap-1">
             {rightIcon ? (
               <span className="text-muted-foreground [&_svg]:size-4">{rightIcon}</span>
             ) : null}
@@ -124,7 +127,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               <button
                 type="button"
                 aria-label="Clear input"
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className={inputActionClass}
                 onClick={handleClear}
               >
                 <X className="size-4" />
@@ -135,7 +138,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               <button
                 type="button"
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className={inputActionClass}
                 onClick={() => setShowPassword((visible) => !visible)}
               >
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
