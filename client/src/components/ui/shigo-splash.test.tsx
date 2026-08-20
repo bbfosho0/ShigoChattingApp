@@ -13,3 +13,9 @@ test("owns the full viewport so no page background can show below the splash", (
   expect(splash).toHaveClass("min-h-screen");
   expect(splash).toHaveClass("min-h-[100dvh]");
 });
+
+test("exposes the moon identity and live progress inside the brand composition", () => {
+  render(<ShigoSplash showAction={false} progress={42} />);
+  expect(screen.getByTestId("shigo-moon-mark")).toBeInTheDocument();
+  expect(screen.getByTestId("shigo-splash-progress")).toHaveStyle({ width: "42%" });
+});
