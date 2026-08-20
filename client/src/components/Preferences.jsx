@@ -6,6 +6,8 @@ import { ThemeContext } from "../context/ThemeContext";
 import { useMusic } from "../context/MusicContext";
 import { PreferencesShell } from "./ui/preferences-shell";
 
+export const AUTH_TOKEN_UPDATED_EVENT = "shigo:auth-token-updated";
+
 const Preferences = ({ open, onClose, user }) => {
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const {
@@ -43,6 +45,11 @@ const Preferences = ({ open, onClose, user }) => {
         throw new Error("Password change response did not include a replacement session token");
       }
       localStorage.setItem("token", res.data.token);
+      window.dispatchEvent(
+        new CustomEvent(AUTH_TOKEN_UPDATED_EVENT, {
+          detail: { token: res.data.token },
+        })
+      );
       toast.success("Password changed");
     } catch (err) {
       const message =
