@@ -100,8 +100,8 @@ const Chatroom = () => {
       console.error("Socket connect_error:", err.message);
     });
 
-    const onAuthTokenUpdated = (event) => {
-      const nextToken = event?.detail?.token || localStorage.getItem("token");
+    const onAuthTokenUpdated = () => {
+      const nextToken = localStorage.getItem("token");
       if (!nextToken || !active) return;
 
       socket.auth = { token: nextToken };
