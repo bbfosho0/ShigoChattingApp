@@ -2,60 +2,90 @@ import { ArrowRight } from "lucide-react";
 
 import { Button } from "components/ui/button";
 import { MagneticCursor } from "components/ui/magnetic-cursor";
+import { ShigoBrandArtwork } from "components/ui/shigo-brand-artwork";
 import { ShigoShader } from "components/ui/shigo-shader";
+import { cn } from "lib/utils";
 
 export interface ShigoSplashProps {
-  magnetic?: boolean;
-  showAction?: boolean;
   onContinue?: () => void;
+  showAction?: boolean;
+  magnetic?: boolean;
+  className?: string;
 }
 
-function SplashContent({ showAction = true, onContinue }: Pick<ShigoSplashProps, "showAction" | "onContinue">) {
+function SplashMark() {
   return (
-    <div
-      data-shigo-splash
-      className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden bg-[#090A0F] text-white"
-    >
-      <ShigoShader />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/5 to-black/50" />
-
-      <header className="relative z-10 flex items-center justify-between p-6 sm:p-8 lg:px-12 lg:py-10">
-        <div data-magnetic className="flex items-center gap-3 rounded-lg px-2 py-1">
-          <div className="relative flex size-10 items-center justify-center overflow-hidden rounded-md bg-white text-sm font-bold text-[#090A0F]">
-            S
-            <span aria-hidden="true" className="absolute inset-x-1 bottom-0 h-px bg-primary/70" />
-          </div>
-          <div><p className="text-sm font-semibold tracking-[-0.01em]">ShigoChat</p><p className="text-[11px] text-white/45">Quiet Room</p></div>
-        </div>
-        <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/30">Shigo Midnight</span>
-      </header>
-
-      <main className="relative z-10 flex flex-1 items-center px-6 py-16 sm:px-10 lg:px-20 lg:py-20">
-        <div className="max-w-[46rem]">
-          <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.22em] text-white/30">Presence without pressure</p>
-          <h1 className="font-brand text-6xl leading-[0.9] tracking-[-0.045em] text-white/95 sm:text-7xl lg:text-[6rem]">A quieter place to connect.</h1>
-          <p className="mt-7 max-w-xl text-sm leading-7 text-white/55 sm:text-[15px]">A calm room for conversation, where the interface lowers its voice and leaves more space for the people inside it.</p>
-          {showAction ? (
-            <div className="mt-10" data-magnetic>
-              <Button onClick={onContinue} trailingIcon={ArrowRight} className="bg-white text-[#090A0F] shadow-[0_10px_36px_rgba(0,0,0,0.18)] hover:bg-white/90">Enter Quiet Room</Button>
-            </div>
-          ) : null}
-        </div>
-      </main>
-
-      <footer className="relative z-10 mx-6 flex justify-between border-t border-white/[0.06] py-6 text-[10px] uppercase tracking-[0.16em] text-white/30 sm:mx-8 sm:py-8 lg:mx-12 lg:py-9">
-        <span>Conversation without the noise</span>
-        <span>01 · ShigoChat</span>
-      </footer>
+    <div className="relative flex size-10 items-center justify-center overflow-hidden rounded-md bg-foreground text-sm font-bold text-background ring-1 ring-inset ring-primary/25">
+      S
+      <span aria-hidden="true" className="absolute inset-x-1 bottom-0 h-px bg-primary/80" />
     </div>
   );
 }
 
-export function ShigoSplash({ magnetic = false, showAction = true, onContinue }: ShigoSplashProps) {
-  const content = <SplashContent showAction={showAction} onContinue={onContinue} />;
-  return magnetic ? (
-    <MagneticCursor magneticFactor={0.32} cursorSize={26} hoverPadding={8} blendMode="exclusion" contrastBoost={1.15}>
-      {content}
-    </MagneticCursor>
-  ) : content;
+export function ShigoSplash({
+  onContinue,
+  showAction = true,
+  magnetic = false,
+  className,
+}: ShigoSplashProps) {
+  const content = (
+    <div
+      data-shigo-splash
+      className={cn(
+        "relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground",
+        className
+      )}
+    >
+      <ShigoBrandArtwork imageClassName="scale-[1.02]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.28] dark:opacity-[0.38]">
+        <ShigoShader />
+      </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,transparent_0%,hsl(var(--background)/0.06)_42%,hsl(var(--background)/0.72)_100%)] dark:bg-[radial-gradient(circle_at_50%_42%,transparent_0%,rgba(9,10,15,0.12)_40%,rgba(9,10,15,0.78)_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/5 via-background/10 to-background/55 dark:from-black/5 dark:via-black/10 dark:to-black/55"
+      />
+
+      <header className="relative z-10 flex h-20 items-center justify-between px-5 sm:px-8 lg:px-12">
+        <div className="flex items-center gap-3">
+          <SplashMark />
+          <div>
+            <p className="text-[13px] font-semibold tracking-[-0.01em]">ShigoChat</p>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Quiet Room</p>
+          </div>
+        </div>
+        <span className="hidden text-[10px] uppercase tracking-[0.18em] text-muted-foreground sm:block">Presence without pressure</span>
+      </header>
+
+      <main className="relative z-10 flex flex-1 items-center px-5 pb-20 pt-8 sm:px-8 lg:px-12">
+        <div className="w-full max-w-5xl">
+          <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.24em] text-muted-foreground">Shigo Midnight</p>
+          <h1 className="max-w-4xl font-brand text-[clamp(3.5rem,9vw,8.8rem)] leading-[0.84] tracking-[-0.055em] text-foreground">
+            A quieter place
+            <span className="block text-foreground/72">to connect.</span>
+          </h1>
+          <div className="mt-9 flex max-w-xl flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
+            <p className="max-w-sm text-sm leading-7 text-foreground/66 sm:text-[15px]">
+              Conversation without the noise around it. A shared room designed to feel present, personal, and gently alive.
+            </p>
+            {showAction ? (
+              <Button onClick={onContinue} trailingIcon={ArrowRight} size="lg" className="w-fit shadow-panel">
+                Enter Quiet Room
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </main>
+
+      <footer className="relative z-10 flex items-end justify-between px-5 pb-6 text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:px-8 lg:px-12">
+        <span>01 · Quiet Room</span>
+        <span className="hidden sm:inline">Light / Dark · Reduced motion aware</span>
+      </footer>
+    </div>
+  );
+
+  return magnetic ? <MagneticCursor>{content}</MagneticCursor> : content;
 }
