@@ -107,14 +107,17 @@ export function ShigoComposer({
 
   return (
     <div
+      data-shigo-composer
       className={cn(
-        "rounded-lg border border-border/70 bg-shigo-raised shadow-none outline-none transition-[border-color,box-shadow] focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+        "group relative overflow-hidden rounded-lg border border-border/50 bg-shigo-raised shadow-none outline-none transition-[border-color,box-shadow,background-color] duration-base focus-within:border-primary/35 focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
         className
       )}
     >
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+
       {replyingTo ? (
-        <div className="flex items-center gap-3 bg-secondary/40 px-3.5 py-2.5">
-          <div className="min-w-0 flex-1 border-l-2 border-primary pl-3">
+        <div className="flex items-center gap-3 bg-secondary/25 px-3.5 py-2.5">
+          <div className="min-w-0 flex-1 border-l-2 border-primary/75 pl-3">
             <p className="text-[11px] font-semibold text-primary">Replying</p>
             <p className="truncate text-xs text-muted-foreground">{replyingTo}</p>
           </div>
@@ -123,7 +126,7 @@ export function ShigoComposer({
       ) : null}
 
       {attachments.length > 0 ? (
-        <div className="grid gap-2 border-b border-border/60 p-3 sm:grid-cols-2">
+        <div className="grid gap-2 border-b border-border/40 p-3 sm:grid-cols-2">
           {attachments.map((attachment) => (
             <FileAttachment key={attachment.id} attachment={attachment} onRemove={removeAttachment} />
           ))}
@@ -149,7 +152,7 @@ export function ShigoComposer({
               aria-label="Attach files"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled || attachments.length >= 4}
-              className="shrink-0"
+              className="shrink-0 text-muted-foreground hover:text-foreground"
             >
               <Paperclip size={17} strokeWidth={1.5} />
             </Button>
@@ -178,7 +181,7 @@ export function ShigoComposer({
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button type="button" size="icon" variant="ghost" aria-label="Choose emoji" disabled={disabled} className="shrink-0">
+            <Button type="button" size="icon" variant="ghost" aria-label="Choose emoji" disabled={disabled} className="shrink-0 text-muted-foreground hover:text-foreground">
               <Smile size={17} strokeWidth={1.5} />
             </Button>
           </PopoverTrigger>
@@ -187,11 +190,21 @@ export function ShigoComposer({
           </PopoverContent>
         </Popover>
 
-        <Button type="button" size="icon" onClick={send} disabled={!canSend} aria-label="Send message" className="shrink-0">
+        <Button
+          type="button"
+          size="icon"
+          onClick={send}
+          disabled={!canSend}
+          aria-label="Send message"
+          className={cn(
+            "shrink-0 transition-shadow duration-base",
+            canSend && "shadow-[0_0_16px_hsl(var(--primary)/0.16)]"
+          )}
+        >
           <ArrowUp size={16} strokeWidth={2} />
         </Button>
       </div>
-      <div className="hidden justify-end px-3.5 pb-2 text-[11px] text-muted-foreground sm:flex">Enter to send · Shift+Enter for new line</div>
+      <div className="pointer-events-none hidden justify-end px-3.5 pb-2 text-[11px] text-muted-foreground opacity-0 transition-opacity duration-base group-focus-within:opacity-100 sm:flex">Enter to send · Shift+Enter for new line</div>
     </div>
   );
 }
