@@ -98,6 +98,7 @@ jobs:
           node --check routes/messages.js
           node --check middleware/auth.js
           node --check middleware/validators.js
+          node --check lib/authTokens.js
           node --check models/User.js
           node --check models/Message.js
 
