@@ -52,11 +52,11 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-test("authenticated password change stores the replacement JWT and announces socket rotation", async () => {
+test("authenticated password change stores the replacement JWT and announces socket rotation without exposing the JWT in the event", async () => {
   localStorage.setItem("token", "old-token");
   axios.patch.mockResolvedValueOnce({ data: { message: "Password changed.", token: "fresh-token" } });
-  const observedTokens = [];
-  const onTokenUpdated = (event) => observedTokens.push(event.detail?.token);
+  const observedEvents = [];
+  const onTokenUpdated = (event) => observedEvents.push(event);
   window.addEventListener(AUTH_TOKEN_UPDATED_EVENT, onTokenUpdated);
 
   render(
@@ -75,7 +75,8 @@ test("authenticated password change stores the replacement JWT and announces soc
     );
   });
   expect(localStorage.getItem("token")).toBe("fresh-token");
-  expect(observedTokens).toEqual(["fresh-token"]);
+  expect(observedEvents).toHaveLength(1);
+  expect(observedEvents[0]).not.toHaveProperty("detail");
   window.removeEventListener(AUTH_TOKEN_UPDATED_EVENT, onTokenUpdated);
 });
 
