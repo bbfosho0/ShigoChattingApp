@@ -34,11 +34,15 @@ const Preferences = ({ open, onClose, user }) => {
 
     try {
       setSecurityLoading(true);
-      await axios.patch(
+      const res = await axios.patch(
         `${process.env.REACT_APP_API_URL}/api/auth/change-password`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      if (!res.data?.token) {
+        throw new Error("Password change response did not include a replacement session token");
+      }
+      localStorage.setItem("token", res.data.token);
       toast.success("Password changed");
     } catch (err) {
       const message =
