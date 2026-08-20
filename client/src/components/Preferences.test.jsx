@@ -23,6 +23,29 @@ jest.mock("../context/MusicContext", () => ({
     seek: jest.fn(),
   }),
 }));
+jest.mock("./ui/preferences-shell", () => ({
+  PreferencesShell: (props) => {
+    const ReactModule = require("react");
+    return ReactModule.createElement(
+      "button",
+      { type: "button", onClick: () => props.onUpdatePassword?.("old-password", "new-password") },
+      "Trigger password change"
+    );
+  },
+}));
+jest.mock("components/ui/alert-dialog", () => ({
+  AlertDialog: ({ children }) => <>{children}</>,
+  AlertDialogAction: ({ children, ...props }) => <button {...props}>{children}</button>,
+  AlertDialogCancel: ({ children, ...props }) => <button {...props}>{children}</button>,
+  AlertDialogContent: ({ children }) => <div>{children}</div>,
+  AlertDialogDescription: ({ children }) => <p>{children}</p>,
+  AlertDialogFooter: ({ children }) => <div>{children}</div>,
+  AlertDialogHeader: ({ children }) => <div>{children}</div>,
+  AlertDialogTitle: ({ children }) => <h2>{children}</h2>,
+  AlertDialogTrigger: ({ children }) => <>{children}</>,
+}));
+jest.mock("components/ui/ambient-player", () => ({ AmbientPlayer: () => null }));
+jest.mock("components/ui/presence-avatar", () => ({ PresenceAvatar: () => null }));
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -39,11 +62,7 @@ test("authenticated password change stores the replacement JWT", async () => {
     </ThemeContext.Provider>
   );
 
-  fireEvent.click(screen.getByRole("tab", { name: /security/i }));
-  fireEvent.change(await screen.findByLabelText(/current password/i), { target: { value: "old-password" } });
-  fireEvent.change(screen.getByLabelText(/^new password$/i), { target: { value: "new-password" } });
-  fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: "new-password" } });
-  fireEvent.click(screen.getByRole("button", { name: /update password/i }));
+  fireEvent.click(screen.getByRole("button", { name: /trigger password change/i }));
 
   await waitFor(() => {
     expect(axios.patch).toHaveBeenCalledWith(
