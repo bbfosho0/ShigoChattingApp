@@ -15,6 +15,10 @@ export const Default: Story = {
   args: { showAction: true, onContinue: () => undefined },
 };
 
+export const Progress: Story = {
+  args: { showAction: false, progress: 64 },
+};
+
 export const ReducedChrome: Story = {
   args: { showAction: false },
 };
