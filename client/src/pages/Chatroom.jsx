@@ -232,14 +232,14 @@ const Chatroom = () => {
 
   return (
     <div className="fixed inset-0 flex overflow-hidden bg-background text-foreground">
-      <div className="hidden h-full lg:block">
+      <div className="hidden h-full xl:block">
         <AppSidebar
           {...sidebarProps}
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
         />
       </div>
-      <div className="hidden h-full md:block lg:hidden">
+      <div className="hidden h-full md:block xl:hidden">
         <AppSidebar {...sidebarProps} collapsed />
       </div>
 
