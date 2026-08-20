@@ -81,8 +81,8 @@ const browser = await chromium.launch({ headless: true });
 const manifest = {
   schemaVersion: 1,
   repository: process.env.GITHUB_REPOSITORY || "bbfosho0/ShigoChattingApp",
-  sha: process.env.GITHUB_SHA || null,
-  ref: process.env.GITHUB_REF_NAME || null,
+  sha: process.env.VISUAL_SHA || process.env.GITHUB_SHA || null,
+  ref: process.env.VISUAL_REF || process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || null,
   runId: process.env.GITHUB_RUN_ID || null,
   generatedAt: new Date().toISOString(),
   storybookUrl: baseUrl,
