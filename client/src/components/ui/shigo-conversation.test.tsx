@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { ShigoConversation } from "components/ui/shigo-conversation";
 
@@ -78,5 +78,42 @@ describe("ShigoConversation layout", () => {
     );
 
     expect(screen.getAllByText("Alice")).toHaveLength(2);
+  });
+
+  it("does not pull the transcript to the bottom when the user is reading older messages", () => {
+    const scrollTo = jest.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollTo", {
+      configurable: true,
+      value: scrollTo,
+    });
+
+    const { rerender } = render(
+      <ShigoConversation messages={messages} currentUserId="yoshi" />
+    );
+    const viewport = screen.getByLabelText("Quiet Room messages");
+    scrollTo.mockClear();
+
+    Object.defineProperty(viewport, "scrollHeight", { configurable: true, value: 1000 });
+    Object.defineProperty(viewport, "clientHeight", { configurable: true, value: 300 });
+    Object.defineProperty(viewport, "scrollTop", { configurable: true, value: 120, writable: true });
+    fireEvent.scroll(viewport);
+
+    rerender(
+      <ShigoConversation
+        currentUserId="yoshi"
+        messages={[
+          ...messages,
+          {
+            id: "message-2",
+            senderId: "yoshi",
+            senderName: "Yoshi",
+            content: "New message while you are reading.",
+            createdAt: "2026-08-18T20:41:00",
+          },
+        ]}
+      />
+    );
+
+    expect(scrollTo).not.toHaveBeenCalled();
   });
 });
