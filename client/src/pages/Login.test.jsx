@@ -6,11 +6,11 @@ import Login from "./Login";
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
 
-const navigate = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock("axios");
 jest.mock("react-router-dom", () => ({
-  useNavigate: () => navigate,
+  useNavigate: () => mockNavigate,
 }));
 jest.mock("react-hot-toast", () => ({
   __esModule: true,
