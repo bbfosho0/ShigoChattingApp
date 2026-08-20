@@ -1,5 +1,9 @@
 import { render, screen } from "@testing-library/react";
 
+jest.mock("components/ui/shigo-shader", () => ({
+  ShigoShader: () => <div data-testid="shigo-shader" />,
+}));
+
 import { ShigoSplash } from "./shigo-splash";
 
 test("owns the full viewport so no page background can show below the splash", () => {
