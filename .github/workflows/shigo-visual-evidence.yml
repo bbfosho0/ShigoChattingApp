@@ -1,0 +1,82 @@
+name: Capture Shigo visual evidence
+
+on:
+  push:
+    branches:
+      - storybook-typescript-baseline
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shigo-visual-evidence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+
+      - name: Install client dependencies from lockfile
+        working-directory: client
+        run: npm ci
+
+      - name: Prepare visual artifact directory
+        working-directory: client
+        run: mkdir -p visual-audit
+
+      - name: Build Storybook
+        working-directory: client
+        run: npm run build-storybook
+
+      - name: Install visual capture runtime
+        working-directory: client
+        run: |
+          npm install --no-save --package-lock=false playwright@1.62.1
+          npx playwright install --with-deps chromium
+
+      - name: Check capture script syntax
+        working-directory: client
+        run: node --check scripts/capture-visual-audit.mjs
+
+      - name: Serve built Storybook
+        working-directory: client
+        run: |
+          python3 -m http.server 6006 --bind 127.0.0.1 --directory storybook-static > visual-audit/storybook-server.log 2>&1 &
+          echo $! > visual-audit/storybook-server.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:6006/index.json > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat visual-audit/storybook-server.log
+          exit 1
+
+      - name: Capture official Shigo visual evidence
+        working-directory: client
+        env:
+          STORYBOOK_URL: http://127.0.0.1:6006
+        run: node scripts/capture-visual-audit.mjs
+
+      - name: Upload visual evidence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shigo-visual-audit-${{ github.sha }}
+          path: client/visual-audit/
+          if-no-files-found: error
+          retention-days: 30
