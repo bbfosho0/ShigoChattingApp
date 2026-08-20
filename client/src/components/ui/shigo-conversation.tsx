@@ -71,7 +71,7 @@ export function ShigoConversation({
 
   return (
     <div ref={scrollRef} className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}>
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
+      <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-end gap-5 px-4 py-5 sm:px-6">
         {messages.map((message) => (
           <ShigoMessage
             key={message.id}
