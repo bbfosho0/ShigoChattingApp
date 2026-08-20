@@ -91,7 +91,7 @@ export function ShigoAuthForm({
 
       {error ? <div role="alert" className="border-l-2 border-destructive/70 bg-destructive/[0.045] px-3 py-2.5 text-sm text-destructive">{error}</div> : null}
 
-      <div className="space-y-4.5">
+      <div className="space-y-4">
         {mode === "register" ? (
           <div className="space-y-2"><Label htmlFor={`auth-${mode}-username`}>Display name</Label><Input id={`auth-${mode}-username`} value={username} onChange={(event) => setUsername(event.target.value)} leftIcon={<UserRound />} autoComplete="username" disabled={loading} required /></div>
         ) : null}
