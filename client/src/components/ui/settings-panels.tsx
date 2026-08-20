@@ -20,8 +20,8 @@ import { PresenceAvatar } from "components/ui/presence-avatar";
 
 function SettingsSection({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
-    <section className="border-t border-border/60 pt-6 first:border-t-0 first:pt-0">
-      <div className="mb-4"><h3 className="text-[17px] font-semibold text-foreground">{title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p></div>
+    <section className="border-t border-border/45 pt-7 first:border-t-0 first:pt-0">
+      <div className="mb-5"><h3 className="text-lg font-semibold tracking-[-0.015em] text-foreground">{title}</h3><p className="mt-1.5 text-sm leading-6 text-muted-foreground">{description}</p></div>
       {children}
     </section>
   );
@@ -42,10 +42,10 @@ export function AccountSettingsPanel({ name = "Yoshi", email = "yoshi@example.co
   const canSave = editable && draftName.trim().length > 0 && draftEmail.trim().length > 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-9">
       <SettingsSection title="Profile" description={editable ? "The identity people see when you talk in Quiet Room." : "Your ShigoChat account identity."}>
         <div className="flex items-center gap-3"><PresenceAvatar fallback={(draftName || "?").slice(0, 2).toUpperCase()} presence="online" avatarClassName="size-11" /><div className="min-w-0"><p className="truncate text-sm font-medium text-foreground">{draftName || "Unnamed"}</p><p className="truncate text-xs text-muted-foreground">{draftEmail}</p></div></div>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="min-w-0 space-y-2"><Label htmlFor="settings-name">Display name</Label><Input id="settings-name" value={draftName} onChange={(event) => setDraftName(event.target.value)} leftIcon={<UserRound />} autoComplete="nickname" readOnly={!editable} /></div>
           <div className="min-w-0 space-y-2"><Label htmlFor="settings-email">Email</Label><Input id="settings-email" value={draftEmail} onChange={(event) => setDraftEmail(event.target.value)} type="email" autoComplete="email" readOnly={!editable} /></div>
         </div>
@@ -60,14 +60,30 @@ export interface AppearanceSettingsPanelProps {
   onThemeChange?: (theme: "light" | "dark") => void;
 }
 
+function ThemeOption({ active, icon, title, description, onClick }: { active: boolean; icon: React.ReactNode; title: string; description: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`relative overflow-hidden rounded-lg border p-4 text-left outline-none transition-[background-color,border-color] duration-base focus-visible:shadow-focus ${active ? "border-primary/20 bg-primary/[0.045]" : "border-transparent bg-secondary/35 hover:bg-accent/55"}`}
+    >
+      {active ? <span aria-hidden="true" className="absolute inset-y-3 left-0 w-px rounded-full bg-primary/75" /> : null}
+      <span className={active ? "text-primary" : "text-muted-foreground"}>{icon}</span>
+      <p className="mt-4 text-sm font-medium text-foreground">{title}</p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
+    </button>
+  );
+}
+
 export function AppearanceSettingsPanel({ theme = "dark", onThemeChange }: AppearanceSettingsPanelProps) {
   return (
     <SettingsSection title="Appearance" description="Choose the same quiet hierarchy in light or dark mode.">
       <div className="grid gap-3 sm:grid-cols-2">
-        <button type="button" aria-pressed={theme === "light"} onClick={() => onThemeChange?.("light")} className={`rounded-lg border p-4 text-left outline-none transition-colors focus-visible:shadow-focus ${theme === "light" ? "border-primary/50 bg-primary/[0.06]" : "border-border/70 bg-transparent hover:bg-accent/40"}`}><Sun size={17} strokeWidth={1.5} /><p className="mt-4 text-sm font-medium">Light</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Alabaster surfaces with violet actions.</p></button>
-        <button type="button" aria-pressed={theme === "dark"} onClick={() => onThemeChange?.("dark")} className={`rounded-lg border p-4 text-left outline-none transition-colors focus-visible:shadow-focus ${theme === "dark" ? "border-primary/50 bg-primary/[0.06]" : "border-border/70 bg-transparent hover:bg-accent/40"}`}><Moon size={17} strokeWidth={1.5} /><p className="mt-4 text-sm font-medium">Dark</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Near-black surfaces with restrained contrast.</p></button>
+        <ThemeOption active={theme === "light"} icon={<Sun size={17} strokeWidth={1.5} />} title="Light" description="Alabaster surfaces with violet actions." onClick={() => onThemeChange?.("light")} />
+        <ThemeOption active={theme === "dark"} icon={<Moon size={17} strokeWidth={1.5} />} title="Dark" description="Near-black surfaces with restrained contrast." onClick={() => onThemeChange?.("dark")} />
       </div>
-      <div className="mt-5 flex items-center justify-between gap-4 rounded-md bg-secondary/40 p-4"><div><p className="text-sm font-medium">Reduced motion</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Shigo automatically honors your operating-system reduced-motion preference.</p></div><Monitor size={18} strokeWidth={1.5} className="shrink-0 text-muted-foreground" /></div>
+      <div className="mt-5 flex items-center justify-between gap-4 rounded-md bg-secondary/30 p-4"><div><p className="text-sm font-medium">Reduced motion</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Shigo automatically honors your operating-system reduced-motion preference.</p></div><Monitor size={18} strokeWidth={1.5} className="shrink-0 text-muted-foreground" /></div>
     </SettingsSection>
   );
 }
@@ -111,7 +127,7 @@ export function SecuritySettingsPanel({ minPasswordLength = 6, loading = false, 
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-9">
       <SettingsSection title="Password" description={`Use at least ${minPasswordLength} characters and do not reuse passwords from other services.`}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="min-w-0 space-y-2"><Label htmlFor="current-password">Current password</Label><Input id="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} type="password" leftIcon={<KeyRound />} autoComplete="current-password" /></div>
