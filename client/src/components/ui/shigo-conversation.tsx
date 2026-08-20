@@ -7,6 +7,7 @@ import { Skeleton } from "components/ui/skeleton";
 import { cn } from "lib/utils";
 
 const MESSAGE_GROUP_WINDOW_MS = 5 * 60 * 1000;
+const STICK_TO_BOTTOM_THRESHOLD_PX = 96;
 
 function messageTime(value: string | Date) {
   const date = value instanceof Date ? value : new Date(value);
@@ -93,9 +94,10 @@ export function ShigoConversation({
   className,
 }: ShigoConversationProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
 
   useEffect(() => {
-    if (!autoScroll || loading) return;
+    if (!autoScroll || loading || !stickToBottomRef.current) return;
     const element = scrollRef.current;
     if (!element) return;
     const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -110,6 +112,11 @@ export function ShigoConversation({
       ref={scrollRef}
       className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}
       aria-label="Quiet Room messages"
+      onScroll={(event) => {
+        const element = event.currentTarget;
+        const distanceFromBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
+        stickToBottomRef.current = distanceFromBottom <= STICK_TO_BOTTOM_THRESHOLD_PX;
+      }}
     >
       {loading ? (
         <ConversationLoading />
