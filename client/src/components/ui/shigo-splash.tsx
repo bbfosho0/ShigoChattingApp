@@ -4,7 +4,6 @@ import { Button } from "components/ui/button";
 import { MagneticCursor } from "components/ui/magnetic-cursor";
 import { ShigoBrandArtwork } from "components/ui/shigo-brand-artwork";
 import { ShigoShader } from "components/ui/shigo-shader";
-import { cn } from "lib/utils";
 
 export interface ShigoSplashProps {
   onContinue?: () => void;
@@ -31,10 +30,7 @@ export function ShigoSplash({
   const content = (
     <div
       data-shigo-splash
-      className={cn(
-        "relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground",
-        className
-      )}
+      className={`relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground ${className ?? ""}`}
     >
       <ShigoBrandArtwork imageClassName="scale-[1.02]" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.28] dark:opacity-[0.38]">
