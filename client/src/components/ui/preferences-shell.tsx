@@ -62,18 +62,19 @@ export function PreferencesContent({
   onDeleteAccount,
 }: Omit<PreferencesShellProps, "children" | "open" | "onOpenChange">) {
   const [section, setSection] = useState<PreferencesSection>(defaultSection);
+  const triggerClassName = "w-full px-2 data-[state=active]:bg-accent data-[state=active]:shadow-none";
 
   return (
-    <Tabs value={section} onValueChange={(value) => setSection(value as PreferencesSection)} className="flex min-h-0 flex-1 flex-col">
-      <div className="overflow-x-auto px-6 pt-5">
-        <TabsList className="min-w-max">
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="ambient">Ambient</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
+    <Tabs value={section} onValueChange={(value) => setSection(value as PreferencesSection)} className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="min-w-0 px-4 pt-4 sm:px-6 sm:pt-5">
+        <TabsList className="grid min-h-0 w-full grid-cols-2 gap-1 border-0 bg-transparent p-0 sm:grid-cols-4">
+          <TabsTrigger className={triggerClassName} value="account">Account</TabsTrigger>
+          <TabsTrigger className={triggerClassName} value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger className={triggerClassName} value="ambient">Ambient</TabsTrigger>
+          <TabsTrigger className={triggerClassName} value="security">Security</TabsTrigger>
         </TabsList>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 pb-5 sm:px-6 sm:pb-6">
         <TabsContent value="account"><AccountSettingsPanel name={name} email={email} onSave={onAccountSave} /></TabsContent>
         <TabsContent value="appearance"><AppearanceSettingsPanel theme={theme} onThemeChange={onThemeChange} /></TabsContent>
         <TabsContent value="ambient"><AmbientSettingsPanel playing={playing} progress={progress} volume={volume} onTogglePlay={onTogglePlay} onPrevious={onPrevious} onNext={onNext} onSeek={onSeek} onVolumeChange={onVolumeChange} /></TabsContent>
@@ -87,12 +88,12 @@ export function PreferencesShell({ children, open, onOpenChange, ...props }: Pre
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       {children ? <SheetTrigger asChild>{children}</SheetTrigger> : null}
-      <SheetContent className="gap-0 sm:max-w-xl">
-        <SheetHeader className="border-b border-border pb-5">
+      <SheetContent className="gap-0 overflow-hidden bg-card sm:max-w-xl">
+        <SheetHeader className="pb-3 pr-10 sm:pb-4">
           <SheetTitle>Preferences</SheetTitle>
-          <SheetDescription>Account, appearance, ambient audio, and security in one place.</SheetDescription>
+          <SheetDescription>Account, appearance, ambient audio, and security.</SheetDescription>
         </SheetHeader>
-        <SheetBody className="flex p-0">
+        <SheetBody className="flex min-w-0 overflow-hidden p-0">
           <PreferencesContent {...props} />
         </SheetBody>
       </SheetContent>
