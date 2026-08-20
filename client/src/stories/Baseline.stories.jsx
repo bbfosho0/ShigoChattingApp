@@ -8,7 +8,7 @@ const Baseline = () => (
 );
 
 const meta = {
-  title: "Baseline/JSX",
+  title: "Internal/Baseline/JSX",
   component: Baseline,
 };
 
