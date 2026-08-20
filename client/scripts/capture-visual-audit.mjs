@@ -51,6 +51,13 @@ const targets = [
   { title: "Auth/Register", name: "Default", width: 1440, height: 1000, theme: "dark" },
   { title: "Auth/Mobile", name: "Login", width: 390, height: 844, theme: "dark" },
   { title: "Auth/Mobile", name: "Register", width: 390, height: 844, theme: "dark" },
+  { title: "Auth/Forgot Password", name: "Default", width: 1440, height: 1000, theme: "dark" },
+  { title: "Auth/Forgot Password", name: "Sent", width: 1440, height: 1000, theme: "dark" },
+  { title: "Auth/Forgot Password", name: "Mobile", width: 390, height: 844, theme: "dark" },
+  { title: "Auth/Reset Password", name: "Default", width: 1440, height: 1000, theme: "dark" },
+  { title: "Auth/Reset Password", name: "Invalid", width: 1440, height: 1000, theme: "dark" },
+  { title: "Auth/Reset Password", name: "Success", width: 1440, height: 1000, theme: "dark" },
+  { title: "Auth/Reset Password", name: "Mobile", width: 390, height: 844, theme: "dark" },
 
   { title: "Experience/Splash", name: "Default", width: 1280, height: 900, theme: "dark" },
   { title: "Experience/Splash", name: "Default", width: 390, height: 844, theme: "dark" },
