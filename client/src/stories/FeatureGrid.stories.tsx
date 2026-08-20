@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import FeatureGrid from "components/ui/feature-grid";
 
 const meta = {
-  title: "Components/FeatureGrid",
+  title: "Reference/FeatureGrid",
   component: FeatureGrid,
   parameters: {
     layout: "fullscreen",
