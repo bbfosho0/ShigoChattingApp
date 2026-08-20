@@ -10,6 +10,7 @@ import {
 import Chatroom from "./pages/Chatroom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import SplashScreen from "./pages/SplashScreen";
 import { AuthContext } from "./context/AuthContext";
 
@@ -29,6 +30,7 @@ function AnimatedRoutes() {
       >
         <Routes location={location}>
           <Route path="/" element={<SplashScreen />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/login"
             element={user ? <Navigate to="/chat" /> : <Login />}
