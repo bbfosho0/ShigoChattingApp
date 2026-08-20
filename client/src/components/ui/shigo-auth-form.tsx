@@ -76,16 +76,22 @@ export function ShigoAuthForm({
   const disabled = loading || !email.trim() || (mode === "register" && !username.trim()) || !passwordValid;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-7">
       <div>
-        <div className="mb-6 flex items-center gap-2 lg:hidden"><div className="flex size-8 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">S</div><span className="text-sm font-semibold">ShigoChat</span></div>
-        <h1 className="text-3xl font-semibold tracking-[-0.03em] text-foreground">{current.title}</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">{current.description}</p>
+        <div className="mb-8 flex items-center gap-2.5 lg:hidden">
+          <div className="relative flex size-8 items-center justify-center overflow-hidden rounded-md bg-foreground text-xs font-bold text-background ring-1 ring-inset ring-primary/20">
+            S
+            <span aria-hidden="true" className="absolute inset-x-1 bottom-0 h-px bg-primary/70" />
+          </div>
+          <div><p className="text-sm font-semibold tracking-[-0.01em]">ShigoChat</p><p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Shigo Midnight</p></div>
+        </div>
+        <h1 className="text-[2rem] font-semibold leading-tight tracking-[-0.035em] text-foreground sm:text-[2.15rem]">{current.title}</h1>
+        <p className="mt-2.5 text-sm leading-6 text-muted-foreground">{current.description}</p>
       </div>
 
-      {error ? <div role="alert" className="rounded-md border border-destructive/25 bg-destructive/[0.06] px-3 py-2 text-sm text-destructive">{error}</div> : null}
+      {error ? <div role="alert" className="border-l-2 border-destructive/70 bg-destructive/[0.045] px-3 py-2.5 text-sm text-destructive">{error}</div> : null}
 
-      <div className="space-y-4">
+      <div className="space-y-4.5">
         {mode === "register" ? (
           <div className="space-y-2"><Label htmlFor={`auth-${mode}-username`}>Display name</Label><Input id={`auth-${mode}-username`} value={username} onChange={(event) => setUsername(event.target.value)} leftIcon={<UserRound />} autoComplete="username" disabled={loading} required /></div>
         ) : null}
@@ -99,7 +105,7 @@ export function ShigoAuthForm({
         ) : null}
       </div>
 
-      <Button type="submit" className="w-full" loading={loading} disabled={disabled}>{current.submit}</Button>
+      <Button type="submit" className="w-full shadow-[0_0_18px_hsl(var(--primary)/0.08)]" loading={loading} disabled={disabled}>{current.submit}</Button>
 
       <div className="text-center text-sm text-muted-foreground">
         {mode === "login" ? <>New here? <button type="button" onClick={() => onModeChange?.("register")} className={authTextActionClass}>Create an account</button></> : null}
