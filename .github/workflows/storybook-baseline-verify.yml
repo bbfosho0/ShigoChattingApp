@@ -97,10 +97,14 @@ jobs:
           node --check routes/auth.js
           node --check routes/messages.js
           node --check middleware/auth.js
+          node --check middleware/authRateLimits.js
           node --check middleware/validators.js
           node --check lib/authTokens.js
+          node --check lib/passwordRecovery.js
+          node --check services/email.js
           node --check models/User.js
           node --check models/Message.js
+          node --check models/PasswordResetToken.js
 
   windows-dev-launcher:
     runs-on: windows-latest
