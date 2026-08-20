@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
-import { Hash, Moon, Settings2, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import toast from "react-hot-toast";
@@ -11,9 +10,9 @@ import MessageInput from "../components/MessageInput";
 import MusicPlayer from "../components/MusicPlayer";
 import Preferences from "../components/Preferences";
 import { AppSidebar } from "../components/ui/app-sidebar";
-import { Button } from "../components/ui/button";
 import { CONVERSATION_MEASURE_CLASS } from "../components/ui/conversation-measure";
 import { MobileNav } from "../components/ui/mobile-nav";
+import { QuietRoomHeader } from "../components/ui/quiet-room-header";
 import { ShigoConversation } from "../components/ui/shigo-conversation";
 
 const normalizeMessage = (message) => {
@@ -243,39 +242,14 @@ const Chatroom = () => {
         <AppSidebar {...sidebarProps} collapsed />
       </div>
 
-      <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border/50 bg-background px-3 sm:px-4">
-          <div className="md:hidden">
-            <MobileNav {...sidebarProps} />
-          </div>
-
-          <Hash size={17} strokeWidth={1.8} className="shrink-0 text-primary" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">Quiet Room</p>
-            <p className="truncate text-xs text-muted-foreground">
-              A calm shared space for conversation.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleDarkMode}
-              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setPrefsOpen(true)}
-              aria-label="Open preferences"
-            >
-              <Settings2 size={16} />
-            </Button>
-          </div>
-        </header>
+      <main className="shigo-quiet-room-atmosphere flex min-w-0 flex-1 flex-col">
+        <QuietRoomHeader
+          mobileNav={<MobileNav {...sidebarProps} />}
+          onToggleTheme={toggleDarkMode}
+          onPreferences={() => setPrefsOpen(true)}
+          darkMode={darkMode}
+          showThemeToggle
+        />
 
         <ShigoConversation
           messages={conversationMessages}
@@ -285,7 +259,7 @@ const Chatroom = () => {
           onEdit={handleEdit}
         />
 
-        <footer className="shrink-0 bg-background px-3 pb-3 pt-2 sm:px-4 sm:pb-4">
+        <footer className="shrink-0 px-3 pb-3 pt-2 sm:px-4 sm:pb-4">
           <div className={CONVERSATION_MEASURE_CLASS}>
             <MessageInput onSend={handleSend} disabled={loading} />
           </div>
