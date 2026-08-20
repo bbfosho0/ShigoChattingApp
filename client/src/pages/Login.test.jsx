@@ -1,13 +1,17 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
-import { MemoryRouter } from "react-router-dom";
 
 import Login from "./Login";
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
 
+const navigate = jest.fn();
+
 jest.mock("axios");
+jest.mock("react-router-dom", () => ({
+  useNavigate: () => navigate,
+}));
 jest.mock("react-hot-toast", () => ({
   __esModule: true,
   default: { success: jest.fn(), error: jest.fn() },
@@ -15,13 +19,11 @@ jest.mock("react-hot-toast", () => ({
 
 function renderLogin() {
   return render(
-    <MemoryRouter initialEntries={["/login"]}>
-      <ThemeContext.Provider value={{ darkMode: true, toggleDarkMode: jest.fn() }}>
-        <AuthContext.Provider value={{ user: null, setUser: jest.fn() }}>
-          <Login />
-        </AuthContext.Provider>
-      </ThemeContext.Provider>
-    </MemoryRouter>
+    <ThemeContext.Provider value={{ darkMode: true, toggleDarkMode: jest.fn() }}>
+      <AuthContext.Provider value={{ user: null, setUser: jest.fn() }}>
+        <Login />
+      </AuthContext.Provider>
+    </ThemeContext.Provider>
   );
 }
 
