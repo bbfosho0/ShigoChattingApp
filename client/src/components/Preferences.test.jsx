@@ -2,7 +2,7 @@ import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 
-import Preferences from "./Preferences";
+import Preferences, { AUTH_TOKEN_UPDATED_EVENT } from "./Preferences";
 import { SecuritySettingsPanel } from "./ui/settings-panels";
 import { ThemeContext } from "../context/ThemeContext";
 
@@ -52,9 +52,12 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-test("authenticated password change stores the replacement JWT", async () => {
+test("authenticated password change stores the replacement JWT and announces socket rotation", async () => {
   localStorage.setItem("token", "old-token");
   axios.patch.mockResolvedValueOnce({ data: { message: "Password changed.", token: "fresh-token" } });
+  const observedTokens = [];
+  const onTokenUpdated = (event) => observedTokens.push(event.detail?.token);
+  window.addEventListener(AUTH_TOKEN_UPDATED_EVENT, onTokenUpdated);
 
   render(
     <ThemeContext.Provider value={{ darkMode: true, toggleDarkMode: jest.fn() }}>
@@ -72,6 +75,8 @@ test("authenticated password change stores the replacement JWT", async () => {
     );
   });
   expect(localStorage.getItem("token")).toBe("fresh-token");
+  expect(observedTokens).toEqual(["fresh-token"]);
+  window.removeEventListener(AUTH_TOKEN_UPDATED_EVENT, onTokenUpdated);
 });
 
 test("security settings require at least eight characters", () => {
