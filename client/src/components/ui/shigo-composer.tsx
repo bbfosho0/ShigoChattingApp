@@ -106,14 +106,19 @@ export function ShigoComposer({
   const canSend = !disabled && (text.trim().length > 0 || attachments.length > 0);
 
   return (
-    <div className={cn("rounded-lg border border-border/70 bg-shigo-raised shadow-none", className)}>
+    <div
+      className={cn(
+        "rounded-lg border border-border/70 bg-shigo-raised shadow-none outline-none transition-[border-color,box-shadow] focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+        className
+      )}
+    >
       {replyingTo ? (
         <div className="flex items-center gap-3 bg-secondary/40 px-3.5 py-2.5">
           <div className="min-w-0 flex-1 border-l-2 border-primary pl-3">
             <p className="text-[11px] font-semibold text-primary">Replying</p>
             <p className="truncate text-xs text-muted-foreground">{replyingTo}</p>
           </div>
-          <Button size="icon-sm" variant="ghost" onClick={onCancelReply} aria-label="Cancel reply"><X size={14} /></Button>
+          <Button size="icon" variant="ghost" onClick={onCancelReply} aria-label="Cancel reply"><X size={14} /></Button>
         </div>
       ) : null}
 
@@ -167,7 +172,7 @@ export function ShigoComposer({
               send();
             }
           }}
-          className="max-h-32 min-h-[2.25rem] flex-1 resize-none border-0 bg-transparent px-1.5 py-2 shadow-none focus-visible:border-transparent focus-visible:shadow-none"
+          className="max-h-32 min-h-[2.25rem] flex-1 resize-none border-0 bg-transparent px-1.5 py-2 shadow-none focus:border-transparent focus:ring-0 focus:ring-offset-0 focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-none"
           aria-label="Message Quiet Room"
         />
 
