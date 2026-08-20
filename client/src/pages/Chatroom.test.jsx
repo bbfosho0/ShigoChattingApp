@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
 
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
 import Chatroom from "./Chatroom";
 
+const mockNavigate = jest.fn();
 const mockSocket = {
   on: jest.fn(),
   off: jest.fn(),
@@ -12,6 +12,10 @@ const mockSocket = {
   disconnect: jest.fn(),
   connected: false,
 };
+
+jest.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+}));
 
 jest.mock("axios", () => ({
   get: jest.fn(() => Promise.resolve({ data: [] })),
@@ -47,6 +51,7 @@ jest.mock("../components/ui/shigo-conversation", () => ({
 describe("Chatroom responsive shell", () => {
   beforeEach(() => {
     localStorage.setItem("token", "test-token");
+    mockNavigate.mockClear();
     mockSocket.on.mockClear();
     mockSocket.off.mockClear();
     mockSocket.disconnect.mockClear();
@@ -58,18 +63,16 @@ describe("Chatroom responsive shell", () => {
 
   it("keeps the compact rail through the small-desktop range and expands at xl", () => {
     render(
-      <MemoryRouter>
-        <AuthContext.Provider
-          value={{
-            user: { _id: "yoshi", username: "Yoshi", email: "yoshi@example.com" },
-            setUser: jest.fn(),
-          }}
-        >
-          <ThemeContext.Provider value={{ darkMode: true, toggleDarkMode: jest.fn() }}>
-            <Chatroom />
-          </ThemeContext.Provider>
-        </AuthContext.Provider>
-      </MemoryRouter>
+      <AuthContext.Provider
+        value={{
+          user: { _id: "yoshi", username: "Yoshi", email: "yoshi@example.com" },
+          setUser: jest.fn(),
+        }}
+      >
+        <ThemeContext.Provider value={{ darkMode: true, toggleDarkMode: jest.fn() }}>
+          <Chatroom />
+        </ThemeContext.Provider>
+      </AuthContext.Provider>
     );
 
     const expandedWrapper = screen.getByTestId("sidebar-expanded").parentElement;
