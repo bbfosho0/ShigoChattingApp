@@ -1,4 +1,15 @@
+import type { ReactNode } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+
+jest.mock("components/ui/popover", () => ({
+  Popover: ({ children }: { children: ReactNode }) => <>{children}</>,
+  PopoverTrigger: ({ children }: { children: ReactNode }) => <>{children}</>,
+  PopoverContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+}));
+
+jest.mock("components/ui/presence-avatar", () => ({
+  PresenceAvatar: ({ fallback }: { fallback: string }) => <div aria-label="Avatar">{fallback}</div>,
+}));
 
 import { ShigoConversation } from "components/ui/shigo-conversation";
 
