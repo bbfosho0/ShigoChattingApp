@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { ThemeContext } from "../context/ThemeContext";
-import { AuthShell } from "../components/ui/auth-shell";
-import { Button } from "../components/ui/button";
-import { ShigoAuthForm } from "../components/ui/shigo-auth-form";
+import { AuthShell } from "../components/ui/auth-shell.tsx";
+import { Button } from "../components/ui/button.tsx";
+import { ShigoAuthForm } from "../components/ui/shigo-auth-form.tsx";
+import { ShigoBrandArtwork } from "../components/ui/shigo-brand-artwork.tsx";
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,10 @@ const Register = () => {
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-x-hidden bg-background p-4 text-foreground sm:p-6">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 text-foreground sm:p-6">
+      <ShigoBrandArtwork imageClassName="scale-[1.03]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-background/28 backdrop-blur-[2px] dark:bg-[#090A0F]/36" />
+
       <div className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6">
         <Button
           type="button"
@@ -58,17 +62,19 @@ const Register = () => {
         </Button>
       </div>
 
-      <AuthShell>
-        <ShigoAuthForm
-          mode="register"
-          loading={loading}
-          error={authError}
-          onSubmit={handleRegister}
-          onModeChange={(mode) => {
-            if (mode === "login") navigate("/login");
-          }}
-        />
-      </AuthShell>
+      <div className="relative z-10 w-full">
+        <AuthShell>
+          <ShigoAuthForm
+            mode="register"
+            loading={loading}
+            error={authError}
+            onSubmit={handleRegister}
+            onModeChange={(mode) => {
+              if (mode === "login") navigate("/login");
+            }}
+          />
+        </AuthShell>
+      </div>
     </main>
   );
 };
