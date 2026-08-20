@@ -1,6 +1,6 @@
 import React from "react";
 import "../src/index.css";
-import { ShigoMotionProvider } from "../src/components/ui/shigo-motion-provider";
+import { ShigoMotionProvider } from "../src/components/ui/shigo-motion-provider.tsx";
 
 const preview = {
   decorators: [
