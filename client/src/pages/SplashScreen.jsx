@@ -56,16 +56,7 @@ const SplashScreen = () => {
 
   return (
     <main className="fixed inset-0 overflow-hidden bg-[#090A0F]" aria-label="Splash screen">
-      <ShigoSplash showAction={false} />
-      <div className="pointer-events-none absolute bottom-8 left-1/2 z-20 w-36 -translate-x-1/2 sm:bottom-10">
-        <div className="h-0.5 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full rounded-full bg-white/65 transition-[width] duration-75 ease-linear motion-reduce:transition-none"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="mt-2 text-center text-[10px] uppercase tracking-[0.14em] text-white/30">Opening Quiet Room</p>
-      </div>
+      <ShigoSplash showAction={false} progress={progress} />
     </main>
   );
 };
