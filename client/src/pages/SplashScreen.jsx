@@ -11,6 +11,24 @@ const SplashScreen = () => {
   const navigationTimerRef = useRef(null);
 
   useEffect(() => {
+    const destination = user ? "/chat" : "/login";
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    if (reducedMotion) {
+      setProgress(100);
+      navigationTimerRef.current = window.setTimeout(
+        () => navigate(destination, { replace: true }),
+        500
+      );
+
+      return () => {
+        if (navigationTimerRef.current) {
+          window.clearTimeout(navigationTimerRef.current);
+          navigationTimerRef.current = null;
+        }
+      };
+    }
+
     let currentProgress = 0;
     setProgress(0);
 
@@ -21,7 +39,7 @@ const SplashScreen = () => {
       if (currentProgress >= 100) {
         window.clearInterval(intervalId);
         navigationTimerRef.current = window.setTimeout(
-          () => navigate(user ? "/chat" : "/login", { replace: true }),
+          () => navigate(destination, { replace: true }),
           400
         );
       }
@@ -42,7 +60,7 @@ const SplashScreen = () => {
       <div className="pointer-events-none absolute bottom-8 left-1/2 z-20 w-36 -translate-x-1/2 sm:bottom-10">
         <div className="h-0.5 overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-white/65 transition-[width] duration-75 ease-linear"
+            className="h-full rounded-full bg-white/65 transition-[width] duration-75 ease-linear motion-reduce:transition-none"
             style={{ width: `${progress}%` }}
           />
         </div>

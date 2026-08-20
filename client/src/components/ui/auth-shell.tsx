@@ -12,13 +12,13 @@ export interface AuthShellProps {
 
 export function AuthShell({ children, visual, compact = false, className }: AuthShellProps) {
   if (compact) {
-    return <div className={cn("mx-auto w-full max-w-md rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-dialog sm:p-8", className)}>{children}</div>;
+    return <div className={cn("mx-auto w-full max-w-md rounded-xl border border-border/70 bg-card p-6 text-card-foreground shadow-floating sm:p-8", className)}>{children}</div>;
   }
 
   return (
-    <div className={cn("grid w-full max-w-5xl overflow-hidden rounded-2xl border border-border bg-card shadow-dialog lg:grid-cols-[1.05fr_0.95fr]", className)}>
+    <div className={cn("grid w-full max-w-6xl overflow-hidden bg-card text-card-foreground sm:rounded-xl sm:border sm:border-border/70 sm:shadow-dialog lg:grid-cols-[1.08fr_0.92fr]", className)}>
       <div className="hidden lg:block">{visual ?? <AuthShaderPane />}</div>
-      <div className="flex min-h-[34rem] items-center justify-center p-6 sm:p-10">
+      <div className="flex min-h-[34rem] items-center justify-center px-5 py-8 sm:p-10 lg:min-h-[38rem] lg:p-12">
         <div className="w-full max-w-sm">{children}</div>
       </div>
     </div>
