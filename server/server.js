@@ -11,7 +11,7 @@ const dotenv = require("dotenv");
 const http = require("http");
 const { Server } = require("socket.io");
 
-const authRoutes = require("./routes/auth");
+const authModule = require("./routes/auth");
 const messageRoutes = require("./routes/messages");
 const Message = require("./models/Message");
 const { verifyAuthTokenAgainstUser } = require("./lib/authTokens");
@@ -68,6 +68,10 @@ io.use(async (socket, next) => {
   }
 });
 
+function disconnectUserSockets(userId) {
+  io.in(`user:${String(userId)}`).disconnectSockets(true);
+}
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
@@ -87,10 +91,16 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
+app.use(
+  "/api/auth",
+  authModule.createAuthRouter({
+    disconnectUserSockets,
+  })
+);
 app.use("/api/messages", messageRoutes);
 
 io.on("connection", (socket) => {
+  socket.join(`user:${String(socket.user._id)}`);
   console.log("User connected:", socket.id, "UserId:", socket.user._id);
 
   function extractSenderId(sender) {
