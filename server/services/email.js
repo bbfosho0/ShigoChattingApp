@@ -10,10 +10,13 @@ function requiredEnv(env, name) {
 }
 
 function buildSmtpConfig(env = process.env) {
+  const secure = String(env.SMTP_SECURE).toLowerCase() === "true";
+
   return {
     host: requiredEnv(env, "SMTP_HOST"),
     port: Number(requiredEnv(env, "SMTP_PORT")),
-    secure: String(env.SMTP_SECURE).toLowerCase() === "true",
+    secure,
+    requireTLS: !secure,
     auth: {
       user: requiredEnv(env, "SMTP_USER"),
       pass: requiredEnv(env, "SMTP_PASS"),
