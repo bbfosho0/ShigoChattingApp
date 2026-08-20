@@ -6,15 +6,16 @@ import toast from "react-hot-toast";
 
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
-import { AuthShell } from "../components/ui/auth-shell";
-import { Button } from "../components/ui/button";
-import { ShigoAuthForm } from "../components/ui/shigo-auth-form";
+import { AuthShell } from "../components/ui/auth-shell.tsx";
+import { Button } from "../components/ui/button.tsx";
+import { ShigoAuthForm } from "../components/ui/shigo-auth-form.tsx";
+import { ShigoBrandArtwork } from "../components/ui/shigo-brand-artwork.tsx";
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
-  const [authError, setAuthError] = useState("");
   const { setUser } = useContext(AuthContext);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
+  const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async ({ email, password }) => {
@@ -28,13 +29,12 @@ const Login = () => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setUser(res.data.user);
-      toast.success("Welcome back");
       navigate("/chat");
     } catch (err) {
       const message =
         err.response?.data?.message ||
         err.response?.data?.errors?.[0]?.msg ||
-        "Invalid credentials";
+        "Login failed. Check your email and password.";
       setAuthError(message);
       toast.error(message);
     } finally {
@@ -43,7 +43,10 @@ const Login = () => {
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-x-hidden bg-background p-4 text-foreground sm:p-6">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 text-foreground sm:p-6">
+      <ShigoBrandArtwork imageClassName="scale-[1.03]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-background/28 backdrop-blur-[2px] dark:bg-[#090A0F]/36" />
+
       <div className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6">
         <Button
           type="button"
@@ -57,18 +60,20 @@ const Login = () => {
         </Button>
       </div>
 
-      <AuthShell>
-        <ShigoAuthForm
-          mode="login"
-          loading={loading}
-          error={authError}
-          showForgotPassword={false}
-          onSubmit={handleLogin}
-          onModeChange={(mode) => {
-            if (mode === "register") navigate("/register");
-          }}
-        />
-      </AuthShell>
+      <div className="relative z-10 w-full">
+        <AuthShell>
+          <ShigoAuthForm
+            mode="login"
+            loading={loading}
+            error={authError}
+            onSubmit={handleLogin}
+            showForgotPassword={false}
+            onModeChange={(mode) => {
+              if (mode === "register") navigate("/register");
+            }}
+          />
+        </AuthShell>
+      </div>
     </main>
   );
 };
