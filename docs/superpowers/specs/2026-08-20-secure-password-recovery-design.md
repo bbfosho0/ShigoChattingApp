@@ -31,19 +31,21 @@ The authenticated JWT currently contains the user id only, so changing a passwor
 The implementation will follow these rules:
 
 1. Password-reset requests return the same response whether or not an account exists.
-2. Reset tokens are opaque random values generated with Node's cryptographically secure `crypto` APIs.
-3. Only a SHA-256 hash of a reset token is stored in MongoDB. The raw token exists only in the reset URL sent to the user.
-4. Tokens are linked to one user, expire after 30 minutes, and are single use.
-5. A new reset request invalidates that user's previous outstanding reset tokens.
-6. Recovery endpoints are rate limited.
-7. Reset URLs are built only from the configured trusted client origin, never from the incoming `Host` header.
-8. Password reset requires a new password and confirmation in the client. The server enforces the same minimum password policy independently.
-9. Successful recovery does not automatically log the user in.
-10. Successful recovery invalidates all previously issued authentication tokens.
-11. Existing authenticated password changes also revoke previous sessions while returning a fresh token to the current session so the person changing their password is not unexpectedly logged out.
-12. Email content never contains a password.
-13. The reset page removes the raw token from the visible URL/history as soon as the client has captured it in memory.
-14. Recovery remains usable with reduced motion and keyboard-only navigation.
+2. Public response timing is deliberately normalized so a missing account does not return through a visibly faster path.
+3. Reset tokens are opaque random values generated with Node's cryptographically secure `crypto` APIs.
+4. Only a SHA-256 hash of a reset token is stored in MongoDB. The raw token exists only in the reset URL sent to the user.
+5. Tokens are linked to one user, expire after 30 minutes, and are single use.
+6. A new reset request invalidates that user's previous outstanding reset tokens.
+7. Recovery endpoints are rate limited.
+8. Reset URLs are built only from the configured trusted client origin, never from the incoming `Host` header.
+9. Password reset requires a new password and confirmation in the client. The server enforces the same minimum password policy independently.
+10. Successful recovery does not automatically log the user in.
+11. Successful recovery invalidates all previously issued authentication tokens.
+12. Existing authenticated password changes also revoke previous sessions while returning a fresh token to the current session so the person changing their password is not unexpectedly logged out.
+13. Email content never contains a password.
+14. The reset page removes the raw token from the visible URL/history as soon as the client has captured it in memory.
+15. The application uses a `no-referrer` policy so reset-token URLs are not leaked through browser referrer headers.
+16. Recovery remains usable with reduced motion and keyboard-only navigation.
 
 ## 4. Chosen architecture
 
@@ -55,10 +57,10 @@ Fields:
 
 ```text
 userId      ObjectId, required, indexed
- tokenHash   String, required, unique
- expiresAt   Date, required, TTL indexed
- consumedAt  Date, nullable
- createdAt   Date
+tokenHash   String, required, unique
+expiresAt   Date, required, TTL indexed
+consumedAt  Date, nullable
+createdAt   Date
 ```
 
 A reset request generates 32 random bytes and encodes them as hex. The raw token is sent in the email. `sha256(rawToken)` is stored in MongoDB.
@@ -113,12 +115,14 @@ Behavior:
 1. Validate and trim email.
 2. Apply IP and normalized-email request rate limits.
 3. Search for the account.
-4. If found:
+4. Generate and hash random-token material on both found and not-found paths so the missing-account path does not skip the security work entirely.
+5. If an account is found:
    - delete or invalidate previous outstanding reset tokens for the user
    - create a fresh token record
    - construct a trusted `CLIENT_URL/reset-password?token=...` URL
-   - dispatch the reset email
-5. Return the same neutral response for existent and non-existent accounts:
+   - schedule reset-email delivery after the neutral public response has been committed
+6. Hold the public response until a small minimum response duration has elapsed so missing accounts do not return through an obviously faster path.
+7. Return the same neutral response for existent and non-existent accounts:
 
 ```json
 {
@@ -126,7 +130,7 @@ Behavior:
 }
 ```
 
-The public response must not reveal whether an account exists.
+Email-delivery failures are logged server-side and never change this public response. This keeps delivery-provider latency and account existence out of the request timing channel. A future multi-instance/high-volume deployment can replace the post-response dispatch with a durable shared job queue without changing the route contract.
 
 ### 4.4 Reset endpoint
 
@@ -165,7 +169,7 @@ Add to `User`:
 authVersion: Number, default 0
 ```
 
-Every new login/register JWT includes:
+Every new login/register JWT includes the user's current authentication version:
 
 ```json
 {
@@ -201,17 +205,20 @@ This does not attempt a larger password-policy redesign.
 
 Add `express-rate-limit` to the server.
 
-Recovery request protections:
+Initial recovery request limits:
 
-- per-IP limiter
-- per-normalized-email limiter
+- per IP: 10 requests per 15 minutes
+- per normalized email identifier: 3 requests per 15 minutes
 
-Reset submission protections:
+Initial reset submission limit:
 
-- per-IP limiter
-- cryptographically strong token itself remains the primary authorization secret
+- per IP: 10 attempts per 15 minutes
+
+The cryptographically strong reset token remains the primary authorization secret.
 
 Use modern `RateLimit-*` response headers and disable legacy `X-RateLimit-*` headers.
+
+The current deployment is effectively single-instance, so the default in-memory limiter store is sufficient for this scope. If ShigoChat later runs multiple API instances, the limiter store must move to a shared backend so limits cannot be bypassed across instances.
 
 Because Render sits behind a reverse proxy, proxy trust must be explicit rather than guessed. Add a deployment variable such as:
 
@@ -257,6 +264,8 @@ On mount the page:
 1. reads `token`
 2. stores it in component memory only
 3. immediately replaces browser history with `/reset-password`, removing the secret from the visible URL
+
+The client application also declares a `no-referrer` policy in its document metadata so the original token-bearing navigation cannot be leaked as a referrer to unrelated destinations.
 
 The form includes:
 
@@ -338,6 +347,7 @@ client/src/pages/Login.jsx
 client/src/components/ui/shigo-auth-form.tsx
 client/src/App.jsx
 client/src/components/Preferences.jsx
+client/public/index.html
 ```
 
 Storybook should gain canonical recovery request/reset states rather than mixing them into generic reference stories.
@@ -362,6 +372,7 @@ Required cases:
 - rate limiter is mounted on recovery endpoints
 - reset URL uses configured `CLIENT_URL`, not request Host
 - email failure does not expose whether the account exists
+- missing-account and existing-account requests both pass through the response-normalization path
 
 Use dependency boundaries so tests do not require sending real email.
 
@@ -373,6 +384,7 @@ Required cases:
 - forgot submission sends only email
 - neutral success UI
 - reset route captures token then removes it from browser URL/history
+- document referrer policy is `no-referrer`
 - password confirmation mismatch blocks submit
 - invalid/expired token state renders correctly
 - successful reset directs the user back to normal sign-in
@@ -409,6 +421,8 @@ CLIENT_URL=https://shigochat.onrender.com
 TRUST_PROXY=1
 ```
 
+For common SMTP ports, port 465 normally uses `SMTP_SECURE=true`; port 587 normally starts unencrypted and upgrades with STARTTLS, so `SMTP_SECURE=false`.
+
 No SMTP password, API key, reset token, or other secret belongs in git.
 
 ## 11. Explicit non-goals
@@ -428,10 +442,10 @@ This feature does not include:
 
 The feature is complete when:
 
-1. A registered user can request a recovery email without the public API revealing whether the email exists.
+1. A registered user can request a recovery email without the public API revealing whether the email exists through response content or an obvious fast-path timing difference.
 2. A configured SMTP provider receives and delivers an opaque, expiring reset link.
 3. The link opens a Shigo-branded reset screen.
-4. The raw reset token is removed from visible browser history after capture.
+4. The raw reset token is removed from visible browser history after capture and is protected by a no-referrer policy.
 5. A valid token can change the password exactly once within 30 minutes.
 6. Expired, invalid, and consumed tokens cannot change credentials.
 7. A reset invalidates all older JWTs and requires normal login afterward.
