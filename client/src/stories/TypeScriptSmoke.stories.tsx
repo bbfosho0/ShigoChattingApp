@@ -16,7 +16,7 @@ function TypeScriptSmoke({ label }: TypeScriptSmokeProps) {
 }
 
 const meta = {
-  title: "Baseline/TypeScript",
+  title: "Internal/Baseline/TypeScript",
   component: TypeScriptSmoke,
   args: {
     label: "TSX is compiling"
