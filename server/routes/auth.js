@@ -117,6 +117,7 @@ function createAuthRouter(overrides = {}) {
     forgotPasswordEmailLimiter,
     resetPasswordIpLimiter,
     verifyTokenMiddleware: verifyToken,
+    disconnectUserSockets: async () => {},
     minimumForgotDurationMs: DEFAULT_FORGOT_MIN_DURATION_MS,
     defer: setImmediate,
     env: process.env,
@@ -266,6 +267,7 @@ function createAuthRouter(overrides = {}) {
         user.authVersion = Number(user.authVersion || 0) + 1;
         await user.save();
         await deps.invalidatePasswordResetTokens(user._id);
+        await deps.disconnectUserSockets(user._id);
 
         schedule("Password changed email failed", () =>
           deps.sendPasswordChangedEmail(deps.normalizeEmail(user.email))
@@ -299,6 +301,7 @@ function createAuthRouter(overrides = {}) {
         user.authVersion = Number(user.authVersion || 0) + 1;
         await user.save();
         await deps.invalidatePasswordResetTokens(user._id);
+        await deps.disconnectUserSockets(user._id);
 
         const token = deps.signAuthToken(user);
 
