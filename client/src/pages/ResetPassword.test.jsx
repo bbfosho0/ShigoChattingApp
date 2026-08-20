@@ -15,6 +15,12 @@ jest.mock("react-hot-toast", () => ({
   __esModule: true,
   default: { success: jest.fn(), error: jest.fn() },
 }));
+jest.mock("../components/ui/auth-shell.tsx", () => ({
+  AuthShell: ({ children }) => <div>{children}</div>,
+}));
+jest.mock("../components/ui/shigo-brand-artwork.tsx", () => ({
+  ShigoBrandArtwork: () => null,
+}));
 
 function renderReset(entry = "/reset-password?token=secret-reset-token") {
   window.history.replaceState({}, "", entry);
@@ -62,14 +68,14 @@ test("submits only the in-memory token and confirmed new password without auto-l
     );
   });
 
-  expect(screen.getByText(/password reset/i)).toBeInTheDocument();
+  expect(await screen.findByText(/password reset/i)).toBeInTheDocument();
   expect(localStorage.getItem("token")).toBeNull();
   expect(localStorage.getItem("user")).toBeNull();
 });
 
 test("missing or rejected tokens render the same invalid recovery state", async () => {
   const { unmount } = renderReset("/reset-password");
-  expect(screen.getByText(/invalid or has expired/i)).toBeInTheDocument();
+  expect(await screen.findByText(/invalid or has expired/i)).toBeInTheDocument();
   unmount();
 
   axios.post.mockRejectedValueOnce({ response: { status: 400 } });
@@ -78,5 +84,5 @@ test("missing or rejected tokens render the same invalid recovery state", async 
   fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: "new-password-123" } });
   fireEvent.click(screen.getByRole("button", { name: /reset password/i }));
 
-  await waitFor(() => expect(screen.getByText(/invalid or has expired/i)).toBeInTheDocument());
+  expect(await screen.findByText(/invalid or has expired/i)).toBeInTheDocument();
 });
