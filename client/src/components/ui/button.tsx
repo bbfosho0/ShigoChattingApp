@@ -43,7 +43,20 @@ const buttonVariants = cva(
   }
 );
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+type MotionReservedButtonEvents =
+  | "onAnimationStart"
+  | "onAnimationEnd"
+  | "onAnimationIteration"
+  | "onDrag"
+  | "onDragStart"
+  | "onDragEnd";
+
+type NativeButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  MotionReservedButtonEvents
+>;
+
+interface ButtonProps extends NativeButtonProps, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
   leadingIcon?: LucideIcon;
