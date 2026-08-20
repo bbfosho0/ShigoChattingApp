@@ -10,4 +10,13 @@ describe("Chatroom responsive shell", () => {
     expect(source).not.toContain('className="hidden h-full lg:block"');
     expect(source).not.toContain('className="hidden h-full md:block lg:hidden"');
   });
+
+  it("reconnects Socket.IO with a replacement JWT after an authenticated password change", () => {
+    const source = fs.readFileSync(path.join(__dirname, "Chatroom.jsx"), "utf8");
+
+    expect(source).toContain("AUTH_TOKEN_UPDATED_EVENT");
+    expect(source).toContain("socket.auth = { token: nextToken }");
+    expect(source).toContain("socket.connect()");
+    expect(source).toContain("window.removeEventListener(AUTH_TOKEN_UPDATED_EVENT, onAuthTokenUpdated)");
+  });
 });
