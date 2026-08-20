@@ -56,7 +56,7 @@ jobs:
         working-directory: client
         run: |
           python3 -m http.server 6006 --bind 127.0.0.1 --directory storybook-static > visual-audit/storybook-server.log 2>&1 &
-          echo $! > visual-audit/storybook-server.pid
+          echo $! > /tmp/shigo-storybook-server.pid
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:6006/index.json > /dev/null; then
               exit 0
@@ -70,13 +70,15 @@ jobs:
         working-directory: client
         env:
           STORYBOOK_URL: http://127.0.0.1:6006
+          VISUAL_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          VISUAL_REF: ${{ github.head_ref || github.ref_name }}
         run: node scripts/capture-visual-audit.mjs
 
       - name: Upload visual evidence artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: shigo-visual-audit-${{ github.sha }}
+          name: shigo-visual-audit-${{ github.event.pull_request.head.sha || github.sha }}
           path: client/visual-audit/
           if-no-files-found: error
           retention-days: 30
