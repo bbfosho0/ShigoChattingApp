@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import PricingTable from "components/ui/pricing-table";
 
 const meta = {
-  title: "Components/PricingTable",
+  title: "Reference/PricingTable",
   component: PricingTable,
   parameters: {
     layout: "fullscreen",
