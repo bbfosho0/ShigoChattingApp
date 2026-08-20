@@ -19,6 +19,15 @@ const { verifyAuthTokenAgainstUser } = require("./lib/authTokens");
 dotenv.config();
 
 const app = express();
+
+if (process.env.TRUST_PROXY) {
+  const parsed = Number(process.env.TRUST_PROXY);
+  app.set(
+    "trust proxy",
+    Number.isFinite(parsed) ? parsed : process.env.TRUST_PROXY
+  );
+}
+
 const server = http.createServer(app);
 
 const allowedOrigins = ["http://localhost:3000"];
