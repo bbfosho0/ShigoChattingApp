@@ -1,5 +1,6 @@
-import { Fragment, useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { CONVERSATION_MEASURE_CLASS } from "components/ui/conversation-measure";
 import { ShigoMessage, type MessageGroupPosition, type ShigoMessageData } from "components/ui/shigo-message";
@@ -101,11 +102,50 @@ export function ShigoConversation({
     const element = scrollRef.current;
     if (!element) return;
     const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    element.scrollTo({
-      top: element.scrollHeight,
-      behavior: reducedMotion ? "auto" : "smooth",
-    });
+    element.scrollTo({ top: element.scrollHeight, behavior: reducedMotion ? "auto" : "smooth" });
   }, [autoScroll, loading, messages.length]);
+
+  const messageNodes: ReactNode[] = [];
+  messages.forEach((message, index) => {
+    const previous = messages[index - 1];
+    const showDayLabel = showDaySeparators && (!previous || !sameDay(previous, message));
+    const position = groupPosition(messages, index);
+    const groupStart = position === "single" || position === "start";
+    const date = messageTime(message.createdAt);
+
+    if (showDayLabel && date) {
+      messageNodes.push(
+        <motion.div
+          key={`day-${message.id}`}
+          className={cn("mb-4 flex items-center gap-3", index > 0 && "mt-6")}
+          role="separator"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="h-px flex-1 bg-border/60" />
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {date.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
+          </span>
+          <div className="h-px flex-1 bg-border/60" />
+        </motion.div>
+      );
+    }
+
+    messageNodes.push(
+      <ShigoMessage
+        key={message.id}
+        message={message}
+        currentUserId={currentUserId}
+        groupPosition={position}
+        className={cn(!showDayLabel && groupStart && index > 0 && "mt-4", !groupStart && "mt-1.5")}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onReply={onReply}
+        onReact={onReact}
+      />
+    );
+  });
 
   return (
     <div
@@ -124,40 +164,9 @@ export function ShigoConversation({
         <ConversationEmpty />
       ) : (
         <div className={cn(CONVERSATION_MEASURE_CLASS, "flex min-h-full flex-col justify-end px-4 py-5 sm:px-6")}>
-          {messages.map((message, index) => {
-            const previous = messages[index - 1];
-            const showDayLabel = showDaySeparators && (!previous || !sameDay(previous, message));
-            const position = groupPosition(messages, index);
-            const groupStart = position === "single" || position === "start";
-            const date = messageTime(message.createdAt);
-
-            return (
-              <Fragment key={message.id}>
-                {showDayLabel && date ? (
-                  <div className={cn("mb-4 flex items-center gap-3", index > 0 && "mt-6")} role="separator">
-                    <div className="h-px flex-1 bg-border/60" />
-                    <span className="text-[11px] font-medium text-muted-foreground">
-                      {date.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
-                    </span>
-                    <div className="h-px flex-1 bg-border/60" />
-                  </div>
-                ) : null}
-                <ShigoMessage
-                  message={message}
-                  currentUserId={currentUserId}
-                  groupPosition={position}
-                  className={cn(
-                    !showDayLabel && groupStart && index > 0 && "mt-4",
-                    !groupStart && "mt-1.5"
-                  )}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  onReply={onReply}
-                  onReact={onReact}
-                />
-              </Fragment>
-            );
-          })}
+          <AnimatePresence initial={false} mode="popLayout">
+            {messageNodes}
+          </AnimatePresence>
         </div>
       )}
     </div>

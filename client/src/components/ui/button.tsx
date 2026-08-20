@@ -4,8 +4,10 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
+import { motion } from "motion/react";
 
 import { cn } from "lib/utils";
+import { shigoHoverLift, shigoPress, shigoSpringSnappy } from "lib/shigo-motion";
 
 const buttonVariants = cva(
   [
@@ -18,20 +20,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80",
-        primary:
-          "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80",
-        secondary:
-          "bg-accent text-foreground hover:bg-accent/80 active:bg-accent",
-        tertiary:
-          "border border-border bg-transparent text-foreground hover:bg-muted active:bg-muted/60",
-        outline:
-          "border border-border bg-transparent text-foreground hover:bg-muted active:bg-muted/60",
-        ghost:
-          "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground active:bg-muted/60",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80",
+        primary: "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80",
+        secondary: "bg-accent text-foreground hover:bg-accent/80 active:bg-accent",
+        tertiary: "border border-border bg-transparent text-foreground hover:bg-muted active:bg-muted/60",
+        outline: "border border-border bg-transparent text-foreground hover:bg-muted active:bg-muted/60",
+        ghost: "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground active:bg-muted/60",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -44,16 +39,11 @@ const buttonVariants = cva(
         "icon-lg": "size-10 rounded-full p-0 [&_svg]:size-5",
       },
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
+    defaultVariants: { variant: "default", size: "default" },
   }
 );
 
-interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
   leadingIcon?: LucideIcon;
@@ -82,8 +72,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const isIconOnly =
-      size === "icon" || size === "icon-sm" || size === "icon-lg";
+    const isIconOnly = size === "icon" || size === "icon-sm" || size === "icon-lg";
     const iconSize = size === "sm" ? 14 : size === "lg" ? 20 : 16;
     const classes = cn(buttonVariants({ variant, size }), className);
 
@@ -108,9 +97,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         strokeWidth={1.5}
         className="transition-[stroke-width] duration-75 group-hover:[stroke-width:2]"
       />
-    ) : (
-      leftIcon
-    );
+    ) : leftIcon;
 
     const trailingContent = TrailingIcon ? (
       <TrailingIcon
@@ -119,35 +106,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         strokeWidth={1.5}
         className="transition-[stroke-width] duration-75 group-hover:[stroke-width:2]"
       />
-    ) : (
-      rightIcon
-    );
+    ) : rightIcon;
 
     return (
-      <button
+      <motion.button
         ref={ref}
         className={classes}
         disabled={disabled || loading}
         aria-busy={loading || undefined}
+        whileHover={disabled || loading ? undefined : shigoHoverLift}
+        whileTap={disabled || loading ? undefined : shigoPress}
+        transition={shigoSpringSnappy}
         {...props}
       >
         {loading ? (
           <>
-            <span
-              aria-hidden="true"
-              className="flex items-center justify-center gap-[inherit] opacity-0"
-            >
+            <span aria-hidden="true" className="flex items-center justify-center gap-[inherit] opacity-0">
               {!isIconOnly ? leadingContent : null}
               {children}
               {!isIconOnly ? trailingContent : null}
             </span>
             <span className="absolute inset-0 flex items-center justify-center">
-              <svg
-                aria-hidden="true"
-                className="size-8"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
+              <svg aria-hidden="true" className="size-8" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M 12 12 C 14 8.5 19 8.5 19 12 C 19 15.5 14 15.5 12 12 C 10 8.5 5 8.5 5 12 C 5 15.5 10 15.5 12 12 Z"
                   stroke="currentColor"
@@ -170,7 +150,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {trailingContent}
           </>
         )}
-      </button>
+      </motion.button>
     );
   }
 );

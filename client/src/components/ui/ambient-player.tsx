@@ -1,8 +1,10 @@
 import { Pause, Play, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 
 import { Button } from "components/ui/button";
 import { Slider } from "components/ui/slider";
 import { cn } from "lib/utils";
+import { shigoSpringSoft } from "lib/shigo-motion";
 
 export interface AmbientPlayerProps {
   trackName?: string;
@@ -37,6 +39,8 @@ export function AmbientPlayer({
 }: AmbientPlayerProps) {
   const normalizedProgress = Math.min(100, Math.max(0, progress));
   const normalizedVolume = Math.min(100, Math.max(0, volume));
+  const reducedMotion = useReducedMotion();
+  const animateBars = playing && !reducedMotion;
 
   if (compact) {
     return (
@@ -49,10 +53,15 @@ export function AmbientPlayer({
             <p className="truncate text-[13px] font-medium text-foreground">{trackName}</p>
             <p className="truncate text-[11px] text-muted-foreground">{subtitle}</p>
           </div>
-          <span className={cn("size-2 rounded-full", playing ? "bg-shigo-signal" : "bg-shigo-presence-offline")} aria-label={playing ? "Playing" : "Paused"} />
+          <motion.span
+            className={cn("size-2 rounded-full", playing ? "bg-shigo-signal" : "bg-shigo-presence-offline")}
+            aria-label={playing ? "Playing" : "Paused"}
+            animate={playing && !reducedMotion ? { opacity: [0.55, 1, 0.55] } : { opacity: 1 }}
+            transition={playing && !reducedMotion ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" } : shigoSpringSoft}
+          />
         </div>
         <div className="mt-3 h-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-          <div className="h-full rounded-full bg-shigo-ambient" style={{ width: `${normalizedProgress}%` }} />
+          <motion.div className="h-full rounded-full bg-shigo-ambient" initial={false} animate={{ width: `${normalizedProgress}%` }} transition={shigoSpringSoft} />
         </div>
       </div>
     );
@@ -73,10 +82,13 @@ export function AmbientPlayer({
 
       <div className="mt-6 flex h-10 items-end gap-1" aria-hidden="true">
         {bars.map((height, index) => (
-          <span
+          <motion.span
+            data-shigo-spectrum-bar
             key={`${height}-${index}`}
-            className={cn("min-w-0 flex-1 rounded-full", index / bars.length <= normalizedProgress / 100 ? "bg-shigo-ambient" : "bg-muted")}
+            className={cn("min-w-0 flex-1 origin-bottom rounded-full", index / bars.length <= normalizedProgress / 100 ? "bg-shigo-ambient" : "bg-muted")}
             style={{ height: `${height}px` }}
+            animate={animateBars ? { scaleY: [0.72, 1, 0.82], opacity: [0.72, 1, 0.78] } : { scaleY: 1, opacity: 1 }}
+            transition={animateBars ? { duration: 0.85 + (index % 5) * 0.11, delay: (index % 4) * 0.035, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" } : shigoSpringSoft}
           />
         ))}
       </div>

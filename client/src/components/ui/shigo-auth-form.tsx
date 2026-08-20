@@ -1,9 +1,11 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Mail, UserRound } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
+import { shigoEnter, shigoSpringSoft } from "lib/shigo-motion";
 
 export type AuthMode = "login" | "register" | "forgot";
 
@@ -76,8 +78,15 @@ export function ShigoAuthForm({
   const disabled = loading || !email.trim() || (mode === "register" && !username.trim()) || !passwordValid;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-7">
-      <div>
+    <motion.form
+      onSubmit={handleSubmit}
+      className="space-y-7"
+      initial="hidden"
+      animate="visible"
+      variants={shigoEnter}
+      transition={shigoSpringSoft}
+    >
+      <motion.div layout="position" transition={shigoSpringSoft}>
         <div className="mb-8 flex items-center gap-2.5 lg:hidden">
           <div className="relative flex size-8 items-center justify-center overflow-hidden rounded-md bg-foreground text-xs font-bold text-background ring-1 ring-inset ring-primary/20">
             S
@@ -85,25 +94,57 @@ export function ShigoAuthForm({
           </div>
           <div><p className="text-sm font-semibold tracking-[-0.01em]">ShigoChat</p><p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Shigo Midnight</p></div>
         </div>
-        <h1 className="text-[2rem] font-semibold leading-tight tracking-[-0.035em] text-foreground sm:text-[2.15rem]">{current.title}</h1>
-        <p className="mt-2.5 text-sm leading-6 text-muted-foreground">{current.description}</p>
-      </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`auth-copy-${mode}`}
+            initial={{ opacity: 0, y: 7 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={shigoSpringSoft}
+          >
+            <h1 className="text-[2rem] font-semibold leading-tight tracking-[-0.035em] text-foreground sm:text-[2.15rem]">{current.title}</h1>
+            <p className="mt-2.5 text-sm leading-6 text-muted-foreground">{current.description}</p>
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
 
-      {error ? <div role="alert" className="border-l-2 border-destructive/70 bg-destructive/[0.045] px-3 py-2.5 text-sm text-destructive">{error}</div> : null}
+      <AnimatePresence initial={false}>
+        {error ? (
+          <motion.div
+            key="auth-error"
+            role="alert"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="border-l-2 border-destructive/70 bg-destructive/[0.045] px-3 py-2.5 text-sm text-destructive"
+          >
+            {error}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
-      <div className="space-y-4">
-        {mode === "register" ? (
-          <div className="space-y-2"><Label htmlFor={`auth-${mode}-username`}>Display name</Label><Input id={`auth-${mode}-username`} value={username} onChange={(event) => setUsername(event.target.value)} leftIcon={<UserRound />} autoComplete="username" disabled={loading} required /></div>
-        ) : null}
-        <div className="space-y-2"><Label htmlFor={`auth-${mode}-email`}>Email</Label><Input id={`auth-${mode}-email`} value={email} onChange={(event) => setEmail(event.target.value)} type="email" leftIcon={<Mail />} autoComplete="email" disabled={loading} required /></div>
-        {mode !== "forgot" ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between"><Label htmlFor={`auth-${mode}-password`}>Password</Label>{mode === "login" && showForgotPassword ? <button type="button" onClick={() => onModeChange?.("forgot")} className={`${authTextActionClass} text-xs`}>Forgot password?</button> : null}</div>
-            <Input id={`auth-${mode}-password`} value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={mode === "register" ? 8 : undefined} autoComplete={mode === "login" ? "current-password" : "new-password"} disabled={loading} required />
-            {mode === "register" ? <p className="text-[11px] leading-5 text-muted-foreground">Use at least 8 characters. The production API remains responsible for final validation.</p> : null}
-          </div>
-        ) : null}
-      </div>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={`auth-fields-${mode}`}
+          className="space-y-4"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={shigoSpringSoft}
+        >
+          {mode === "register" ? (
+            <div className="space-y-2"><Label htmlFor={`auth-${mode}-username`}>Display name</Label><Input id={`auth-${mode}-username`} value={username} onChange={(event) => setUsername(event.target.value)} leftIcon={<UserRound />} autoComplete="username" disabled={loading} required /></div>
+          ) : null}
+          <div className="space-y-2"><Label htmlFor={`auth-${mode}-email`}>Email</Label><Input id={`auth-${mode}-email`} value={email} onChange={(event) => setEmail(event.target.value)} type="email" leftIcon={<Mail />} autoComplete="email" disabled={loading} required /></div>
+          {mode !== "forgot" ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between"><Label htmlFor={`auth-${mode}-password`}>Password</Label>{mode === "login" && showForgotPassword ? <button type="button" onClick={() => onModeChange?.("forgot")} className={`${authTextActionClass} text-xs`}>Forgot password?</button> : null}</div>
+              <Input id={`auth-${mode}-password`} value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={mode === "register" ? 8 : undefined} autoComplete={mode === "login" ? "current-password" : "new-password"} disabled={loading} required />
+              {mode === "register" ? <p className="text-[11px] leading-5 text-muted-foreground">Use at least 8 characters. The production API remains responsible for final validation.</p> : null}
+            </div>
+          ) : null}
+        </motion.div>
+      </AnimatePresence>
 
       <Button type="submit" className="w-full shadow-[0_0_18px_hsl(var(--primary)/0.08)]" loading={loading} disabled={disabled}>{current.submit}</Button>
 
@@ -112,6 +153,6 @@ export function ShigoAuthForm({
         {mode === "register" ? <>Already have an account? <button type="button" onClick={() => onModeChange?.("login")} className={authTextActionClass}>Sign in</button></> : null}
         {mode === "forgot" ? <button type="button" onClick={() => onModeChange?.("login")} className={authTextActionClass}>Back to sign in</button> : null}
       </div>
-    </form>
+    </motion.form>
   );
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Hash, Music2, PanelLeftClose, PanelLeftOpen, Settings2 } from "lucide-react";
+import { motion } from "motion/react";
 
 import { ProfileMenu } from "components/ui/profile-menu";
 import {
@@ -9,6 +10,7 @@ import {
   TooltipTrigger,
 } from "components/ui/tooltip";
 import { cn } from "lib/utils";
+import { shigoAmbient, shigoSpringSoft } from "lib/shigo-motion";
 
 export interface AppSidebarProps {
   collapsed?: boolean;
@@ -33,6 +35,17 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
   );
 }
 
+function ActiveIndicator() {
+  return (
+    <motion.span
+      layoutId="shigo-sidebar-active"
+      aria-hidden="true"
+      className="absolute left-0 top-2 bottom-2 w-px rounded-full bg-primary/75 shadow-[0_0_12px_hsl(var(--primary)/0.35)]"
+      transition={shigoSpringSoft}
+    />
+  );
+}
+
 function SidebarIconButton({ label, children, onClick, active = false }: { label: string; children: ReactNode; onClick?: () => void; active?: boolean }) {
   return (
     <Tooltip>
@@ -46,7 +59,7 @@ function SidebarIconButton({ label, children, onClick, active = false }: { label
             active ? "bg-primary/[0.035] text-primary" : "text-muted-foreground"
           )}
         >
-          {active ? <span aria-hidden="true" className="absolute left-0 top-2 bottom-2 w-px rounded-full bg-primary/75" /> : null}
+          {active ? <ActiveIndicator /> : null}
           {children}
         </button>
       </TooltipTrigger>
@@ -70,7 +83,14 @@ export function AppSidebar({
 }: AppSidebarProps) {
   return (
     <TooltipProvider delayDuration={100}>
-      <aside className={cn("flex h-full shrink-0 flex-col border-r border-border/50 bg-shigo-shell text-foreground transition-[width] duration-panel ease-shigo", collapsed ? "w-[4.5rem]" : "w-56", className)}>
+      <aside className={cn("relative flex h-full shrink-0 flex-col overflow-hidden border-r border-border/50 bg-shigo-shell text-foreground transition-[width] duration-panel ease-shigo", collapsed ? "w-[4.5rem]" : "w-56", className)}>
+        <motion.span
+          data-shigo-sidebar-seam
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-[8%] right-0 z-20 w-px origin-center bg-gradient-to-b from-transparent via-primary/35 to-transparent"
+          animate={{ opacity: [0.18, 0.5, 0.18], scaleY: [0.82, 1, 0.82] }}
+          transition={{ ...shigoAmbient, duration: 9 }}
+        />
         <div className={cn("flex h-14 items-center", collapsed ? "justify-center px-2" : "justify-between px-3.5")}>
           <div className={cn("flex min-w-0 items-center gap-2.5", collapsed && "justify-center")}>
             <BrandMark compact={collapsed} />
@@ -90,7 +110,7 @@ export function AppSidebar({
           ) : (
             <>
               <div className="relative flex w-full items-center gap-3 overflow-hidden rounded-md bg-primary/[0.035] px-3 py-2.5 pl-3.5 text-left">
-                <span aria-hidden="true" className="absolute left-0 top-2 bottom-2 w-px rounded-full bg-primary/75" />
+                <ActiveIndicator />
                 <Hash size={16} strokeWidth={1.8} className="text-primary" />
                 <div className="min-w-0 flex-1"><p className="truncate text-[13px] font-semibold">Quiet Room</p><p className="truncate text-[11px] text-muted-foreground">{roomStatus}</p></div>
               </div>

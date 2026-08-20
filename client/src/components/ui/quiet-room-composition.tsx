@@ -1,3 +1,5 @@
+import { motion, useReducedMotion } from "motion/react";
+
 import { AmbientPlayer } from "components/ui/ambient-player";
 import { AppSidebar } from "components/ui/app-sidebar";
 import { CONVERSATION_MEASURE_CLASS } from "components/ui/conversation-measure";
@@ -7,6 +9,7 @@ import { QuietRoomHeader } from "components/ui/quiet-room-header";
 import { ShigoComposer } from "components/ui/shigo-composer";
 import { ShigoConversation } from "components/ui/shigo-conversation";
 import type { ShigoMessageData } from "components/ui/shigo-message";
+import { shigoAmbient } from "lib/shigo-motion";
 
 const sampleMessages: ShigoMessageData[] = [
   { id: "1", senderId: "alice", senderName: "Alice", content: "Hey. You still around?", createdAt: "2026-08-18T20:40:00" },
@@ -25,6 +28,30 @@ export interface QuietRoomCompositionProps {
 }
 
 const ambient = <AmbientPlayer compact playing trackName="Rainfall" subtitle="Quiet Mix" progress={42} />;
+
+function QuietRoomAtmosphereMotion() {
+  const reducedMotion = useReducedMotion();
+  return (
+    <motion.div
+      data-shigo-atmosphere-motion
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      animate={reducedMotion ? { opacity: 0.65 } : { opacity: [0.48, 0.72, 0.48] }}
+      transition={reducedMotion ? undefined : { ...shigoAmbient, duration: 12 }}
+    >
+      <motion.div
+        className="absolute -right-[18%] top-[6%] h-[42%] w-[48%] rounded-full bg-primary/[0.035] blur-3xl"
+        animate={reducedMotion ? undefined : { x: [0, -12, 0], y: [0, 7, 0], scale: [1, 1.04, 1] }}
+        transition={reducedMotion ? undefined : shigoAmbient}
+      />
+      <motion.div
+        className="absolute -left-[12%] bottom-[8%] h-[30%] w-[38%] rounded-full bg-shigo-signal/[0.018] blur-3xl"
+        animate={reducedMotion ? undefined : { x: [0, 10, 0], y: [0, -5, 0], scale: [1, 1.03, 1] }}
+        transition={reducedMotion ? undefined : { ...shigoAmbient, duration: 16 }}
+      />
+    </motion.div>
+  );
+}
 
 export function QuietRoomComposition({
   mobile = false,
@@ -48,7 +75,8 @@ export function QuietRoomComposition({
   if (mobile) {
     return (
       <div className={`${themeClass}flex h-screen w-full flex-col overflow-hidden bg-background text-foreground`}>
-        <main className="shigo-quiet-room-atmosphere flex min-h-0 flex-1 flex-col">
+        <main className="shigo-quiet-room-atmosphere relative flex min-h-0 flex-1 flex-col overflow-hidden">
+          <QuietRoomAtmosphereMotion />
           <QuietRoomHeader
             mobileNav={<MobileNav {...commonSidebarProps} />}
             onToggleTheme={() => undefined}
@@ -66,7 +94,8 @@ export function QuietRoomComposition({
   return (
     <div className={`${themeClass}flex h-screen w-full overflow-hidden bg-background text-foreground`}>
       <AppSidebar collapsed={tablet || collapsed} {...commonSidebarProps} />
-      <main className="shigo-quiet-room-atmosphere flex min-w-0 flex-1 flex-col">
+      <main className="shigo-quiet-room-atmosphere relative flex min-w-0 flex-1 flex-col overflow-hidden">
+        <QuietRoomAtmosphereMotion />
         <QuietRoomHeader
           onToggleTheme={() => undefined}
           onPreferences={() => undefined}

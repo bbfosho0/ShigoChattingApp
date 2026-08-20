@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, MoreHorizontal, Pencil, Reply, Smile, Trash2, X } from "lucide-react";
+import { motion } from "motion/react";
 
 import { Button } from "components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "components/ui/popover";
 import { PresenceAvatar } from "components/ui/presence-avatar";
 import { Textarea } from "components/ui/textarea";
 import { cn } from "lib/utils";
+import { shigoMessageOther, shigoMessageSelf, shigoSpringSoft } from "lib/shigo-motion";
 
 export interface ShigoMessageData {
   id: string;
@@ -94,9 +96,7 @@ export function ShigoMessage({
 
   const time = useMemo(() => {
     const date = message.createdAt instanceof Date ? message.createdAt : new Date(message.createdAt);
-    return Number.isNaN(date.getTime())
-      ? ""
-      : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return Number.isNaN(date.getTime()) ? "" : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }, [message.createdAt]);
 
   const saveEdit = () => {
@@ -117,10 +117,16 @@ export function ShigoMessage({
   };
 
   return (
-    <article
+    <motion.article
       data-group-position={groupPosition}
       data-message-owner={own ? "self" : "other"}
       className={cn("group/message flex w-full gap-3", own && "flex-row-reverse", className)}
+      variants={own ? shigoMessageSelf : shigoMessageOther}
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      transition={shigoSpringSoft}
+      layout="position"
     >
       {!own ? (
         groupStart ? (
@@ -171,9 +177,7 @@ export function ShigoMessage({
               className={cn(
                 "px-3.5 py-2 text-sm leading-6",
                 messageRadius(own, groupPosition),
-                own
-                  ? "bg-shigo-own-message text-foreground"
-                  : "bg-shigo-other-message text-foreground"
+                own ? "bg-shigo-own-message text-foreground" : "bg-shigo-other-message text-foreground"
               )}
             >
               <p className="whitespace-pre-wrap break-words">{message.content}</p>
@@ -213,10 +217,8 @@ export function ShigoMessage({
           ) : null}
         </div>
 
-        {own && !editing && groupEnd ? (
-          <span className="mt-1 px-1 text-[11px] text-muted-foreground">{time}</span>
-        ) : null}
+        {own && !editing && groupEnd ? <span className="mt-1 px-1 text-[11px] text-muted-foreground">{time}</span> : null}
       </div>
-    </article>
+    </motion.article>
   );
 }

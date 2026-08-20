@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
+import { motion, useReducedMotion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import toast from "react-hot-toast";
@@ -44,6 +45,7 @@ const Chatroom = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const socketRef = useRef(null);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!user) {
@@ -242,7 +244,26 @@ const Chatroom = () => {
         <AppSidebar {...sidebarProps} collapsed />
       </div>
 
-      <main className="shigo-quiet-room-atmosphere flex min-w-0 flex-1 flex-col">
+      <main className="shigo-quiet-room-atmosphere relative flex min-w-0 flex-1 flex-col overflow-hidden">
+        <motion.div
+          data-shigo-atmosphere-motion
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          animate={reducedMotion ? { opacity: 0.62 } : { opacity: [0.46, 0.68, 0.46] }}
+          transition={reducedMotion ? undefined : { duration: 12, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+        >
+          <motion.div
+            className="absolute -right-[18%] top-[6%] h-[42%] w-[48%] rounded-full bg-primary/[0.035] blur-3xl"
+            animate={reducedMotion ? undefined : { x: [0, -12, 0], y: [0, 7, 0], scale: [1, 1.04, 1] }}
+            transition={reducedMotion ? undefined : { duration: 14, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -left-[12%] bottom-[8%] h-[30%] w-[38%] rounded-full bg-shigo-signal/[0.018] blur-3xl"
+            animate={reducedMotion ? undefined : { x: [0, 10, 0], y: [0, -5, 0], scale: [1, 1.03, 1] }}
+            transition={reducedMotion ? undefined : { duration: 16, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+          />
+        </motion.div>
+
         <QuietRoomHeader
           mobileNav={<MobileNav {...sidebarProps} />}
           onToggleTheme={toggleDarkMode}
