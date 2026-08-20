@@ -11,18 +11,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const fullCanvas = (Story: typeof ShigoAuthPage) => (
-  <div className="dark flex min-h-screen w-full items-center justify-center bg-background p-4 text-foreground sm:p-6">
-    <Story />
-  </div>
-);
-
 export const Default: Story = {
   args: { initialMode: "login", onSubmit: () => undefined },
-  decorators: [fullCanvas],
+  decorators: [(Story) => <div className="dark flex min-h-screen w-full items-center justify-center bg-background p-4 text-foreground sm:p-6"><Story /></div>],
 };
 
 export const Error: Story = {
   args: { initialMode: "login", error: "That email and password combination was not recognized.", onSubmit: () => undefined },
-  decorators: [fullCanvas],
+  decorators: [(Story) => <div className="dark flex min-h-screen w-full items-center justify-center bg-background p-4 text-foreground sm:p-6"><Story /></div>],
 };
