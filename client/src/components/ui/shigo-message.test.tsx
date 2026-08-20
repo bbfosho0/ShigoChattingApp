@@ -11,7 +11,7 @@ jest.mock("components/ui/presence-avatar", () => ({
   PresenceAvatar: ({ fallback }: { fallback: string }) => <div aria-label="Avatar">{fallback}</div>,
 }));
 
-import { ShigoMessage, type ShigoMessageData } from "components/ui/shigo-message";
+import { ShigoMessage, type MessageGroupPosition, type ShigoMessageData } from "components/ui/shigo-message";
 
 const baseMessage: ShigoMessageData = {
   id: "message-1",
@@ -78,5 +78,32 @@ describe("ShigoMessage production behavior", () => {
     const reply = screen.getAllByRole("button", { name: "Reply" })[0];
     expect(reply.className).toContain("size-9");
     expect(reply.querySelector("svg")?.getAttribute("width")).toBe("14");
+  });
+
+  it.each([
+    ["self", "yoshi"],
+    ["other", "alice"],
+  ] as const)("exposes stable group-position selectors for %s messages", (owner, senderId) => {
+    const positions: MessageGroupPosition[] = ["single", "start", "middle", "end"];
+    const { rerender } = render(
+      <ShigoMessage
+        message={{ ...baseMessage, senderId, content: `${owner}-single` }}
+        currentUserId="yoshi"
+        groupPosition="single"
+      />
+    );
+
+    for (const position of positions) {
+      rerender(
+        <ShigoMessage
+          message={{ ...baseMessage, senderId, content: `${owner}-${position}` }}
+          currentUserId="yoshi"
+          groupPosition={position}
+        />
+      );
+      const article = screen.getByText(`${owner}-${position}`).closest("article");
+      expect(article).toHaveAttribute("data-group-position", position);
+      expect(article).toHaveAttribute("data-message-owner", owner);
+    }
   });
 });
