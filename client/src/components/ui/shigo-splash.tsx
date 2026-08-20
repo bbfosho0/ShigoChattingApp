@@ -12,7 +12,10 @@ export interface ShigoSplashProps {
 
 function SplashContent({ showAction = true, onContinue }: Pick<ShigoSplashProps, "showAction" | "onContinue">) {
   return (
-    <div className="relative flex min-h-[36rem] w-full flex-col overflow-hidden bg-[#090A0F] text-white">
+    <div
+      data-shigo-splash
+      className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden bg-[#090A0F] text-white"
+    >
       <ShigoShader />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/35" />
       <header className="relative z-10 flex items-center justify-between p-6 sm:p-8 lg:p-10">
