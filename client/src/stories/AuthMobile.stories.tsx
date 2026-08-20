@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { ShigoAuthPage } from "components/ui/shigo-auth-page";
@@ -11,7 +12,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const darkDecorator = (Story: () => JSX.Element) => (
+const darkDecorator = (Story: () => ReactNode) => (
   <div className="dark min-h-screen w-full bg-background text-foreground">
     <Story />
   </div>
