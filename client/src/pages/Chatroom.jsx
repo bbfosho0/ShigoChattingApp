@@ -9,7 +9,7 @@ import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
 import MessageInput from "../components/MessageInput";
 import MusicPlayer from "../components/MusicPlayer";
-import Preferences from "../components/Preferences";
+import Preferences, { AUTH_TOKEN_UPDATED_EVENT } from "../components/Preferences";
 import { AppSidebar } from "../components/ui/app-sidebar";
 import { CONVERSATION_MEASURE_CLASS } from "../components/ui/conversation-measure";
 import { MobileNav } from "../components/ui/mobile-nav";
@@ -100,6 +100,15 @@ const Chatroom = () => {
       console.error("Socket connect_error:", err.message);
     });
 
+    const onAuthTokenUpdated = (event) => {
+      const nextToken = event?.detail?.token || localStorage.getItem("token");
+      if (!nextToken || !active) return;
+
+      socket.auth = { token: nextToken };
+      if (socket.connected) socket.disconnect();
+      socket.connect();
+    };
+
     const onReceiveMessage = (msg) => {
       if (!active) return;
       setMessages((prev) => {
@@ -124,6 +133,7 @@ const Chatroom = () => {
       );
     };
 
+    window.addEventListener(AUTH_TOKEN_UPDATED_EVENT, onAuthTokenUpdated);
     socket.on("receiveMessage", onReceiveMessage);
     socket.on("editMessage", onEditMessage);
     socket.on("deleteMessage", onDeleteMessage);
@@ -131,6 +141,7 @@ const Chatroom = () => {
     return () => {
       active = false;
       controller.abort();
+      window.removeEventListener(AUTH_TOKEN_UPDATED_EVENT, onAuthTokenUpdated);
       socket.off("receiveMessage", onReceiveMessage);
       socket.off("editMessage", onEditMessage);
       socket.off("deleteMessage", onDeleteMessage);
