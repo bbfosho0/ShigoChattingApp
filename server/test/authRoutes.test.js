@@ -114,8 +114,9 @@ test("reset-password uses one generic response for invalid, expired, or used tok
   }
 });
 
-test("reset-password changes the password, increments authVersion, and does not issue a JWT", async () => {
+test("reset-password changes the password, increments authVersion, revokes live sockets, and does not issue a JWT", async () => {
   let invalidatedUserId = null;
+  let disconnectedUserId = null;
   let changedEmail = null;
   const user = {
     _id: "user-1",
@@ -132,6 +133,7 @@ test("reset-password changes the password, increments authVersion, and does not 
     UserModel: { async findById(id) { return id === "user-1" ? user : null; } },
     consumePasswordResetToken: async () => ({ userId: "user-1" }),
     invalidatePasswordResetTokens: async (id) => { invalidatedUserId = id; },
+    disconnectUserSockets: async (id) => { disconnectedUserId = id; },
     bcryptLib: { async hash(value) { return `hash:${value}`; } },
     sendPasswordChangedEmail: async (email) => { changedEmail = email; },
   });
@@ -146,11 +148,13 @@ test("reset-password changes the password, increments authVersion, and does not 
   assert.equal(user.authVersion, 5);
   assert.equal(user.saved, true);
   assert.equal(invalidatedUserId, "user-1");
+  assert.equal(disconnectedUserId, "user-1");
   assert.equal(changedEmail, "person@example.com");
 });
 
 test("authenticated password change revokes old sessions and returns a fresh JWT", async () => {
   let invalidatedUserId = null;
+  let disconnectedUserId = null;
   const user = {
     _id: "user-1",
     email: "person@example.com",
@@ -167,6 +171,7 @@ test("authenticated password change revokes old sessions and returns a fresh JWT
     },
     signAuthToken: (savedUser) => `fresh-${savedUser.authVersion}`,
     invalidatePasswordResetTokens: async (id) => { invalidatedUserId = id; },
+    disconnectUserSockets: async (id) => { disconnectedUserId = id; },
     sendPasswordChangedEmail: async () => {},
   });
 
@@ -182,6 +187,7 @@ test("authenticated password change revokes old sessions and returns a fresh JWT
   assert.equal(user.authVersion, 3);
   assert.equal(user.password, "hash:new-password-123");
   assert.equal(invalidatedUserId, "user-1");
+  assert.equal(disconnectedUserId, "user-1");
 });
 
 test("register and password mutations enforce at least eight characters", async () => {
