@@ -30,6 +30,20 @@ export interface ShigoMessageProps {
   className?: string;
 }
 
+function messageRadius(own: boolean, position: MessageGroupPosition) {
+  if (own) {
+    if (position === "start") return "rounded-lg rounded-br-sm";
+    if (position === "middle") return "rounded-lg rounded-r-sm";
+    if (position === "end") return "rounded-lg rounded-tr-sm";
+    return "rounded-lg rounded-br-sm";
+  }
+
+  if (position === "start") return "rounded-lg rounded-bl-sm";
+  if (position === "middle") return "rounded-lg rounded-l-sm";
+  if (position === "end") return "rounded-lg rounded-tl-sm";
+  return "rounded-lg rounded-bl-sm";
+}
+
 function MessageActions({
   own,
   onEdit,
@@ -47,7 +61,7 @@ function MessageActions({
   if (!hasActions) return null;
 
   return (
-    <div className="flex items-center rounded-md bg-popover/95 p-0.5 text-muted-foreground shadow-panel">
+    <div className="flex items-center rounded-md border border-border/50 bg-popover p-0.5 text-muted-foreground shadow-floating">
       {onReply ? <Button size="icon" variant="ghost" aria-label="Reply" onClick={onReply}><Reply size={14} /></Button> : null}
       {onReact ? <Button size="icon" variant="ghost" aria-label="React" onClick={onReact}><Smile size={14} /></Button> : null}
       {own && onEdit ? <Button size="icon" variant="ghost" aria-label="Edit message" onClick={onEdit}><Pencil size={14} /></Button> : null}
@@ -103,7 +117,11 @@ export function ShigoMessage({
   };
 
   return (
-    <article className={cn("group/message flex w-full gap-3", own && "flex-row-reverse", className)}>
+    <article
+      data-group-position={groupPosition}
+      data-message-owner={own ? "self" : "other"}
+      className={cn("group/message flex w-full gap-3", own && "flex-row-reverse", className)}
+    >
       {!own ? (
         groupStart ? (
           <PresenceAvatar
@@ -120,7 +138,7 @@ export function ShigoMessage({
       <div className={cn("min-w-0 max-w-[84%] sm:max-w-[72%]", own && "flex flex-col items-end")}>
         {!own && groupStart ? (
           <div className="mb-1.5 flex items-baseline gap-2 px-1">
-            <span className="text-xs font-semibold text-foreground">{message.senderName}</span>
+            <span className="text-xs font-medium text-foreground">{message.senderName}</span>
             <span className="text-[11px] text-muted-foreground">{time}</span>
           </div>
         ) : null}
@@ -151,10 +169,11 @@ export function ShigoMessage({
           ) : (
             <div
               className={cn(
-                "rounded-xl px-3.5 py-2 text-sm leading-6",
+                "px-3.5 py-2 text-sm leading-6",
+                messageRadius(own, groupPosition),
                 own
-                  ? "rounded-br-md bg-shigo-own-message text-foreground"
-                  : "rounded-bl-md bg-shigo-other-message text-foreground"
+                  ? "bg-shigo-own-message text-foreground"
+                  : "bg-shigo-other-message text-foreground"
               )}
             >
               <p className="whitespace-pre-wrap break-words">{message.content}</p>
