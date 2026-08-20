@@ -16,6 +16,8 @@ export interface ShigoMessageData {
   edited?: boolean;
 }
 
+export type MessageGroupPosition = "single" | "start" | "middle" | "end";
+
 export interface ShigoMessageProps {
   message: ShigoMessageData;
   currentUserId: string;
@@ -24,6 +26,8 @@ export interface ShigoMessageProps {
   onReply?: (message: ShigoMessageData) => void;
   onReact?: (message: ShigoMessageData) => void;
   defaultEditing?: boolean;
+  groupPosition?: MessageGroupPosition;
+  className?: string;
 }
 
 function MessageActions({
@@ -60,11 +64,15 @@ export function ShigoMessage({
   onReply,
   onReact,
   defaultEditing = false,
+  groupPosition = "single",
+  className,
 }: ShigoMessageProps) {
   const own = message.senderId === currentUserId;
   const [editing, setEditing] = useState(defaultEditing);
   const [draft, setDraft] = useState(message.content);
   const hasActions = Boolean(onReply || onReact || (own && (onEdit || onDelete)));
+  const groupStart = groupPosition === "single" || groupPosition === "start";
+  const groupEnd = groupPosition === "single" || groupPosition === "end";
 
   useEffect(() => {
     if (!editing) setDraft(message.content);
@@ -95,18 +103,22 @@ export function ShigoMessage({
   };
 
   return (
-    <article className={cn("group/message flex w-full gap-3", own && "flex-row-reverse")}>
+    <article className={cn("group/message flex w-full gap-3", own && "flex-row-reverse", className)}>
       {!own ? (
-        <PresenceAvatar
-          fallback={message.senderName.slice(0, 2).toUpperCase() || "?"}
-          showPresence={false}
-          avatarClassName="size-9"
-          className="mt-5"
-        />
+        groupStart ? (
+          <PresenceAvatar
+            fallback={message.senderName.slice(0, 2).toUpperCase() || "?"}
+            showPresence={false}
+            avatarClassName="size-9"
+            className="mt-5"
+          />
+        ) : (
+          <div aria-hidden="true" className="size-9 shrink-0" />
+        )
       ) : null}
 
       <div className={cn("min-w-0 max-w-[82%] sm:max-w-[72%]", own && "flex flex-col items-end")}>
-        {!own ? (
+        {!own && groupStart ? (
           <div className="mb-1.5 flex items-baseline gap-2 px-1">
             <span className="text-[12px] font-semibold text-foreground">{message.senderName}</span>
             <span className="text-[11px] text-muted-foreground">{time}</span>
@@ -182,7 +194,7 @@ export function ShigoMessage({
           ) : null}
         </div>
 
-        {own && !editing ? (
+        {own && !editing && groupEnd ? (
           <span className="mt-1.5 px-1 text-[11px] text-muted-foreground">{time}</span>
         ) : null}
       </div>

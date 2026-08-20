@@ -1,15 +1,48 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { MessageCircle } from "lucide-react";
 
-import { ShigoMessage, type ShigoMessageData } from "components/ui/shigo-message";
+import { ShigoMessage, type MessageGroupPosition, type ShigoMessageData } from "components/ui/shigo-message";
 import { Skeleton } from "components/ui/skeleton";
 import { cn } from "lib/utils";
+
+const MESSAGE_GROUP_WINDOW_MS = 5 * 60 * 1000;
+
+function messageTime(value: string | Date) {
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function sameDay(a: ShigoMessageData, b: ShigoMessageData) {
+  const left = messageTime(a.createdAt);
+  const right = messageTime(b.createdAt);
+  return Boolean(left && right && left.toDateString() === right.toDateString());
+}
+
+function sameConversationGroup(a: ShigoMessageData | undefined, b: ShigoMessageData | undefined) {
+  if (!a || !b || a.senderId !== b.senderId || !sameDay(a, b)) return false;
+  const left = messageTime(a.createdAt);
+  const right = messageTime(b.createdAt);
+  if (!left || !right) return false;
+  return Math.abs(right.getTime() - left.getTime()) <= MESSAGE_GROUP_WINDOW_MS;
+}
+
+function groupPosition(messages: ShigoMessageData[], index: number): MessageGroupPosition {
+  const current = messages[index];
+  const joinsPrevious = sameConversationGroup(messages[index - 1], current);
+  const joinsNext = sameConversationGroup(current, messages[index + 1]);
+
+  if (joinsPrevious && joinsNext) return "middle";
+  if (joinsPrevious) return "end";
+  if (joinsNext) return "start";
+  return "single";
+}
 
 export interface ShigoConversationProps {
   messages: ShigoMessageData[];
   currentUserId: string;
   loading?: boolean;
   autoScroll?: boolean;
+  showDaySeparators?: boolean;
   onEdit?: (id: string, content: string) => void;
   onDelete?: (id: string) => void;
   onReply?: (message: ShigoMessageData) => void;
@@ -51,6 +84,7 @@ export function ShigoConversation({
   currentUserId,
   loading = false,
   autoScroll = true,
+  showDaySeparators = true,
   onEdit,
   onDelete,
   onReply,
@@ -63,7 +97,11 @@ export function ShigoConversation({
     if (!autoScroll || loading) return;
     const element = scrollRef.current;
     if (!element) return;
-    element.scrollTop = element.scrollHeight;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    element.scrollTo({
+      top: element.scrollHeight,
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
   }, [autoScroll, loading, messages.length]);
 
   if (loading) return <ConversationLoading />;
@@ -71,18 +109,41 @@ export function ShigoConversation({
 
   return (
     <div ref={scrollRef} className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}>
-      <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-end gap-5 px-4 py-5 sm:px-6">
-        {messages.map((message) => (
-          <ShigoMessage
-            key={message.id}
-            message={message}
-            currentUserId={currentUserId}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onReply={onReply}
-            onReact={onReact}
-          />
-        ))}
+      <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-end px-4 py-5 sm:px-6">
+        {messages.map((message, index) => {
+          const previous = messages[index - 1];
+          const showDayLabel = showDaySeparators && (!previous || !sameDay(previous, message));
+          const position = groupPosition(messages, index);
+          const groupStart = position === "single" || position === "start";
+          const date = messageTime(message.createdAt);
+
+          return (
+            <Fragment key={message.id}>
+              {showDayLabel && date ? (
+                <div className={cn("mb-4 flex items-center gap-3", index > 0 && "mt-6")} role="separator">
+                  <div className="h-px flex-1 bg-border/70" />
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    {date.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
+                  </span>
+                  <div className="h-px flex-1 bg-border/70" />
+                </div>
+              ) : null}
+              <ShigoMessage
+                message={message}
+                currentUserId={currentUserId}
+                groupPosition={position}
+                className={cn(
+                  !showDayLabel && groupStart && index > 0 && "mt-4",
+                  !groupStart && "mt-1.5"
+                )}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onReply={onReply}
+                onReact={onReact}
+              />
+            </Fragment>
+          );
+        })}
       </div>
     </div>
   );
