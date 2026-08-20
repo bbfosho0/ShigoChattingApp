@@ -2,10 +2,6 @@
  * @fileoverview
  * Main server entrypoint.
  * Sets up Express server, MongoDB connectivity, and Socket.IO.
- * Includes JWT authentication on socket connections.
- * CORS origins configured dynamically.
- * Improved socket sendMessage handler with enhanced sender ID extraction and warning log.
- * Added socket event handlers for editMessage and deleteMessage broadcasting.
  */
 
 const express = require("express");
@@ -14,11 +10,11 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const http = require("http");
 const { Server } = require("socket.io");
-const jwt = require("jsonwebtoken");
 
 const authRoutes = require("./routes/auth");
 const messageRoutes = require("./routes/messages");
 const Message = require("./models/Message");
+const { verifyAuthTokenAgainstUser } = require("./lib/authTokens");
 
 dotenv.config();
 
@@ -44,7 +40,7 @@ const io = new Server(server, {
   },
 });
 
-io.use((socket, next) => {
+io.use(async (socket, next) => {
   const token =
     socket.handshake.auth?.token ||
     (socket.handshake.headers.authorization
@@ -56,10 +52,9 @@ io.use((socket, next) => {
   }
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    socket.user = user;
+    socket.user = await verifyAuthTokenAgainstUser(token);
     next();
-  } catch (err) {
+  } catch (_err) {
     return next(new Error("Authentication error: invalid token"));
   }
 });
